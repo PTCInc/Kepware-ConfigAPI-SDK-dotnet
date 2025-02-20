@@ -1,7 +1,7 @@
 # Kepware Configuration API SDK for .NET
 
-[![Build Status](https://github.com/rlabbeptc/Kepware-ConfigAPI-SDK-dotnet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/rlabbeptc/Kepware-ConfigAPI-SDK-dotnet/actions)
-[![Build Status](https://github.com/rlabbeptc/Kepware-ConfigAPI-SDK-dotnet/actions/workflows/docker-build-and-push.yml/badge.svg)](https://github.com/rlabbeptc/Kepware-ConfigAPI-SDK-dotnet/actions)
+[![Build Status](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions)
+[![Build Status](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions/workflows/docker-build-and-push.yml/badge.svg)](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions)
 
 ## Overview
 The Kepware Configuration API SDK for .NET provides tools and libraries to interact with the Kepware REST API, enabling configuration management for Kepware servers. This repository includes examples and utilities to streamline development, including a service for continuous synchronization and an API client library.
