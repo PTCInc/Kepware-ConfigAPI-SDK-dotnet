@@ -283,8 +283,9 @@ networks:
 - Use `--persist-default-value` to retain default values in configurations if required.
 
 ## Licensing
-This tool is provided "as is" under the MIT License. Refer to the [LICENSE](../LICENSE.txt) file for more information.
+This tool is provided "as is" under the MIT License. See the [LICENSE](./LICENSE.txt) file for details.
 
 ## Support
-For issues or feature requests, please open a ticket in the GitHub repository.
+For any issues, please open an Issue within the repository. For questions or feature requests, please open a Discussion thread within the repository. 
 
+See [Repository Guidelines](./docs/repo-guidelines.md) for more information.

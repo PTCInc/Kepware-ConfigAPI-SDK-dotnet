@@ -5,12 +5,20 @@
 ## Overview
 The `Kepware.Api` library provides a robust client implementation to interact with the Kepware Configuration API. It supports managing channels, devices, tags, and other configurations programmatically while ensuring secure and efficient communication.
 
+This package is designed to work with all versions of Kepware that support the Configuration API including Thingworx Kepware Server (TKS), Thingworx Kepware Edge (TKE) and KEPServerEX (KEP). For reference, Kepware Server in this documentation will refer to both TKS and KEP versions.
+
 ## Features
-- Connect to Kepware REST APIs securely with HTTPS and optional certificate validation.
-- Perform CRUD operations on channels, devices, and tags.
-- Synchronize configurations between your application and Kepware server.
-- Supports advanced operations like project comparison, entity synchronization, and driver property queries.
-- Built-in support for Dependency Injection to simplify integration.
+1. Connect to Kepware Configuration APIs securely with HTTPS and optional certificate validation.
+2. Perform CRUD operations for the following Kepware configuration objects:
+
+| Features      | TKS/KEP       | TKE           |
+| :----------:  | :----------:  | :----------:  |
+| **Connectivity** <br /> *(Channel, Devices, Tags, Tag Groups)* | Y | Y |
+
+
+3.  Synchronize configurations between your application and Kepware server.
+4.  Supports advanced operations like project comparison, entity synchronization, and driver property queries.
+5.  Built-in support for Dependency Injection to simplify integration.
 
 ## Installation
 
@@ -128,8 +136,10 @@ Add the following configuration to your `NuGet.config` file in the root of your 
   ```
 
 ## Licensing
-This library is provided "as is" under the MIT License. See the [LICENSE](../LICENSE.txt) file for details.
+This SDK is provided "as is" under the MIT License. See the [LICENSE](./LICENSE.txt) file for details.
 
 ## Support
-For issues or feature requests, please open a ticket in the GitHub repository.
+For any issues, please open an Issue within the repository. For questions or feature requests, please open a Discussion thread within the repository. 
+
+See [Repository Guidelines](./docs/repo-guidelines.md) for more information.
 

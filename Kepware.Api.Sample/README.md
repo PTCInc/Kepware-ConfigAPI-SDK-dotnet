@@ -11,7 +11,7 @@ The `Kepware.Api.Sample` project demonstrates how to use the `Kepware.Api` libra
 
 ## Prerequisites
 - A running Kepware server with the Configuration API enabled.
-- .NET SDK 6.0 or later.
+- .NET SDK x.0 or later.
 - Basic understanding of C# programming.
 
 ## Usage
@@ -89,8 +89,9 @@ static async Task Main(string[] args)
 ```
 
 ## Licensing
-This sample project is provided "as is" under the MIT License. Refer to the [LICENSE](../LICENSE.txt) file for details.
+This sample project is provided "as is" under the MIT License. See the [LICENSE](./LICENSE.txt) file for details.
 
 ## Support
-For issues or feature requests, please open a ticket in the GitHub repository.
+For any issues, please open an Issue within the repository. For questions or feature requests, please open a Discussion thread within the repository. 
 
+See [Repository Guidelines](./docs/repo-guidelines.md) for more information.
