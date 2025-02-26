@@ -1,0 +1,1096 @@
+{
+  "source_base_path": "C:/Users/rlabbe/OneDrive - PTC/Documents/GitHub/Kepware-ConfigAPI-SDK-dotnet/docs/docfx",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Resource",
+      "output": {
+        "resource": {
+          "relative_path": "index.json"
+        }
+      }
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "README.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.IKepwareDefaultValueProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.IKepwareDefaultValueProvider.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.IKepwareDefaultValueProvider",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.KepwareApiClient.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.KepwareApiClient.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.KepwareApiClient",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.KepwareApiClient.yml\" sourcestartlinenumber=\"1\">Client for interacting with the Kepware server.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.KepwareApiClientExtentions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.KepwareApiClientExtentions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.KepwareApiClientExtentions",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.KepwareApiClientOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.KepwareApiClientOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.KepwareApiClientOptions",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.KepwareApiServiceCollectionExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.KepwareApiServiceCollectionExtensions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.KepwareApiServiceCollectionExtensions",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.ApiResult.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.ApiResult.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.ApiResult",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.ApiResult.yml\" sourcestartlinenumber=\"1\">Represents the result of an API call.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.ApiStatus.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.ApiStatus.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.ApiStatus",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.ApiStatus.yml\" sourcestartlinenumber=\"1\">Represents the status of the Configuration API REST service.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.BaseEntity.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.BaseEntity.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.BaseEntity",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.BaseEntity.yml\" sourcestartlinenumber=\"1\">Abstract base class for all entities in the Kepware API.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.Channel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.Channel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.Channel",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.Channel.yml\" sourcestartlinenumber=\"1\">Represents a channel in the project</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.ChannelCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.ChannelCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.ChannelCollection",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.ChannelCollection.yml\" sourcestartlinenumber=\"1\">Represents the collection of channels in a project</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.ConsumerExchangeCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.ConsumerExchangeCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.ConsumerExchangeCollection",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.ConsumerExchangeCollection.yml\" sourcestartlinenumber=\"1\">Represents the collection of consumer exchanges in a consumer exchange group</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.ConsumerExchangeGroupCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.ConsumerExchangeGroupCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.ConsumerExchangeGroupCollection",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.ConsumerExchangeGroupCollection.yml\" sourcestartlinenumber=\"1\">Represents the collection of consumer exchange groups in a device</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.DataTypeEnumConverterProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.DataTypeEnumConverterProvider.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.DataTypeEnumConverterProvider",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.DefaultEntity.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.DefaultEntity.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.DefaultEntity",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.DefaultEntity.yml\" sourcestartlinenumber=\"1\">A default entity with an optional owner.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.Device.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.Device.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.Device",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.Device.yml\" sourcestartlinenumber=\"1\">Represents a device in a channel</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.DeviceCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.DeviceCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.DeviceCollection",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.DeviceCollection.yml\" sourcestartlinenumber=\"1\">Represents the collection of devices in a channel</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.DeviceProfileCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.DeviceProfileCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.DeviceProfileCollection",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.DeviceProfileCollection.yml\" sourcestartlinenumber=\"1\">Represents the collection of deviceprofiles in a device</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.DeviceTagCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.DeviceTagCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.DeviceTagCollection",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.DeviceTagCollection.yml\" sourcestartlinenumber=\"1\">Represents the collection of tags in a device</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.DeviceTagGroup.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.DeviceTagGroup.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.DeviceTagGroup",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.DeviceTagGroup.yml\" sourcestartlinenumber=\"1\">Represents a tag group in a device</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.DeviceTagGroupCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.DeviceTagGroupCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.DeviceTagGroupCollection",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.DeviceTagGroupCollection.yml\" sourcestartlinenumber=\"1\">Represents the collection of tag groups in a device or tag group</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.DeviceTagGroupTagCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.DeviceTagGroupTagCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.DeviceTagGroupTagCollection",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.DeviceTagGroupTagCollection.yml\" sourcestartlinenumber=\"1\">Represents the collection of tag in a tag group</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.Docs.Channel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.Docs.Channel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.Docs.Channel",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.Docs.Channel.yml\" sourcestartlinenumber=\"1\">Represents a channel in the API documentation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.Docs.CollectionDefinition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.Docs.CollectionDefinition.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.Docs.CollectionDefinition",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.Docs.CollectionDefinition.yml\" sourcestartlinenumber=\"1\">Represents a collection definition in the API documentation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.Docs.Device.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.Docs.Device.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.Docs.Device",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.Docs.Device.yml\" sourcestartlinenumber=\"1\">Represents a device in the API documentation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.Docs.Driver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.Docs.Driver.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.Docs.Driver",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.Docs.Driver.yml\" sourcestartlinenumber=\"1\">Represents a driver in the API documentation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.Docs.PropertyDefinition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.Docs.PropertyDefinition.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.Docs.PropertyDefinition",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.Docs.PropertyDefinition.yml\" sourcestartlinenumber=\"1\">Represents a property definition in the API documentation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.Docs.TypeDefinition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.Docs.TypeDefinition.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.Docs.TypeDefinition",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.Docs.TypeDefinition.yml\" sourcestartlinenumber=\"1\">Represents a type definition in the API documentation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.Docs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.Docs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.Docs",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.Docs.yml\" sourcestartlinenumber=\"1\">Contains classes and definitions for API documentation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.EndpointAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.EndpointAttribute.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.EndpointAttribute",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.EntityCollection-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.EntityCollection-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.EntityCollection<T>",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.EntityFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.EntityFactory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.EntityFactory",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.IDataTypeEnumConverter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.IDataTypeEnumConverter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.IDataTypeEnumConverter",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.IHaveName.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.IHaveName.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.IHaveName",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.IHaveName.yml\" sourcestartlinenumber=\"1\">Interface for entities that have a name.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.IHaveOwner.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.IHaveOwner.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.IHaveOwner",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.IHaveOwner.yml\" sourcestartlinenumber=\"1\">Interface for entities that have an owner.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.NamedEntity.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.NamedEntity.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.NamedEntity",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.NamedEntity.yml\" sourcestartlinenumber=\"1\">A named entity with a unique name and description.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.NamedUidEntity.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.NamedUidEntity.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.NamedUidEntity",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.NamedUidEntity.yml\" sourcestartlinenumber=\"1\">A named entity with a unique identifier.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.OmniAlarmCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.OmniAlarmCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.OmniAlarmCollection",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.OmniAlarmCollection.yml\" sourcestartlinenumber=\"1\">Represents the collection of omni gas alarms in an omni mapping</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.OmniMappingCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.OmniMappingCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.OmniMappingCollection",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.OmniMappingCollection.yml\" sourcestartlinenumber=\"1\">Represents the collection of omni mappings in an omni mapping group</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.OmniMappingGroupCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.OmniMappingGroupCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.OmniMappingGroupCollection",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.OmniMappingGroupCollection.yml\" sourcestartlinenumber=\"1\">Represents the collection of omni mapping groups in a device</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.PhoneEntryCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.PhoneEntryCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.PhoneEntryCollection",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.PhoneEntryCollection.yml\" sourcestartlinenumber=\"1\">Represents the collection of phone entries in a phonebook</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.PhonebookCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.PhonebookCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.PhonebookCollection",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.PhonebookCollection.yml\" sourcestartlinenumber=\"1\">Represents the collection of phonebooks in a channel</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.ProducerExchangeCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.ProducerExchangeCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.ProducerExchangeCollection",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.ProducerExchangeCollection.yml\" sourcestartlinenumber=\"1\">Represents the collection of producer exchanges in a producer exchange group</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.ProducerExchangeGroupCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.ProducerExchangeGroupCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.ProducerExchangeGroupCollection",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.ProducerExchangeGroupCollection.yml\" sourcestartlinenumber=\"1\">Represents the collection of producer exchange groups in a device</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.ProductInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.ProductInfo.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.ProductInfo",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.ProductInfo.yml\" sourcestartlinenumber=\"1\">Represents information about a product.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.ProductType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.ProductType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.ProductType",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.ProductType.yml\" sourcestartlinenumber=\"1\">Represents the type of product.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.Project.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.Project.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.Project",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.Project.yml\" sourcestartlinenumber=\"1\">Represents a project in the Kepware configuration</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.Properties.NonSerialized.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.Properties.NonSerialized.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.Properties.NonSerialized",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.Properties.NonSerialized.yml\" sourcestartlinenumber=\"1\">Contains constants related to non-serialized properties.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.Properties.NonUpdatable.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.Properties.NonUpdatable.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.Properties.NonUpdatable",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.Properties.NonUpdatable.yml\" sourcestartlinenumber=\"1\">Contains constants related to non-updatable properties.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.Properties.Tag.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.Properties.Tag.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.Properties.Tag",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.Properties.Tag.yml\" sourcestartlinenumber=\"1\">Contains constants related to tag properties.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.Properties.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.Properties.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.Properties",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.Properties.yml\" sourcestartlinenumber=\"1\">Contains constants and static properties related to Kepware API properties.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.RecursiveEndpointAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.RecursiveEndpointAttribute.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.RecursiveEndpointAttribute",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.Tag.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.Tag.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.Tag",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Model.Tag.yml\" sourcestartlinenumber=\"1\">Represents a tag in a device or tag group</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.TagDataType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.TagDataType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model.TagDataType",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Model.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Model.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Model",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Serializer.CsvTagSerializer.CsvHeaders.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Serializer.CsvTagSerializer.CsvHeaders.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Serializer.CsvTagSerializer.CsvHeaders",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Serializer.CsvTagSerializer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Serializer.CsvTagSerializer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Serializer.CsvTagSerializer",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Serializer.CsvTagSerializer.yml\" sourcestartlinenumber=\"1\">Serializes and deserializes tags to and from CSV files</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Serializer.JsonProjectRoot.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Serializer.JsonProjectRoot.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Serializer.JsonProjectRoot",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Serializer.KepYamlContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Serializer.KepYamlContext.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Serializer.KepYamlContext",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Serializer.StaticTypeInspector.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Serializer.StaticTypeInspector.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Serializer.StaticTypeInspector",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Serializer.YamlSerializer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Serializer.YamlSerializer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Serializer.YamlSerializer",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Serializer.YamlSerializer.yml\" sourcestartlinenumber=\"1\">Provides methods for serializing and deserializing YAML data.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Serializer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Serializer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Serializer",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Util.CustomHashGenerator.HashSourceBuilder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Util.CustomHashGenerator.HashSourceBuilder.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Util.CustomHashGenerator.HashSourceBuilder",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Util.CustomHashGenerator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Util.CustomHashGenerator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Util.CustomHashGenerator",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Util.EndpointResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Util.EndpointResolver.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Util.EndpointResolver",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Util.EntityCompare.CollectionResultBucket-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Util.EntityCompare.CollectionResultBucket-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Util.EntityCompare.CollectionResultBucket<K>",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Util.EntityCompare.CollectionResultBucket-1.yml\" sourcestartlinenumber=\"1\">Represents the result of comparing two collections of entities.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Util.EntityCompare.CompareResult.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Util.EntityCompare.CompareResult.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Util.EntityCompare.CompareResult",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Util.EntityCompare.CompareResult.yml\" sourcestartlinenumber=\"1\">The result of comparing two entities.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Util.EntityCompare.ResultBucket-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Util.EntityCompare.ResultBucket-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Util.EntityCompare.ResultBucket<T>",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Util.EntityCompare.ResultBucket-1.yml\" sourcestartlinenumber=\"1\">Represents the result of comparing two entities.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Util.EntityCompare.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Util.EntityCompare.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Util.EntityCompare",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Util.EntityCompare.yml\" sourcestartlinenumber=\"1\">Compares two entities and determines if they are the same, different, or if one is missing.\nLeft represents the source and Right represents the target.</p>\n<p sourcefile=\"api/Kepware.Api.Util.EntityCompare.yml\" sourcestartlinenumber=\"4\">PresentInRightOnly - The entity is in the Right but not in the Left.\nPresentInLeftOnly - The entity is in the Left but not in the Right.\nChanged - The entity is in both the Left and Right but the properties are different.\nNone - The entity is in both the Left and Right and the properties are the same.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Util.EnvVariableResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Util.EnvVariableResolver.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Util.EnvVariableResolver",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Util.HelperExtentions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Util.HelperExtentions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Util.HelperExtentions",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Util.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Util.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Util",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api",
+      "Summary": null
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html"
+        },
+        ".json": {
+          "relative_path": "api/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/getting-started.md",
+      "output": {
+        ".html": {
+          "relative_path": "docs/getting-started.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/introduction.md",
+      "output": {
+        ".html": {
+          "relative_path": "docs/introduction.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "docs/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "docs/toc.html"
+        },
+        ".json": {
+          "relative_path": "docs/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html"
+        },
+        ".json": {
+          "relative_path": "toc.json"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}
