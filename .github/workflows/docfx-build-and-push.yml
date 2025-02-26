@@ -43,6 +43,12 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+          fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
+    - uses: dotnet/nbgv@master
+      id: nbgv
+      with:
+          setAllVars: true
     - name: Dotnet Setup
       uses: actions/setup-dotnet@v4
       with:
