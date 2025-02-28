@@ -1,6 +1,6 @@
 ﻿name-template: 'v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
-commitish: refs/heads/master
+commitish: refs/heads/main
 version-resolver:
   major:
     labels:
