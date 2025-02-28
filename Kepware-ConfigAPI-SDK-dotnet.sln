@@ -7,6 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kepware.SyncService", "Kepw
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFiles", "SolutionFiles", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
+		.copilot.json = .copilot.json
 		.dockerignore = .dockerignore
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
@@ -19,6 +20,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kepware.Api", "Kepware.Api\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{A904D930-41F6-4016-A8BE-AED91D9E5B26}"
 	ProjectSection(SolutionItems) = preProject
+		.github\copilot-instructions.md = .github\copilot-instructions.md
 		.github\release-drafter.yml = .github\release-drafter.yml
 	EndProjectSection
 EndProject

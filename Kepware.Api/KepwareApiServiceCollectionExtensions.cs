@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Kepware.Api.Util;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -45,6 +46,7 @@ namespace Kepware.Api
 
             return services;
         }
+
         public static IServiceCollection AddKepwareApiClient(this IServiceCollection services, string name, KepwareApiClientOptions options)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
@@ -59,7 +61,6 @@ namespace Kepware.Api
                 throw new ArgumentNullException(nameof(options));
             if (!options.HostUri.IsAbsoluteUri)
                 throw new InvalidOperationException(name + " host is not configured as absolute uri.");
-
 
             var builder = services.AddHttpClient(name + "-httpClient", client => ConfigureHttpClient(options).Invoke(client));
             ConfigureHttpClientBuilder(options).Invoke(builder);
@@ -94,22 +95,19 @@ namespace Kepware.Api
                 });
         }
 
-
         private static Action<IHttpClientBuilder> ConfigureHttpClientBuilder(KepwareApiClientOptions options)
             => clientBuilder =>
             {
+                var handler = options.EnableIpv6 ? new HttpClientHandler() : new Ipv4OnlyHttpClientHandler();
+
                 if (options.DisableCertifcateValidation)
                 {
-                    clientBuilder.ConfigurePrimaryHttpMessageHandler(() =>
-                    {
-                        var handler = new HttpClientHandler();
 #pragma warning disable S4830 // Server certificates should be verified during SSL/TLS connections
-                        handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
 #pragma warning restore S4830 // Server certificates should be verified during SSL/TLS connections
-                        return handler;
-                    });
                 }
 
+                clientBuilder.ConfigurePrimaryHttpMessageHandler(() => { return handler; });
                 options.ConfigureClientBuilder?.Invoke(clientBuilder);
             };
 

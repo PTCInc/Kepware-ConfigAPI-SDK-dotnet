@@ -20,6 +20,8 @@ namespace Kepware.Api
         public Action<HttpClient>? ConfigureClient { get; init; }
         public Action<IHttpClientBuilder>? ConfigureClientBuilder { get; init; }
 
+        public bool EnableIpv6 { get; init; } = false;
+
         public object? Tag { get; init; }
     }
 }
