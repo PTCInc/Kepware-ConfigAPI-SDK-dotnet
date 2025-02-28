@@ -55,7 +55,7 @@ jobs:
         dotnet-version: 8.x
     - run: cp ./README.md ./docs/docfx/
     - run: dotnet tool update -g docfx
-    - run: docfx .docs/docfx/docfx.json
+    - run: docfx ./docs/docfx/docfx.json
 
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
