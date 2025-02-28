@@ -9,13 +9,22 @@ using System.Collections;
 using System.Text.Json;
 using Kepware.Api.Serializer;
 using Kepware.Api.Model;
+using Kepware.Api.Model.Admin;
 
 namespace Kepware.Api.Serializer
 {
     [JsonSerializable(typeof(Project))]
     [JsonSerializable(typeof(JsonProjectRoot))]
     [JsonSerializable(typeof(ProductInfo))]
+    [JsonSerializable(typeof(AdminSettings))]
+    [JsonSerializable(typeof(UaEndpoint))]
+    [JsonSerializable(typeof(ServerUserGroup))]
+    [JsonSerializable(typeof(ServerUser))]
+    [JsonSerializable(typeof(ProjectPermission))]
     [JsonSerializable(typeof(List<ApiStatus>))]
+    [JsonSerializable(typeof(List<UaEndpoint>))]
+    [JsonSerializable(typeof(List<ServerUserGroup>))]
+    [JsonSerializable(typeof(List<ServerUser>))]
     [JsonSerializable(typeof(List<Channel>))]
     [JsonSerializable(typeof(List<Device>))]
     [JsonSerializable(typeof(List<Tag>))]
@@ -23,6 +32,7 @@ namespace Kepware.Api.Serializer
     [JsonSerializable(typeof(List<DefaultEntity>))]
     [JsonSerializable(typeof(List<object?>))]
     [JsonSerializable(typeof(List<ApiResult>))]
+    [JsonSerializable(typeof(List<ProjectPermission>))]
     [JsonSerializable(typeof(int))]
     [JsonSerializable(typeof(long))]
     [JsonSerializable(typeof(float))]
@@ -55,6 +65,26 @@ namespace Kepware.Api.Serializer
             {
                 return (JsonTypeInfo<T>)(object)Default.DeviceTagGroup;
             }
+            else if (typeof(T) == typeof(AdminSettings))
+            {
+                return (JsonTypeInfo<T>)(object)Default.AdminSettings;
+            }
+            else if (typeof(T) == typeof(ServerUserGroup))
+            {
+                return (JsonTypeInfo<T>)(object)Default.ServerUserGroup;
+            }
+            else if (typeof(T) == typeof(ServerUser))
+            {
+                return (JsonTypeInfo<T>)(object)Default.ServerUser;
+            }
+            else if (typeof(T) == typeof(UaEndpoint))
+            {
+                return (JsonTypeInfo<T>)(object)Default.UaEndpoint;
+            }
+            else if (typeof(T) == typeof(ProjectPermission))
+            {
+                return (JsonTypeInfo<T>)(object)Default.ProjectPermission;
+            }
             else if (typeof(T) == typeof(DefaultEntity))
             {
                 return (JsonTypeInfo<T>)(object)Default.DefaultEntity;
@@ -83,6 +113,22 @@ namespace Kepware.Api.Serializer
             else if (typeof(T) == typeof(Tag))
             {
                 return (JsonTypeInfo<List<T>>)(object)Default.ListTag;
+            }
+            else if (typeof(T) == typeof(UaEndpoint))
+            {
+                return (JsonTypeInfo<List<T>>)(object)Default.ListUaEndpoint;
+            }
+            else if (typeof(T) == typeof(ServerUserGroup))
+            {
+                return (JsonTypeInfo<List<T>>)(object)Default.ListServerUserGroup;
+            }
+            else if (typeof(T) == typeof(ServerUser))
+            {
+                return (JsonTypeInfo<List<T>>)(object)Default.ListServerUser;
+            }
+            else if (typeof(T) == typeof(ProjectPermission))
+            {
+                return (JsonTypeInfo<List<T>>)(object)Default.ListProjectPermission;
             }
             else if (typeof(T) == typeof(DefaultEntity))
             {

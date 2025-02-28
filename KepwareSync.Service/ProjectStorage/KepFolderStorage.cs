@@ -132,7 +132,7 @@ namespace Kepware.SyncService.ProjectStorage
             if (!File.Exists(tagFile))
                 return Task.FromResult(new List<Tag>());
 
-            var dataTypeConverter = m_dataTypeEnumConverterProvider.GetDataTypeEnumConverter(device.GetDynamicProperty<string>(Properties.DeviceDriver));
+            var dataTypeConverter = m_dataTypeEnumConverterProvider.GetDataTypeEnumConverter(device.GetDynamicProperty<string>(Properties.Channel.DeviceDriver));
             return m_csvTagSerializer.ImportTagsAsync(tagFile, dataTypeConverter, cancellationToken);
         }
 
@@ -273,7 +273,7 @@ namespace Kepware.SyncService.ProjectStorage
                 if (!Directory.Exists(deviceFolder))
                     Directory.CreateDirectory(deviceFolder);
 
-                var dataTypeConverter = m_dataTypeEnumConverterProvider.GetDataTypeEnumConverter(device.GetDynamicProperty<string>(Properties.DeviceDriver));
+                var dataTypeConverter = m_dataTypeEnumConverterProvider.GetDataTypeEnumConverter(device.GetDynamicProperty<string>(Properties.Channel.DeviceDriver));
                 deviceDirsToDelete.Remove(fileSaveName);
 
                 try

@@ -143,8 +143,20 @@ namespace Kepware.Api.Model
         /// <returns>The current instance for chaining.</returns>
         public BaseEntity SetDynamicProperty<T>(string key, T value)
         {
-            DynamicProperties[key] = value is JsonElement jsonElement ? jsonElement : KepJsonContext.WrapInJsonElement(value);
-            _hash = null;
+            if (value is null)
+            {
+                if (DynamicProperties.ContainsKey(key))
+                {
+                    DynamicProperties.Remove(key);
+                    _hash = null;
+                }
+            }
+            else
+            {
+                DynamicProperties[key] = value is JsonElement jsonElement ? jsonElement : KepJsonContext.WrapInJsonElement(value);
+                _hash = null;
+            }
+            
             return this;
         }
 
@@ -217,7 +229,7 @@ namespace Kepware.Api.Model
                 DynamicProperties.Remove(Properties.Description);
             }
 
-            if (TryGetGetDynamicProperty<string>(Properties.DeviceDriver, out var driver))
+            if (TryGetGetDynamicProperty<string>(Properties.Channel.DeviceDriver, out var driver))
             {
                 var defaultValues = await defaultValueProvider.GetDefaultValuesAsync(driver, TypeName, cancellationToken);
                 foreach (var prop in DynamicProperties.ToList())
@@ -234,6 +246,27 @@ namespace Kepware.Api.Model
             {
                 ProjectId = null;
             }
+        }
+
+        public virtual Dictionary<string, JsonElement> GetUpdateDiff(DefaultEntity other)
+        {
+            var diff = new Dictionary<string, JsonElement>();
+
+            if (Description != other.Description)
+            {
+                diff[Properties.Description] = KepJsonContext.WrapInJsonElement(Description);
+            }
+
+            foreach (var kvp in DynamicProperties.Except(Properties.NonSerialized.AsHashSet, Properties.NonUpdatable.AsHashSet, ConditionalNonSerialized()))
+            {
+                if (!other.DynamicProperties.TryGetValue(kvp.Key, out var otherValue) ||
+                    !KepJsonContext.JsonElementEquals(kvp.Value, otherValue))
+                {
+                    diff[kvp.Key] = kvp.Value;
+                }
+            }
+
+            return diff;
         }
     }
 
@@ -287,30 +320,20 @@ namespace Kepware.Api.Model
         /// <returns>A dictionary of differences.</returns>
         public virtual Dictionary<string, JsonElement> GetUpdateDiff(NamedEntity other, bool blnAddProjectId = true)
         {
-            var diff = new Dictionary<string, JsonElement>();
+            var diff = base.GetUpdateDiff(other);
             if (Name != other.Name)
             {
                 diff[Properties.Name] = KepJsonContext.WrapInJsonElement(Name);
             }
 
-            if (Description != other.Description)
-            {
-                diff[Properties.Description] = KepJsonContext.WrapInJsonElement(Description);
-            }
 
             if (blnAddProjectId && ProjectId != 0)
             {
                 diff[Properties.ProjectId] = KepJsonContext.WrapInJsonElement(ProjectId);
             }
 
-            foreach (var kvp in DynamicProperties.Except(Properties.NonSerialized.AsHashSet, Properties.NonUpdatable.AsHashSet, ConditionalNonSerialized()))
-            {
-                if (!other.DynamicProperties.TryGetValue(kvp.Key, out var otherValue) ||
-                    !KepJsonContext.JsonElementEquals(kvp.Value, otherValue))
-                {
-                    diff[kvp.Key] = kvp.Value;
-                }
-            }
+
+         
             return diff;
         }
     }
