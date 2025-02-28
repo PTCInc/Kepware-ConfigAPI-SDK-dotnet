@@ -627,6 +627,19 @@ references:
   isSpec: "True"
   fullName: Kepware.Api.KepwareApiClientOptions.DisableCertifcateValidation
   nameWithType: KepwareApiClientOptions.DisableCertifcateValidation
+- uid: Kepware.Api.KepwareApiClientOptions.EnableIpv6
+  name: EnableIpv6
+  href: api/Kepware.Api.KepwareApiClientOptions.html#Kepware_Api_KepwareApiClientOptions_EnableIpv6
+  commentId: P:Kepware.Api.KepwareApiClientOptions.EnableIpv6
+  fullName: Kepware.Api.KepwareApiClientOptions.EnableIpv6
+  nameWithType: KepwareApiClientOptions.EnableIpv6
+- uid: Kepware.Api.KepwareApiClientOptions.EnableIpv6*
+  name: EnableIpv6
+  href: api/Kepware.Api.KepwareApiClientOptions.html#Kepware_Api_KepwareApiClientOptions_EnableIpv6_
+  commentId: Overload:Kepware.Api.KepwareApiClientOptions.EnableIpv6
+  isSpec: "True"
+  fullName: Kepware.Api.KepwareApiClientOptions.EnableIpv6
+  nameWithType: KepwareApiClientOptions.EnableIpv6
 - uid: Kepware.Api.KepwareApiClientOptions.HostUri
   name: HostUri
   href: api/Kepware.Api.KepwareApiClientOptions.html#Kepware_Api_KepwareApiClientOptions_HostUri
@@ -4217,3 +4230,22 @@ references:
   isSpec: "True"
   fullName: Kepware.Api.Util.HelperExtentions.UnescapeDiskEntry
   nameWithType: HelperExtentions.UnescapeDiskEntry
+- uid: Kepware.Api.Util.Ipv4OnlyHttpClientHandler
+  name: Ipv4OnlyHttpClientHandler
+  href: api/Kepware.Api.Util.Ipv4OnlyHttpClientHandler.html
+  commentId: T:Kepware.Api.Util.Ipv4OnlyHttpClientHandler
+  fullName: Kepware.Api.Util.Ipv4OnlyHttpClientHandler
+  nameWithType: Ipv4OnlyHttpClientHandler
+- uid: Kepware.Api.Util.Ipv4OnlyHttpClientHandler.SendAsync(System.Net.Http.HttpRequestMessage,System.Threading.CancellationToken)
+  name: SendAsync(HttpRequestMessage, CancellationToken)
+  href: api/Kepware.Api.Util.Ipv4OnlyHttpClientHandler.html#Kepware_Api_Util_Ipv4OnlyHttpClientHandler_SendAsync_System_Net_Http_HttpRequestMessage_System_Threading_CancellationToken_
+  commentId: M:Kepware.Api.Util.Ipv4OnlyHttpClientHandler.SendAsync(System.Net.Http.HttpRequestMessage,System.Threading.CancellationToken)
+  fullName: Kepware.Api.Util.Ipv4OnlyHttpClientHandler.SendAsync(System.Net.Http.HttpRequestMessage, System.Threading.CancellationToken)
+  nameWithType: Ipv4OnlyHttpClientHandler.SendAsync(HttpRequestMessage, CancellationToken)
+- uid: Kepware.Api.Util.Ipv4OnlyHttpClientHandler.SendAsync*
+  name: SendAsync
+  href: api/Kepware.Api.Util.Ipv4OnlyHttpClientHandler.html#Kepware_Api_Util_Ipv4OnlyHttpClientHandler_SendAsync_
+  commentId: Overload:Kepware.Api.Util.Ipv4OnlyHttpClientHandler.SendAsync
+  isSpec: "True"
+  fullName: Kepware.Api.Util.Ipv4OnlyHttpClientHandler.SendAsync
+  nameWithType: Ipv4OnlyHttpClientHandler.SendAsync

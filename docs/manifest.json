@@ -1,5 +1,5 @@
 {
-  "source_base_path": "C:/Users/rlabbe/OneDrive - PTC/Documents/GitHub/Kepware-ConfigAPI-SDK-dotnet/docs/docfx",
+  "source_base_path": "C:/Users/redra/OneDrive/Documents/GitHub/Kepware-ConfigAPI-SDK-dotnet/docs/docfx",
   "xrefmap": "xrefmap.yml",
   "files": [
     {
@@ -999,6 +999,20 @@
       "IsMRef": true,
       "Title": "Kepware.Api.Util.HelperExtentions",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Kepware.Api.Util.Ipv4OnlyHttpClientHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Kepware.Api.Util.Ipv4OnlyHttpClientHandler.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Kepware.Api.Util.Ipv4OnlyHttpClientHandler",
+      "Summary": "<p sourcefile=\"api/Kepware.Api.Util.Ipv4OnlyHttpClientHandler.yml\" sourcestartlinenumber=\"1\">A custom HttpClientHandler that ensures HttpClient only uses IPv4 addresses for DNS resolution.</p>\n"
     },
     {
       "type": "ManagedReference",
