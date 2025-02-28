@@ -58,10 +58,12 @@ jobs:
     - run: docfx ./docs/docfx/docfx.json
 
     - name: Upload artifact
+      if: github.event_name != 'pull_request'
       uses: actions/upload-pages-artifact@v3
       with:
         # Upload entire repository
         path: './docs/docfx/_site'
     - name: Deploy to GitHub Pages
+      if: github.event_name != 'pull_request'
       id: deployment
       uses: actions/deploy-pages@v4
