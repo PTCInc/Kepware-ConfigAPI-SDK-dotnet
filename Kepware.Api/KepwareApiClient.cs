@@ -291,18 +291,22 @@ namespace Kepware.Api
         public async Task<bool> UpdateItemAsync<T>(T item, T? oldItem = default, CancellationToken cancellationToken = default)
            where T : NamedEntity, new()
         {
+            var endpoint = EndpointResolver.ResolveEndpoint<T>(oldItem ?? item);
+
+            m_logger.LogInformation("Updating {TypeName} on {Endpoint}...", typeof(T).Name, endpoint);
+
+            var currentEntity = await LoadEntityAsync<T>((oldItem ?? item).Flatten().Select(i => i.Name).Reverse(), cancellationToken: cancellationToken).ConfigureAwait(false);
+            if (currentEntity == null)
+            {
+                return false; // Entity nicht gefunden, kein Update möglich
+            }
+            return await UpdateItemAsync(endpoint, item, currentEntity, cancellationToken).ConfigureAwait(false);
+        }
+        protected async Task<bool> UpdateItemAsync<T>(string endpoint, T item, T currentEntity, CancellationToken cancellationToken = default)
+           where T : NamedEntity, new()
+        {
             try
             {
-                var endpoint = EndpointResolver.ResolveEndpoint<T>(oldItem ?? item);
-
-                m_logger.LogInformation("Updating {TypeName} on {Endpoint}...", typeof(T).Name, endpoint);
-
-                var currentEntity = await LoadEntityAsync<T>((oldItem ?? item).Flatten().Select(i => i.Name).Reverse(), cancellationToken: cancellationToken).ConfigureAwait(false);
-                if (currentEntity == null)
-                {
-                    return false; // Entity nicht gefunden, kein Update möglich
-                }
-
                 item.ProjectId = currentEntity.ProjectId;
 
                 HttpContent httpContent = new StringContent(JsonSerializer.Serialize(item, KepJsonContext.GetJsonTypeInfo<T>()), Encoding.UTF8, "application/json");
@@ -335,10 +339,10 @@ namespace Kepware.Api
         /// <param name="owner">The owner of the entities.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        public Task UpdateItemAsync<T, K>(K item, K? oldItem = default, NamedEntity? owner = null, CancellationToken cancellationToken = default)
+        public async Task<bool> UpdateItemAsync<T, K>(K item, K? oldItem = default, NamedEntity? owner = null, CancellationToken cancellationToken = default)
             where T : EntityCollection<K>
             where K : NamedEntity, new()
-            => UpdateItemsAsync<T, K>([(item, oldItem)], owner, cancellationToken);
+            => (await UpdateItemsAsync<T, K>([(item, oldItem)], owner, cancellationToken)).FirstOrDefault();
 
         /// <summary>
         /// Updates a list of items in the Kepware server.
@@ -349,13 +353,14 @@ namespace Kepware.Api
         /// <param name="owner"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task UpdateItemsAsync<T, K>(List<(K item, K? oldItem)> items, NamedEntity? owner = null, CancellationToken cancellationToken = default)
+        public async Task<List<bool>> UpdateItemsAsync<T, K>(List<(K item, K? oldItem)> items, NamedEntity? owner = null, CancellationToken cancellationToken = default)
           where T : EntityCollection<K>
           where K : NamedEntity, new()
         {
             if (items.Count == 0)
-                return;
+                return [];
 
+            List<bool> result = new List<bool>();
             try
             {
                 var collectionEndpoint = EndpointResolver.ResolveEndpoint<T>(owner).TrimEnd('/');
@@ -366,6 +371,7 @@ namespace Kepware.Api
                     if (currentEntity == null)
                     {
                         m_logger.LogError("Failed to load {TypeName} from {Endpoint}", typeof(K).Name, endpoint);
+                        result.Add(false);
                     }
                     else
                     {
@@ -381,6 +387,11 @@ namespace Kepware.Api
                         {
                             var message = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                             m_logger.LogError("Failed to update {TypeName} from {Endpoint}: {ReasonPhrase}\n{Message}", typeof(T).Name, endpoint, response.ReasonPhrase, message);
+                            result.Add(false);
+                        }
+                        else
+                        {
+                            result.Add(true);
                         }
                     }
                 }
@@ -390,10 +401,48 @@ namespace Kepware.Api
                 m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_httpClient.BaseAddress);
                 m_blnIsConnected = null;
             }
+
+            if (result.Count < items.Count)
+                result.AddRange(Enumerable.Repeat(false, items.Count - result.Count));
+
+            return result;
         }
         #endregion
 
         #region Insert
+
+        public async Task<bool> InsertItemAsync<T>(T item, NamedEntity? owner = null, CancellationToken cancellationToken = default)
+         where T : NamedEntity
+        {
+            try
+            {
+                var endpoint = EndpointResolver.ResolveEndpoint<T>(owner, item.Name).TrimEnd('/');
+
+                if(endpoint.EndsWith("/"+item.Name))
+                    endpoint = endpoint[..(endpoint.Length - item.Name.Length - 1)];
+
+                var jsonContent = JsonSerializer.Serialize(item, KepJsonContext.GetJsonTypeInfo<T>());
+                HttpContent httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                var response = await m_httpClient.PostAsync(endpoint, httpContent, cancellationToken).ConfigureAwait(false);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var message = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                    m_logger.LogError("Failed to insert {TypeName} to {Endpoint}: {ReasonPhrase}\n{Message}", typeof(T).Name, endpoint, response.ReasonPhrase, message);
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            catch (HttpRequestException httpEx)
+            {
+                m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_httpClient.BaseAddress);
+                m_blnIsConnected = null;
+
+            }
+            return false;
+        }
+
         /// <summary>
         /// Inserts an item in the Kepware server.
         /// </summary>
@@ -440,7 +489,7 @@ namespace Kepware.Api
                     var groupedItems = items
                       .GroupBy(i =>
                       {
-                          var driver = i.GetDynamicProperty<string>(Properties.DeviceDriver);
+                          var driver = i.GetDynamicProperty<string>(Properties.Channel.DeviceDriver);
                           return !string.IsNullOrEmpty(driver) && drivers.ContainsKey(driver);
                       });
 
@@ -449,7 +498,7 @@ namespace Kepware.Api
                     {
                         items = groupedItems.FirstOrDefault(g => g.Key)?.ToList() ?? [];
                         m_logger.LogWarning("The following {NumItems} {TypeName} have unsupported drivers ({ListOfUsedUnsupportedDrivers}) and will not be inserted: {ItemsNames}",
-                            unsupportedItems.Count, typeof(K).Name, unsupportedItems.Select(i => i.GetDynamicProperty<string>(Properties.DeviceDriver)).Distinct(), unsupportedItems.Select(i => i.Name));
+                            unsupportedItems.Count, typeof(K).Name, unsupportedItems.Select(i => i.GetDynamicProperty<string>(Properties.Channel.DeviceDriver)).Distinct(), unsupportedItems.Select(i => i.Name));
                     }
                 }
 
@@ -510,13 +559,40 @@ namespace Kepware.Api
         /// <param name="item"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<bool> DeleteItemAsync<T>(T item, CancellationToken cancellationToken = default)
+        public Task<bool> DeleteItemAsync<T>(T item, CancellationToken cancellationToken = default)
           where T : NamedEntity, new()
         {
             var endpoint = EndpointResolver.ResolveEndpoint<T>(item).TrimEnd('/');
-            m_logger.LogInformation("Deleting {TypeName} on {Endpoint}...", item.Name, endpoint);
+            return DeleteItemByEndpointAsync<T>(endpoint, cancellationToken);
+        }
+
+        public Task<bool> DeleteItemAsync<T>(string itemName, CancellationToken cancellationToken = default)
+         where T : NamedEntity, new()
+        {
+            var endpoint = EndpointResolver.ResolveEndpoint<T>([itemName]).TrimEnd('/');
+            return DeleteItemByEndpointAsync<T>(endpoint, cancellationToken);
+        }
+
+        /// <summary>
+        /// Deletes an item from the Kepware server.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="K"></typeparam>
+        /// <param name="item"></param>
+        /// <param name="owner"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Task DeleteItemAsync<T, K>(K item, NamedEntity? owner = null, CancellationToken cancellationToken = default)
+            where T : EntityCollection<K>
+            where K : NamedEntity, new()
+            => DeleteItemsAsync<T, K>([item], owner, cancellationToken);
+
+        protected async Task<bool> DeleteItemByEndpointAsync<T>(string endpoint, CancellationToken cancellationToken = default)
+         where T : NamedEntity, new()
+        {
             try
             {
+                m_logger.LogInformation("Deleting {TypeName} on {Endpoint}...", typeof(T).Name, endpoint);
                 var response = await m_httpClient.DeleteAsync(endpoint, cancellationToken).ConfigureAwait(false);
                 if (!response.IsSuccessStatusCode)
                 {
@@ -535,19 +611,6 @@ namespace Kepware.Api
             }
             return false;
         }
-        /// <summary>
-        /// Deletes an item from the Kepware server.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="K"></typeparam>
-        /// <param name="item"></param>
-        /// <param name="owner"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public Task DeleteItemAsync<T, K>(K item, NamedEntity? owner = null, CancellationToken cancellationToken = default)
-            where T : EntityCollection<K>
-            where K : NamedEntity, new()
-            => DeleteItemsAsync<T, K>([item], owner, cancellationToken);
 
         /// <summary>
         /// Deletes a list of items from the Kepware server.
@@ -591,122 +654,6 @@ namespace Kepware.Api
         #endregion
 
         #region Load
-
-        #region LoadProject
-        /// <summary>
-        /// Loads the project from the Kepware server.
-        /// </summary>
-        /// <param name="blnLoadFullProject"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public async Task<Project> LoadProject(bool blnLoadFullProject = false, CancellationToken cancellationToken = default)
-        {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
-            var productInfo = await GetProductInfoAsync(cancellationToken).ConfigureAwait(false);
-
-            if (blnLoadFullProject && productInfo?.SupportsJsonProjectLoadService == true)
-            {
-                try
-                {
-                    var response = await m_httpClient.GetAsync(ENDPONT_FULL_PROJECT, cancellationToken).ConfigureAwait(false);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var prjRoot = await JsonSerializer.DeserializeAsync(
-                            await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false),
-                            KepJsonContext.Default.JsonProjectRoot, cancellationToken).ConfigureAwait(false);
-
-                        if (prjRoot?.Project != null)
-                        {
-                            prjRoot.Project.IsLoadedByProjectLoadService = true;
-
-                            if (prjRoot.Project.Channels != null)
-                                foreach (var channel in prjRoot.Project.Channels)
-                                {
-                                    if (channel.Devices != null)
-                                        foreach (var device in channel.Devices)
-                                        {
-                                            device.Owner = channel;
-
-                                            if (device.Tags != null)
-                                                foreach (var tag in device.Tags)
-                                                    tag.Owner = device;
-
-                                            if (device.TagGroups != null)
-                                                SetOwnerRecursive(device.TagGroups, device);
-                                        }
-                                }
-
-                            m_logger.LogInformation("Loaded project via JsonProjectLoad Service in {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
-                            return prjRoot.Project;
-                        }
-                    }
-                }
-                catch (HttpRequestException httpEx)
-                {
-                    m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_httpClient.BaseAddress);
-                    m_blnIsConnected = null;
-                }
-
-                m_logger.LogWarning("Failed to load project");
-                return new Project();
-            }
-            else
-            {
-                var project = await LoadEntityAsync<Project>(cancellationToken: cancellationToken).ConfigureAwait(false);
-
-                if (project == null)
-                {
-                    m_logger.LogWarning("Failed to load project");
-                    project = new Project();
-                }
-                else if (blnLoadFullProject)
-                {
-                    project.Channels = await LoadCollectionAsync<ChannelCollection, Channel>(cancellationToken: cancellationToken).ConfigureAwait(false);
-
-                    if (project.Channels != null)
-                    {
-                        int totalChannelCount = project.Channels.Count;
-                        int loadedChannelCount = 0;
-                        await Task.WhenAll(project.Channels.Select(async channel =>
-                        {
-                            channel.Devices = await LoadCollectionAsync<DeviceCollection, Device>(channel, cancellationToken).ConfigureAwait(false);
-
-                            if (channel.Devices != null)
-                            {
-                                await Task.WhenAll(channel.Devices.Select(async device =>
-                                {
-                                    device.Tags = await LoadCollectionAsync<DeviceTagCollection, Tag>(device, cancellationToken: cancellationToken).ConfigureAwait(false);
-                                    device.TagGroups = await LoadCollectionAsync<DeviceTagGroupCollection, DeviceTagGroup>(device, cancellationToken: cancellationToken).ConfigureAwait(false);
-
-                                    if (device.TagGroups != null)
-                                    {
-                                        await LoadTagGroupsRecursiveAsync(device.TagGroups, cancellationToken: cancellationToken).ConfigureAwait(false);
-                                    }
-                                }));
-                            }
-                            // Log information, loaded channel <Name> x of y
-                            loadedChannelCount++;
-                            if (totalChannelCount == 1)
-                            {
-                                m_logger.LogInformation("Loaded channel {ChannelName}", channel.Name);
-                            }
-                            else
-                            {
-                                m_logger.LogInformation("Loaded channel {ChannelName} {LoadedChannelCount} of {TotalChannelCount}", channel.Name, loadedChannelCount, totalChannelCount);
-                            }
-
-                        }));
-                    }
-
-                    m_logger.LogInformation("Loaded project in {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
-                }
-
-                return project;
-            }
-        }
-        #endregion
-
         #region LoadEntity
 
         public Task<T?> LoadEntityAsync<T>(string? name = default, CancellationToken cancellationToken = default)
@@ -755,7 +702,7 @@ namespace Kepware.Api
                 var response = await m_httpClient.GetAsync(endpoint, cancellationToken).ConfigureAwait(false);
                 if (!response.IsSuccessStatusCode)
                 {
-                    m_logger.LogError("Failed to load {TypeName} from {Endpoint}: {ReasonPhrase}", typeof(T).Name, endpoint, response.ReasonPhrase);
+                    m_logger.LogWarning("Failed to load {TypeName} from {Endpoint}: {ReasonPhrase}", typeof(T).Name, endpoint, response.ReasonPhrase);
                     return default;
                 }
 
@@ -814,7 +761,7 @@ namespace Kepware.Api
                 var response = await m_httpClient.GetAsync(endpoint, cancellationToken).ConfigureAwait(false);
                 if (!response.IsSuccessStatusCode)
                 {
-                    m_logger.LogError("Failed to load {TypeName} from {Endpoint}: {ReasonPhrase}", typeof(T).Name, endpoint, response.ReasonPhrase);
+                    m_logger.LogWarning("Failed to load {TypeName} from {Endpoint}: {ReasonPhrase}", typeof(T).Name, endpoint, response.ReasonPhrase);
                     return default;
                 }
 
@@ -827,7 +774,7 @@ namespace Kepware.Api
                 }
                 else
                 {
-                    m_logger.LogError("Failed to deserialize {TypeName} from {Endpoint}", typeof(T).Name, endpoint);
+                    m_logger.LogWarning("Failed to deserialize {TypeName} from {Endpoint}", typeof(T).Name, endpoint);
                     return default;
                 }
             }
@@ -941,8 +888,6 @@ namespace Kepware.Api
         #endregion
 
         #endregion
-
-
 
         #region private methods
 
@@ -1064,7 +1009,7 @@ namespace Kepware.Api
                 };
 
                 var defaults = collectionDefinition?.PropertyDefinitions?
-                    .Where(p => !string.IsNullOrEmpty(p.SymbolicName) && p.SymbolicName != Properties.DeviceDriver)
+                    .Where(p => !string.IsNullOrEmpty(p.SymbolicName) && p.SymbolicName != Properties.Channel.DeviceDriver)
                     .ToDictionary(p => p.SymbolicName!, p => p.GetDefaultValue()) ?? [];
 
                 return m_driverDefaultValues[key] = new ReadOnlyDictionary<string, JsonElement>(defaults);
