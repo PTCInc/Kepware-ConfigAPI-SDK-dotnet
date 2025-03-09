@@ -25,7 +25,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(user), "application/json");
 
             // Act
-            var result = await _kepwareApiClient.GetServerUserAsync(user.Name);
+            var result = await _kepwareApiClient.Admin.GetServerUserAsync(user.Name);
 
             // Assert
             result.ShouldNotBeNull();
@@ -42,11 +42,11 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.NotFound, "Not Found");
 
             // Act
-            var result = await _kepwareApiClient.GetServerUserAsync(userName);
+            var result = await _kepwareApiClient.Admin.GetServerUserAsync(userName);
 
             // Assert
             result.ShouldBeNull();
-            _loggerMock.Verify(logger => 
+            _loggerMockGeneric.Verify(logger => 
                 logger.Log(
                     LogLevel.Warning,
                     It.IsAny<EventId>(),
@@ -68,7 +68,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.Created);
 
             // Act
-            var result = await _kepwareApiClient.CreateOrUpdateServerUserAsync(user);
+            var result = await _kepwareApiClient.Admin.CreateOrUpdateServerUserAsync(user);
 
             // Assert
             result.ShouldBeTrue();
@@ -91,7 +91,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK);
 
             // Act
-            var result = await _kepwareApiClient.CreateOrUpdateServerUserAsync(user);
+            var result = await _kepwareApiClient.Admin.CreateOrUpdateServerUserAsync(user);
 
             // Assert
             result.ShouldBeTrue();
@@ -111,7 +111,7 @@ namespace Kepware.Api.Test.ApiClient
 
             // Act & Assert
             await Should.ThrowAsync<ArgumentException>(async () => 
-                await _kepwareApiClient.CreateOrUpdateServerUserAsync(user));
+                await _kepwareApiClient.Admin.CreateOrUpdateServerUserAsync(user));
         }
 
 
@@ -127,7 +127,7 @@ namespace Kepware.Api.Test.ApiClient
 
             // Act & Assert
             await Should.ThrowAsync<ArgumentException>(async () =>
-                await _kepwareApiClient.CreateOrUpdateServerUserAsync(user));
+                await _kepwareApiClient.Admin.CreateOrUpdateServerUserAsync(user));
         }
 
 
@@ -143,7 +143,7 @@ namespace Kepware.Api.Test.ApiClient
             user.Password = "short";
             // Act & Assert
             await Should.ThrowAsync<ArgumentException>(async () =>
-                await _kepwareApiClient.CreateOrUpdateServerUserAsync(user));
+                await _kepwareApiClient.Admin.CreateOrUpdateServerUserAsync(user));
         }
 
 
@@ -162,7 +162,7 @@ namespace Kepware.Api.Test.ApiClient
             user.Password = null;
 
             // Act
-            var result = await _kepwareApiClient.CreateOrUpdateServerUserAsync(user);
+            var result = await _kepwareApiClient.Admin.CreateOrUpdateServerUserAsync(user);
 
             // Assert
             result.ShouldBeTrue();
@@ -179,7 +179,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK);
 
             // Act
-            var result = await _kepwareApiClient.DeleteServerUserAsync(userName);
+            var result = await _kepwareApiClient.Admin.DeleteServerUserAsync(userName);
 
             // Assert
             result.ShouldBeTrue();
@@ -195,12 +195,12 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
 
             // Act
-            var result = await _kepwareApiClient.DeleteServerUserAsync(userName);
+            var result = await _kepwareApiClient.Admin.DeleteServerUserAsync(userName);
 
             // Assert
             result.ShouldBeFalse();
             _httpMessageHandlerMock.VerifyRequest(HttpMethod.Delete, $"{TEST_ENDPOINT}{ENDPOINT_USER}/{userName}", Times.Once());
-            _loggerMock.Verify(logger => 
+            _loggerMockGeneric.Verify(logger => 
                 logger.Log(
                     LogLevel.Error,
                     It.IsAny<EventId>(),
@@ -223,7 +223,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(users), "application/json");
 
             // Act
-            var result = await _kepwareApiClient.GetServerUserListAsync();
+            var result = await _kepwareApiClient.Admin.GetServerUserListAsync();
 
             // Assert
             result.ShouldNotBeNull();
@@ -238,11 +238,11 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
 
             // Act
-            var result = await _kepwareApiClient.GetServerUserListAsync();
+            var result = await _kepwareApiClient.Admin.GetServerUserListAsync();
 
             // Assert
             result.ShouldBeNull();
-            _loggerMock.Verify(logger => 
+            _loggerMockGeneric.Verify(logger => 
                 logger.Log(
                     LogLevel.Warning,
                     It.IsAny<EventId>(),

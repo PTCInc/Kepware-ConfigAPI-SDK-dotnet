@@ -41,7 +41,7 @@ namespace Kepware.Api.Test.ApiClient
                                    .ReturnsResponse(channelsJson, "application/json");
 
             // Act
-            var result = await _kepwareApiClient.LoadCollectionAsync<ChannelCollection, Channel>();
+            var result = await _kepwareApiClient.GenericConfig.LoadCollectionAsync<ChannelCollection, Channel>();
 
             // Assert
             Assert.NotNull(result);
@@ -71,7 +71,7 @@ namespace Kepware.Api.Test.ApiClient
                                    .ReturnsResponse(channelJson, "application/json");
 
             // Act
-            var result = await _kepwareApiClient.LoadEntityAsync<Channel>("Channel1");
+            var result = await _kepwareApiClient.GenericConfig.LoadEntityAsync<Channel>("Channel1");
 
             // Assert
             Assert.NotNull(result);
@@ -108,7 +108,7 @@ namespace Kepware.Api.Test.ApiClient
                                    .ReturnsResponse(devicesJson, "application/json");
 
             // Act
-            var result = await _kepwareApiClient.LoadCollectionAsync<DeviceCollection, Device>(["Data Type Examples"]);
+            var result = await _kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceCollection, Device>(["Data Type Examples"]);
 
             // Assert
             Assert.NotNull(result);
@@ -138,7 +138,7 @@ namespace Kepware.Api.Test.ApiClient
                                    .ReturnsResponse(deviceJson, "application/json");
 
             // Act
-            var result = await _kepwareApiClient.LoadEntityAsync<Device>("16 Bit Device", new NamedEntity { Name = "Data Type Examples" });
+            var result = await _kepwareApiClient.GenericConfig.LoadEntityAsync<Device>("16 Bit Device", new NamedEntity { Name = "Data Type Examples" });
 
             // Assert
             Assert.NotNull(result);
@@ -159,7 +159,7 @@ namespace Kepware.Api.Test.ApiClient
                                    .ReturnsResponse(HttpStatusCode.NotFound);
 
             // Act
-            var result = await _kepwareApiClient.LoadEntityAsync<Channel>("InvalidChannel");
+            var result = await _kepwareApiClient.GenericConfig.LoadEntityAsync<Channel>("InvalidChannel");
 
             // Assert
             Assert.Null(result);
@@ -173,7 +173,7 @@ namespace Kepware.Api.Test.ApiClient
                                    .ReturnsResponse(HttpStatusCode.InternalServerError);
 
             // Act
-            var result = await _kepwareApiClient.LoadEntityAsync<Channel>("Channel1");
+            var result = await _kepwareApiClient.GenericConfig.LoadEntityAsync<Channel>("Channel1");
 
             // Assert
             Assert.Null(result);
@@ -187,7 +187,7 @@ namespace Kepware.Api.Test.ApiClient
                                    .ThrowsAsync(new HttpRequestException("Network error"));
 
             // Act
-            var result = await _kepwareApiClient.LoadEntityAsync<Channel>("Channel1");
+            var result = await _kepwareApiClient.GenericConfig.LoadEntityAsync<Channel>("Channel1");
 
             // Assert
             Assert.Null(result);
@@ -224,7 +224,7 @@ namespace Kepware.Api.Test.ApiClient
                                    .ReturnsResponse(deviceJson, "application/json");
 
             // Act
-            var result = await _kepwareApiClient.LoadEntityAsync<Device>("16 Bit Device", new NamedEntity { Name = "Data Type Examples" });
+            var result = await _kepwareApiClient.GenericConfig.LoadEntityAsync<Device>("16 Bit Device", new NamedEntity { Name = "Data Type Examples" });
 
             // Assert
             Assert.NotNull(result);
@@ -277,7 +277,7 @@ namespace Kepware.Api.Test.ApiClient
                                    .ReturnsResponse(tagGroupsJson, "application/json");
 
             // Act
-            var result = await _kepwareApiClient.LoadCollectionAsync<DeviceTagGroupCollection, DeviceTagGroup>(new Device("16 Bit Device", "Data Type Examples"));
+            var result = await _kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagGroupCollection, DeviceTagGroup>(new Device("16 Bit Device", "Data Type Examples"));
 
             // Assert
             Assert.NotNull(result);
@@ -310,7 +310,7 @@ namespace Kepware.Api.Test.ApiClient
                                    .ReturnsResponse(tagGroupJson, "application/json");
 
             // Act
-            var result = await _kepwareApiClient.LoadEntityAsync<DeviceTagGroup>("B Registers", new Device("16 Bit Device", "Data Type Examples"));
+            var result = await _kepwareApiClient.GenericConfig.LoadEntityAsync<DeviceTagGroup>("B Registers", new Device("16 Bit Device", "Data Type Examples"));
 
             // Assert
             Assert.NotNull(result);
@@ -352,7 +352,7 @@ namespace Kepware.Api.Test.ApiClient
                                    .ReturnsResponse(tagsJson, "application/json");
 
             // Act
-            var result = await _kepwareApiClient.LoadCollectionAsync<DeviceTagGroupTagCollection, Tag>(new DeviceTagGroup("B Registers", new Device("16 Bit Device", "Data Type Examples")));
+            var result = await _kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagGroupTagCollection, Tag>(new DeviceTagGroup("B Registers", new Device("16 Bit Device", "Data Type Examples")));
 
             // Assert
             Assert.NotNull(result);
@@ -371,7 +371,7 @@ namespace Kepware.Api.Test.ApiClient
             // Act & Assert
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await _kepwareApiClient.LoadCollectionAsync<DeviceTagGroupTagCollection, Tag>(["Data Type Examples", "16 Bit Device", "B Registers"]);
+                await _kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagGroupTagCollection, Tag>(["Data Type Examples", "16 Bit Device", "B Registers"]);
             });
 
             Assert.Equal("Recursive endpoint does not support string list item name", exception.Message);
@@ -411,7 +411,7 @@ namespace Kepware.Api.Test.ApiClient
                                    .ReturnsResponse(tagJson, "application/json");
 
             // Act
-            var result = await _kepwareApiClient.LoadEntityAsync<Tag>("Boolean1", new DeviceTagGroup("B Registers", new Device("16 Bit Device", new Channel("Data Type Examples"))));
+            var result = await _kepwareApiClient.GenericConfig.LoadEntityAsync<Tag>("Boolean1", new DeviceTagGroup("B Registers", new Device("16 Bit Device", new Channel("Data Type Examples"))));
 
             // Assert
             Assert.NotNull(result);

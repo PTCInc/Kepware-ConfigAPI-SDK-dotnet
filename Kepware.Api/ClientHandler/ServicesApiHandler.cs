@@ -12,12 +12,21 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Kepware.Api
+namespace Kepware.Api.ClientHandler
 {
-    public partial class KepwareApiClient
+    public class ServicesApiHandler
     {
         private const string ENDPOINT_REINITIALIZE_RUNTIME = "/config/v1/project/services/ReinitializeRuntime";
         private const string ENDPOINT_TAG_GENERATION = "/config/v1/project/channels/{channelName}/devices/{deviceName}/services/TagGeneration";
+
+        private readonly KepwareApiClient m_kepwareApiClient;
+        private readonly ILogger<ServicesApiHandler> m_logger;
+
+        public ServicesApiHandler(KepwareApiClient kepwareApiClient, ILogger<ServicesApiHandler> logger)
+        {
+            m_kepwareApiClient = kepwareApiClient;
+            m_logger = logger;
+        }
 
 
         #region ReinitializeRuntime
@@ -49,7 +58,7 @@ namespace Kepware.Api
             var request = new ServiceInvocationRequest { Name = ServiceInvocationRequest.ReinitializeRuntimeService, TimeToLiveSeconds = (int)timeToLive.TotalSeconds };
             HttpContent httpContent = new StringContent(JsonSerializer.Serialize(request, KepJsonContext.Default.ServiceInvocationRequest), Encoding.UTF8, "application/json");
 
-            var response = await m_httpClient.PutAsync(ENDPOINT_REINITIALIZE_RUNTIME, httpContent, cancellationToken).ConfigureAwait(false);
+            var response = await m_kepwareApiClient.HttpClient.PutAsync(ENDPOINT_REINITIALIZE_RUNTIME, httpContent, cancellationToken).ConfigureAwait(false);
 
 
             var message = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
@@ -60,7 +69,7 @@ namespace Kepware.Api
 
                 if (jobResponse != null)
                 {
-                    return new KepServerJobPromise(ENDPOINT_REINITIALIZE_RUNTIME, timeToLive, jobResponse, m_httpClient);
+                    return new KepServerJobPromise(ENDPOINT_REINITIALIZE_RUNTIME, timeToLive, jobResponse, m_kepwareApiClient.HttpClient);
                 }
                 else
                 {
@@ -124,7 +133,7 @@ namespace Kepware.Api
             var request = new ServiceInvocationRequest { TimeToLiveSeconds = (int)timeToLive.TotalSeconds };
             HttpContent httpContent = new StringContent(JsonSerializer.Serialize(request, KepJsonContext.Default.ServiceInvocationRequest), Encoding.UTF8, "application/json");
 
-            var response = await m_httpClient.PutAsync(endpoint, httpContent, cancellationToken).ConfigureAwait(false);
+            var response = await m_kepwareApiClient.HttpClient.PutAsync(endpoint, httpContent, cancellationToken).ConfigureAwait(false);
 
             var message = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
@@ -134,7 +143,7 @@ namespace Kepware.Api
 
                 if (jobResponse != null)
                 {
-                    return new KepServerJobPromise(endpoint, timeToLive, jobResponse, m_httpClient);
+                    return new KepServerJobPromise(endpoint, timeToLive, jobResponse, m_kepwareApiClient.HttpClient);
                 }
                 else
                 {

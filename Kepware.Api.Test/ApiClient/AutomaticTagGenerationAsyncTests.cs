@@ -31,7 +31,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.Accepted, JsonSerializer.Serialize(jobResponse), "application/json");
 
             // Act
-            var result = await _kepwareApiClient.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(30));
+            var result = await _kepwareApiClient.ApiServices.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(30));
 
             // Assert
             result.ShouldNotBeNull();
@@ -47,7 +47,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.BadRequest, "Bad Request");
 
             // Act
-            var result = await _kepwareApiClient.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(30));
+            var result = await _kepwareApiClient.ApiServices.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(30));
 
             // Assert
             result.ShouldNotBeNull();
@@ -65,7 +65,7 @@ namespace Kepware.Api.Test.ApiClient
             // Act & Assert
             await Should.ThrowAsync<HttpRequestException>(async () =>
             {
-                await _kepwareApiClient.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(30));
+                await _kepwareApiClient.ApiServices.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(30));
             });
         }
 
@@ -77,7 +77,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.RequestTimeout, "Request Timeout");
 
             // Act
-            var result = await _kepwareApiClient.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(30));
+            var result = await _kepwareApiClient.ApiServices.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(30));
 
             // Assert
             result.ShouldNotBeNull();
@@ -91,7 +91,7 @@ namespace Kepware.Api.Test.ApiClient
             // Act & Assert
             await Should.ThrowAsync<ArgumentOutOfRangeException>(async () =>
             {
-                await _kepwareApiClient.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(-1));
+                await _kepwareApiClient.ApiServices.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(-1));
             });
         }
 
@@ -107,7 +107,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(jobStatus), "application/json");
 
             // Act
-            var result = await _kepwareApiClient.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(30));
+            var result = await _kepwareApiClient.ApiServices.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(30));
             var completionResult = await result.AwaitCompletionAsync();
 
             // Assert
@@ -129,7 +129,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(jobStatusComplete), "application/json");
 
             // Act
-            var result = await _kepwareApiClient.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(30));
+            var result = await _kepwareApiClient.ApiServices.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(30));
             var completionResult = await result.AwaitCompletionAsync();
 
             // Assert
@@ -149,7 +149,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(jobStatus), "application/json");
 
             // Act
-            var result = await _kepwareApiClient.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(2));
+            var result = await _kepwareApiClient.ApiServices.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(2));
             var completionResult = await result.AwaitCompletionAsync();
 
             // Assert
@@ -174,7 +174,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.ServiceUnavailable, JsonSerializer.Serialize(jobStatusFailed), "application/json");
 
             // Act
-            var result = await _kepwareApiClient.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(5));
+            var result = await _kepwareApiClient.ApiServices.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(5));
             var completionResult = await result.AwaitCompletionAsync();
 
             // Assert

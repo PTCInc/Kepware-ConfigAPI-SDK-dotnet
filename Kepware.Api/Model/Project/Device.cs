@@ -14,6 +14,12 @@ namespace Kepware.Api.Model
     [Endpoint("/config/v1/project/channels/{channelName}/devices/{deviceName}")]
     public class Device : NamedUidEntity
     {
+        public Channel? Channel
+        {
+            get => Owner as Channel;
+            set => Owner = value;
+        }
+
         public Device()
         {
 

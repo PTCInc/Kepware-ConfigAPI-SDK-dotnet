@@ -31,7 +31,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(projectPermission), "application/json");
 
             // Act
-            var result = await _kepwareApiClient.GetProjectPermissionAsync(serverUserGroup, projectPermissionName);
+            var result = await _kepwareApiClient.Admin.GetProjectPermissionAsync(serverUserGroup, projectPermissionName);
 
             // Assert
             result.ShouldNotBeNull();
@@ -52,7 +52,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.NotFound, "Not Found");
 
             // Act
-            var result = await _kepwareApiClient.GetProjectPermissionAsync(serverUserGroup, projectPermissionName);
+            var result = await _kepwareApiClient.Admin.GetProjectPermissionAsync(serverUserGroup, projectPermissionName);
 
             // Assert
             result.ShouldBeNull();
@@ -78,7 +78,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK);
 
             // Act
-            var result = await _kepwareApiClient.UpdateProjectPermissionAsync(serverUserGroup, projectPermission);
+            var result = await _kepwareApiClient.Admin.UpdateProjectPermissionAsync(serverUserGroup, projectPermission);
 
             // Assert
             result.ShouldBeTrue();
@@ -102,7 +102,7 @@ namespace Kepware.Api.Test.ApiClient
 
             // Act & Assert
             await Should.ThrowAsync<InvalidOperationException>(async () =>
-                await _kepwareApiClient.UpdateProjectPermissionAsync(serverUserGroup, projectPermission));
+                await _kepwareApiClient.Admin.UpdateProjectPermissionAsync(serverUserGroup, projectPermission));
         }
 
         [Fact]
@@ -125,7 +125,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.BadRequest, "Invalid setting value");
 
             // Act
-            var result = await _kepwareApiClient.UpdateProjectPermissionAsync(serverUserGroup, projectPermission);
+            var result = await _kepwareApiClient.Admin.UpdateProjectPermissionAsync(serverUserGroup, projectPermission);
 
             // Assert
             result.ShouldBeFalse();

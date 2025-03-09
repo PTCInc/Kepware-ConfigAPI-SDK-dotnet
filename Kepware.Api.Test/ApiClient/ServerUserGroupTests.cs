@@ -25,7 +25,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(userGroup), "application/json");
 
             // Act
-            var result = await _kepwareApiClient.GetServerUserGroupAsync(userGroup.Name);
+            var result = await _kepwareApiClient.Admin.GetServerUserGroupAsync(userGroup.Name);
 
             // Assert
             result.ShouldNotBeNull();
@@ -42,11 +42,11 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.NotFound, "Not Found");
 
             // Act
-            var result = await _kepwareApiClient.GetServerUserGroupAsync(groupName);
+            var result = await _kepwareApiClient.Admin.GetServerUserGroupAsync(groupName);
 
             // Assert
             result.ShouldBeNull();
-            _loggerMock.Verify(logger => 
+            _loggerMockGeneric.Verify(logger => 
                 logger.Log(
                     LogLevel.Warning,
                     It.IsAny<EventId>(),
@@ -68,7 +68,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.Created);
 
             // Act
-            var result = await _kepwareApiClient.CreateOrUpdateServerUserGroupAsync(userGroup);
+            var result = await _kepwareApiClient.Admin.CreateOrUpdateServerUserGroupAsync(userGroup);
 
             // Assert
             result.ShouldBeTrue();
@@ -91,7 +91,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK);
 
             // Act
-            var result = await _kepwareApiClient.CreateOrUpdateServerUserGroupAsync(userGroup);
+            var result = await _kepwareApiClient.Admin.CreateOrUpdateServerUserGroupAsync(userGroup);
 
             // Assert
             result.ShouldBeTrue();
@@ -108,7 +108,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK);
 
             // Act
-            var result = await _kepwareApiClient.DeleteServerUserGroupAsync(groupName);
+            var result = await _kepwareApiClient.Admin.DeleteServerUserGroupAsync(groupName);
 
             // Assert
             result.ShouldBeTrue();
@@ -124,12 +124,12 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
 
             // Act
-            var result = await _kepwareApiClient.DeleteServerUserGroupAsync(groupName);
+            var result = await _kepwareApiClient.Admin.DeleteServerUserGroupAsync(groupName);
 
             // Assert
             result.ShouldBeFalse();
             _httpMessageHandlerMock.VerifyRequest(HttpMethod.Delete, $"{TEST_ENDPOINT}{ENDPOINT_USER_GROUP}/{groupName}", Times.Once());
-            _loggerMock.Verify(logger => 
+            _loggerMockGeneric.Verify(logger => 
                 logger.Log(
                     LogLevel.Error,
                     It.IsAny<EventId>(),
@@ -152,7 +152,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(userGroups), "application/json");
 
             // Act
-            var result = await _kepwareApiClient.GetServerUserGroupListAsync();
+            var result = await _kepwareApiClient.Admin.GetServerUserGroupListAsync();
 
             // Assert
             result.ShouldNotBeNull();
@@ -167,11 +167,11 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
 
             // Act
-            var result = await _kepwareApiClient.GetServerUserGroupListAsync();
+            var result = await _kepwareApiClient.Admin.GetServerUserGroupListAsync();
 
             // Assert
             result.ShouldBeNull();
-            _loggerMock.Verify(logger => 
+            _loggerMockGeneric.Verify(logger => 
                 logger.Log(
                     LogLevel.Warning,
                     It.IsAny<EventId>(),

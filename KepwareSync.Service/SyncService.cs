@@ -113,7 +113,7 @@ namespace Kepware.SyncService
 
         private static async Task<long> FetchCurrentProjectIdAsync(KepwareApiClient client, CancellationToken cancellationToken)
         {
-            var project = await client.LoadProject(false, cancellationToken).ConfigureAwait(false);
+            var project = await client.Project.LoadProject(false, cancellationToken).ConfigureAwait(false);
 
             return project?.ProjectId ?? -1;
         }
@@ -157,7 +157,7 @@ namespace Kepware.SyncService
         internal async Task SyncFromPrimaryKepServerAsync(CancellationToken cancellationToken = default)
         {
             m_logger.LogInformation("Synchronizing full project from primary Kepware...");
-            var project = await m_kepServerClient.LoadProject(true);
+            var project = await m_kepServerClient.Project.LoadProject(true);
             await project.Cleanup(m_kepServerClient, true, cancellationToken);
 
             if (m_kepServerClient.ClientOptions.Tag is KepwareSyncTarget targetOptions &&
@@ -230,7 +230,7 @@ namespace Kepware.SyncService
                     m_logger.LogInformation("Syncing from secondary client {ClientHostName}...", clientToSyncFrom.ClientHostName);
                 }
 
-                var projectFromSecondary = await clientToSyncFrom.LoadProject(true, cancellationToken).ConfigureAwait(false);
+                var projectFromSecondary = await clientToSyncFrom.Project.LoadProject(true, cancellationToken).ConfigureAwait(false);
                 await SyncProjectToKepServerAsync("secondary", projectFromSecondary, m_kepServerClient, "Primary",
                     onSyncedWithChanges: () => NotifyChange(new ChangeEvent { Source = ChangeSource.PrimaryKepServer, Reason = "Sync from secondary kepserver" }),
                     cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -274,7 +274,7 @@ namespace Kepware.SyncService
                 overwrite.Apply(project);
             }
 
-            var (inserts, updates, deletes) = await kepServerClient.CompareAndApply(project, cancellationToken).ConfigureAwait(false);
+            var (inserts, updates, deletes) = await kepServerClient.Project.CompareAndApply(project, cancellationToken).ConfigureAwait(false);
 
             if (updates > 0 || deletes > 0 || inserts > 0)
             {
