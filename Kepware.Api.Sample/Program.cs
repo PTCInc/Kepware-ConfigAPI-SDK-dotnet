@@ -58,6 +58,21 @@ namespace Kepware.Api.Sample
 
                 await api.DeleteItemAsync(device);
                 await api.DeleteItemAsync(channel1);
+
+
+                var reinitJob = await api.ReinitializeRuntimeAsync();
+
+                var result = await reinitJob.AwaitCompletionAsync();
+
+                if(result)
+                {
+                    Console.WriteLine("ReinitializeRuntimeAsync completed successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("ReinitializeRuntimeAsync failed.");
+                }
+
             }
 
             Console.WriteLine();

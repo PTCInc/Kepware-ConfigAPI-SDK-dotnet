@@ -15,18 +15,30 @@ This package is designed to work with all versions of Kepware that support the C
 | :----------:  | :----------:  | :----------:  |
 | **Project Properties** <br /> *(Get Only)* | Y | Y |
 | **Connectivity** <br /> *(Channel, Devices, Tags, Tag Groups)* | Y | Y |
-| **Product Info and Health Status\*\*** | Y | Y |
-| **Export Project\***| Y | Y |
-| **Import Project (via CompareAndApply)\*\***| Y | Y |
-| **Import Project (via JsonProjectLoad Service)**| N | N |
+| **Administration** <br /> *(User Groups, Users, UA Endpoints, Local License Server)* | Y[^1] | Y |
+| **Product Info and Health Status[^4]** | Y | Y |
+| **Export Project[^2]**| Y | Y |
+| **Import Project (via CompareAndApply)[^3]***| Y | Y |
+| **Import Project (via JsonProjectLoad Service)[^2]**| N | N |
 
+**Notes:**
+[^1]: UA Endpoints and Local License Server supported for Kepware Edge only
+[^2]: JsonProjectLoad was added to Kepware Server v6.17 / Kepware Edge v1.10 and later builds, the SDK detects the server version and uses the appropriate service or loads the project by multiple requests if using KepwareApiClient.LoadProject.
+[^3]: CompareAndApply is handled by the SDK, it compares the source project with the server project and applies the changes. The JsonProjectLoad service is a direct call to the server to load a project.
+[^4]: Added to Kepware Server v6.13 / Kepware Edge v1.5 and later builds
 
-- Note (*) - JsonProjectLoad was added to Kepware Server v6.17 / Kepware Edge v1.10 and later builds, the SDK detects the server version and uses the appropriate service or loads the project by multiple requests if using KepwareApiClient.LoadProject.
-- Note (**) - CompareAndApply is handled by the SDK, it compares the source project with the server project and applies the changes. The JsonProjectLoad service is a direct call to the server to load a project.
+3. Configuration API *Services* implemented:
 
-3.  Synchronize configurations between your application and Kepware server.
-4.  Supports advanced operations like project comparison, entity synchronization, and driver property queries.
-5.  Built-in support for Dependency Injection to simplify integration.
+| Services      | TKS/KEP       | TKE           |
+| :----------:  | :----------:  | :----------:  |
+| **TagGeneration** <br /> *(for supported drivers)* | N | N |
+| **ReinitializeRuntime** | Y* | Y |
+| **ProjectLoad and ProjectSave**| N | N |
+| **JsonProjectLoad\*\*** <br /> *(used for import project feature)*| Y | Y |
+
+4.  Synchronize configurations between your application and Kepware server.
+5.  Supports advanced operations like project comparison, entity synchronization, and driver property queries.
+6.  Built-in support for Dependency Injection to simplify integration.
 
 ## Installation
 

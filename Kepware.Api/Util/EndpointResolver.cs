@@ -103,7 +103,7 @@ namespace Kepware.Api.Util
             return ReplacePlaceholders(endpointTemplateAttribute.EndpointTemplate, placeholderValues) + endpointTemplateAttribute.Suffix;
         }
 
-        private static string ReplacePlaceholders(string template, IEnumerable<string> placeholderValues)
+        public static string ReplacePlaceholders(string template, IEnumerable<string> placeholderValues)
         {
             var placeholders = s_pathplaceHolderRegex.Matches(template).ToArray();
             var values = placeholderValues.ToArray();
