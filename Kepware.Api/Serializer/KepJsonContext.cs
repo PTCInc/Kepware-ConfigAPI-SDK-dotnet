@@ -21,6 +21,7 @@ namespace Kepware.Api.Serializer
     [JsonSerializable(typeof(ServerUserGroup))]
     [JsonSerializable(typeof(ServerUser))]
     [JsonSerializable(typeof(ProjectPermission))]
+    [JsonSerializable(typeof(ProjectProperties))]
     [JsonSerializable(typeof(List<ApiStatus>))]
     [JsonSerializable(typeof(List<UaEndpoint>))]
     [JsonSerializable(typeof(List<ServerUserGroup>))]
@@ -84,6 +85,10 @@ namespace Kepware.Api.Serializer
             else if (typeof(T) == typeof(ProjectPermission))
             {
                 return (JsonTypeInfo<T>)(object)Default.ProjectPermission;
+            }
+            else if (typeof(T) == typeof(ProjectProperties))
+            {
+                return (JsonTypeInfo<T>)(object)Default.ProjectProperties;
             }
             else if (typeof(T) == typeof(DefaultEntity))
             {
