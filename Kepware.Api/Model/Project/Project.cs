@@ -32,6 +32,7 @@ namespace Kepware.Api.Model
         /// <summary>
         /// Gets or sets the project properties in the project
         /// </summary>
+        [YamlIgnore, JsonIgnore]
         public ProjectProperties ProjectProperties { get; }
 
         #endregion
@@ -124,8 +125,7 @@ namespace Kepware.Api.Model
     /// <summary>
     /// Represents the project properties in the Kepware configuration
     /// </summary>
-    [Endpoint("/config/v1/project")]
-    public partial class ProjectProperties(Project project) : NamedEntity
+    public partial class ProjectProperties(Project project)
     // Inherit Named Entity type to ensure ProjectID management when updating properties.
     // Updates for these properties need ProjectID or overrides
     {
