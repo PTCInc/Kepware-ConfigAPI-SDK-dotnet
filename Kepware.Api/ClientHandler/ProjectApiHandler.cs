@@ -67,8 +67,12 @@ namespace Kepware.Api.ClientHandler
         {
             if (sourceProject.Hash != projectFromApi.Hash)
             {
-                //TODO update project
-                m_logger.LogInformation("[not implemented] Project has changed. Updating project...");
+                m_logger.LogInformation("Project properties has changed. Updating project properties...");
+                var result = await SetProjectPropertiesAsync(projectFromApi, cancellationToken: cancellationToken).ConfigureAwait(false);
+                if (!result)
+                {
+                    m_logger.LogError("Failed to update project properties...");
+                }
             }
             int inserts = 0, updates = 0, deletes = 0;
 
