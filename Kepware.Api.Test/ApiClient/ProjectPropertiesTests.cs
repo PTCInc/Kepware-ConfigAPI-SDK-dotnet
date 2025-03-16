@@ -303,7 +303,7 @@ namespace Kepware.Api.Test.ApiClient
             var project = new Project();
             var settings = new ProjectProperties(project)
             {
-                ProjectId = 1291004473,
+                //ProjectId = 1291004473,
                 Title = "Default Project",
                 EnableOpcDa1 = true,
                 EnableOpcDa2 = true,
