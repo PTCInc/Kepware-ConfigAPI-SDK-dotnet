@@ -10,6 +10,7 @@ using System.Text.Json;
 using Kepware.Api.Serializer;
 using Kepware.Api.Model;
 using Kepware.Api.Model.Admin;
+using Kepware.Api.Model.Services;
 
 namespace Kepware.Api.Serializer
 {
@@ -21,7 +22,11 @@ namespace Kepware.Api.Serializer
     [JsonSerializable(typeof(ServerUserGroup))]
     [JsonSerializable(typeof(ServerUser))]
     [JsonSerializable(typeof(ProjectPermission))]
-    [JsonSerializable(typeof(ProjectProperties))]
+    [JsonSerializable(typeof(ApiResponseMessage))]
+    [JsonSerializable(typeof(JobResponseMessage))]
+    [JsonSerializable(typeof(JobStatusMessage))]
+    [JsonSerializable(typeof(ServiceInvocationRequest))]
+    
     [JsonSerializable(typeof(List<ApiStatus>))]
     [JsonSerializable(typeof(List<UaEndpoint>))]
     [JsonSerializable(typeof(List<ServerUserGroup>))]

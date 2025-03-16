@@ -25,7 +25,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(uaEndpoint), "application/json");
 
             // Act
-            var result = await _kepwareApiClient.GetUaEndpointAsync(uaEndpoint.Name);
+            var result = await _kepwareApiClient.Admin.GetUaEndpointAsync(uaEndpoint.Name);
 
             // Assert
             result.ShouldNotBeNull();
@@ -42,11 +42,11 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.NotFound, "Not Found");
 
             // Act
-            var result = await _kepwareApiClient.GetUaEndpointAsync(endpointName);
+            var result = await _kepwareApiClient.Admin.GetUaEndpointAsync(endpointName);
 
             // Assert
             result.ShouldBeNull();
-            _loggerMock.Verify(logger => 
+            _loggerMockGeneric.Verify(logger => 
                 logger.Log(
                     LogLevel.Warning,
                     It.IsAny<EventId>(),
@@ -68,7 +68,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.Created);
 
             // Act
-            var result = await _kepwareApiClient.CreateOrUpdateUaEndpointAsync(uaEndpoint);
+            var result = await _kepwareApiClient.Admin.CreateOrUpdateUaEndpointAsync(uaEndpoint);
 
             // Assert
             result.ShouldBeTrue();
@@ -91,7 +91,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK);
 
             // Act
-            var result = await _kepwareApiClient.CreateOrUpdateUaEndpointAsync(uaEndpoint);
+            var result = await _kepwareApiClient.Admin.CreateOrUpdateUaEndpointAsync(uaEndpoint);
 
             // Assert
             result.ShouldBeTrue();
@@ -108,7 +108,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK);
 
             // Act
-            var result = await _kepwareApiClient.DeleteUaEndpointAsync(endpointName);
+            var result = await _kepwareApiClient.Admin.DeleteUaEndpointAsync(endpointName);
 
             // Assert
             result.ShouldBeTrue();
@@ -124,12 +124,12 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
 
             // Act
-            var result = await _kepwareApiClient.DeleteUaEndpointAsync(endpointName);
+            var result = await _kepwareApiClient.Admin.DeleteUaEndpointAsync(endpointName);
 
             // Assert
             result.ShouldBeFalse();
             _httpMessageHandlerMock.VerifyRequest(HttpMethod.Delete, $"{TEST_ENDPOINT}{ENDPOINT_UA}/{endpointName}", Times.Once());
-            _loggerMock.Verify(logger => 
+            _loggerMockGeneric.Verify(logger => 
                 logger.Log(
                     LogLevel.Error,
                     It.IsAny<EventId>(),
@@ -152,7 +152,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(uaEndpoints), "application/json");
 
             // Act
-            var result = await _kepwareApiClient.GetUaEndpointListAsync();
+            var result = await _kepwareApiClient.Admin.GetUaEndpointListAsync();
 
             // Assert
             result.ShouldNotBeNull();
@@ -169,11 +169,11 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
 
             // Act
-            var result = await _kepwareApiClient.GetUaEndpointListAsync();
+            var result = await _kepwareApiClient.Admin.GetUaEndpointListAsync();
 
             // Assert
             result.ShouldBeNull();
-            _loggerMock.Verify(logger => 
+            _loggerMockGeneric.Verify(logger => 
                 logger.Log(
                     LogLevel.Warning,
                     It.IsAny<EventId>(),

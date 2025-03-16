@@ -106,7 +106,7 @@ namespace Kepware.Api.Test.ApiClient
                 await ConfigureToServeEndpoints();
             }
 
-            var project = await _kepwareApiClient.LoadProject(true);
+            var project = await _kepwareApiClient.Project.LoadProject(true);
 
             project.IsLoadedByProjectLoadService.ShouldBe(supportsJsonLoad);
 
@@ -190,7 +190,7 @@ namespace Kepware.Api.Test.ApiClient
 
             await ConfigureToServeEndpoints();
 
-            var project = await _kepwareApiClient.LoadProject(blnLoadFullProject: false);
+            var project = await _kepwareApiClient.Project.LoadProject(blnLoadFullProject: false);
 
             project.ShouldNotBeNull();
             project.Channels.ShouldBeNull("Channels list should be null.");
@@ -209,7 +209,7 @@ namespace Kepware.Api.Test.ApiClient
                                    .ThrowsAsync(new HttpRequestException());
 
             // Act
-            var project = await _kepwareApiClient.LoadProject(true);
+            var project = await _kepwareApiClient.Project.LoadProject(true);
 
             // Assert
             project.ShouldNotBeNull();

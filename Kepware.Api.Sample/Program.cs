@@ -41,23 +41,38 @@ namespace Kepware.Api.Sample
             if (await api.TestConnectionAsync())
             {
                 //connection is established
-                var channel1 = await api.GetOrCreateChannelAsync("Channel by Api", "Simulator");
-                var device = await api.GetOrCreateDeviceAsync(channel1, "Device by Api");
+                var channel1 = await api.Project.Channels.GetOrCreateChannelAsync("Channel by Api", "Simulator");
+                var device = await api.Project.Devices.GetOrCreateDeviceAsync(channel1, "Device by Api");
 
                 device.Description = "Test";
 
-                await api.UpdateItemAsync(device);
+                await api.Project.Devices.UpdateDeviceAsync(device);
 
-                DeviceTagCollection tags = new DeviceTagCollection([
-                     new Tag { Name = "RampByApi", TagAddress = "RAMP (120, 35, 100, 4)", Description ="A ramp created by the C# Api Client" },
+
+                device.Tags = new DeviceTagCollection([
+                    new Tag { Name = "RampByApi", TagAddress = "RAMP (120, 35, 100, 4)", Description ="A ramp created by the C# Api Client" },
                     new Tag { Name = "SineByApi", TagAddress = "SINE (10, -40.000000, 40.000000, 0.050000, 0)" },
                     new Tag { Name = "BooleanByApi", TagAddress = "B0001" },
                     ]);
 
-                await api.CompareAndApply<DeviceTagCollection, Tag>(tags, device.Tags, device);
+                await api.Project.Devices.UpdateDeviceAsync(device, true);
 
-                await api.DeleteItemAsync(device);
-                await api.DeleteItemAsync(channel1);
+                await api.Project.Devices.DeleteDeviceAsync(device);
+                await api.Project.Channels.DeleteChannelAsync(channel1);
+
+                var reinitJob = await api.ApiServices.ReinitializeRuntimeAsync();
+
+                var result = await reinitJob.AwaitCompletionAsync();
+
+                if (result)
+                {
+                    Console.WriteLine("ReinitializeRuntimeAsync completed successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("ReinitializeRuntimeAsync failed.");
+                }
+
             }
 
             Console.WriteLine();

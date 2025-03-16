@@ -12,6 +12,7 @@ using System.Net;
 using System.IO;
 using Kepware.Api.Model;
 using Kepware.Api.Serializer;
+using Kepware.Api.ClientHandler;
 
 namespace Kepware.Api.Test.ApiClient
 {
@@ -21,19 +22,37 @@ namespace Kepware.Api.Test.ApiClient
 
         protected readonly Mock<HttpMessageHandler> _httpMessageHandlerMock;
         protected readonly Mock<ILogger<KepwareApiClient>> _loggerMock;
+        protected readonly Mock<ILogger<AdminApiHandler>> _loggerMockAdmin;
+        protected readonly Mock<ILogger<GenericApiHandler>> _loggerMockGeneric;
+        protected readonly Mock<ILoggerFactory> _loggerFactoryMock;
         protected readonly KepwareApiClient _kepwareApiClient;
 
         protected TestApiClientBase()
         {
             _httpMessageHandlerMock = new Mock<HttpMessageHandler>();
             _loggerMock = new Mock<ILogger<KepwareApiClient>>();
+            _loggerMockAdmin = new Mock<ILogger<AdminApiHandler>>();
+            _loggerMockGeneric = new Mock<ILogger<GenericApiHandler>>();
+            _loggerFactoryMock = new Mock<ILoggerFactory>();
+
+            _loggerFactoryMock.Setup(factory => factory.CreateLogger(It.IsAny<string>())).Returns((string name) =>
+            {
+                if (name == typeof(KepwareApiClient).FullName)
+                    return _loggerMock.Object;
+                else if (name == typeof(AdminApiHandler).FullName)
+                    return _loggerMockAdmin.Object;
+                else if (name == typeof(GenericApiHandler).FullName)
+                    return _loggerMockGeneric.Object;
+                else
+                    return Mock.Of<ILogger>();
+            });
 
             var httpClient = new HttpClient(_httpMessageHandlerMock.Object)
             {
                 BaseAddress = new Uri(TEST_ENDPOINT)
             };
 
-            _kepwareApiClient = new KepwareApiClient("TestClient", new KepwareApiClientOptions { HostUri = httpClient.BaseAddress }, _loggerMock.Object, httpClient);
+            _kepwareApiClient = new KepwareApiClient("TestClient", new KepwareApiClientOptions { HostUri = httpClient.BaseAddress }, _loggerFactoryMock.Object, httpClient);
         }
 
         protected static async Task<JsonProjectRoot> LoadJsonTestDataAsync()

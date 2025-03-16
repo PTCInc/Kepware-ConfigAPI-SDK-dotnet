@@ -25,7 +25,7 @@ public class UpdateTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.UpdateItemAsync(channel);
+        var result = await _kepwareApiClient.GenericConfig.UpdateItemAsync(channel);
 
         // Assert
         result.ShouldBeTrue();
@@ -44,7 +44,7 @@ public class UpdateTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.NotFound);
 
         // Act
-        var result = await _kepwareApiClient.UpdateItemAsync(channel);
+        var result = await _kepwareApiClient.GenericConfig.UpdateItemAsync(channel);
 
         // Assert
         result.ShouldBeFalse();
@@ -77,7 +77,7 @@ public class UpdateTests : TestApiClientBase
         }
 
         // Act
-        await _kepwareApiClient.UpdateItemsAsync<DeviceTagCollection, Tag>(tags, device);
+        await _kepwareApiClient.GenericConfig.UpdateItemsAsync<DeviceTagCollection, Tag>(tags, device);
 
         // Assert
         foreach (var tag in tags)
@@ -103,13 +103,13 @@ public class UpdateTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.InternalServerError, "Server Error");
 
         // Act
-        var result = await _kepwareApiClient.UpdateItemAsync(channel);
+        var result = await _kepwareApiClient.GenericConfig.UpdateItemAsync(channel);
 
         // Assert
         result.ShouldBeFalse();
         _httpMessageHandlerMock.VerifyRequest(HttpMethod.Get, $"{TEST_ENDPOINT}{endpoint}", Times.Once());
         _httpMessageHandlerMock.VerifyRequest(HttpMethod.Put, $"{TEST_ENDPOINT}{endpoint}", Times.Once());
-        _loggerMock.Verify(logger => 
+        _loggerMockGeneric.Verify(logger => 
             logger.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
@@ -134,13 +134,13 @@ public class UpdateTests : TestApiClientBase
             .Throws(new HttpRequestException("Connection error"));
 
         // Act
-        var result = await _kepwareApiClient.UpdateItemAsync(channel);
+        var result = await _kepwareApiClient.GenericConfig.UpdateItemAsync(channel);
 
         // Assert
         result.ShouldBeFalse();
         _httpMessageHandlerMock.VerifyRequest(HttpMethod.Get, $"{TEST_ENDPOINT}{endpoint}", Times.Once());
         _httpMessageHandlerMock.VerifyRequest(HttpMethod.Put, $"{TEST_ENDPOINT}{endpoint}", Times.Once());
-        _loggerMock.Verify(logger => 
+        _loggerMockGeneric.Verify(logger => 
             logger.Log(
                 LogLevel.Warning,
                 It.IsAny<EventId>(),

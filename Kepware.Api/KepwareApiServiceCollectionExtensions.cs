@@ -36,11 +36,11 @@ namespace Kepware.Api
             {
                 return options.Select(kvp =>
                 {
-                    var logger = serviceProvider.GetRequiredService<ILogger<KepwareApiClient>>();
+                    var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
                     var factory = serviceProvider.GetRequiredService<IHttpClientFactory>();
                     var httpClient = factory.CreateClient(kvp.Key + "-httpClient");
 
-                    return new KepwareApiClient(kvp.Key, kvp.Value, logger, httpClient);
+                    return new KepwareApiClient(kvp.Key, kvp.Value, loggerFactory, httpClient);
                 }).ToList();
             });
 
@@ -67,11 +67,11 @@ namespace Kepware.Api
 
             services.AddSingleton(serviceProvider =>
             {
-                var logger = serviceProvider.GetRequiredService<ILogger<KepwareApiClient>>();
+                var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
                 var factory = serviceProvider.GetRequiredService<IHttpClientFactory>();
                 var httpClient = factory.CreateClient(name + "-httpClient");
 
-                return new KepwareApiClient(name, options, logger, httpClient);
+                return new KepwareApiClient(name, options, loggerFactory, httpClient);
             });
 
             return services;

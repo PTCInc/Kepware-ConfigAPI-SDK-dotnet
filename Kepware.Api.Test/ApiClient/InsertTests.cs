@@ -23,7 +23,7 @@ public class InsertTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.InsertItemAsync<ChannelCollection, Channel>(channel);
+        var result = await _kepwareApiClient.GenericConfig.InsertItemAsync<ChannelCollection, Channel>(channel);
 
         // Assert
         result.ShouldBeTrue();
@@ -42,12 +42,12 @@ public class InsertTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.InternalServerError, "Server Error");
 
         // Act
-        var result = await _kepwareApiClient.InsertItemAsync<ChannelCollection, Channel>(channel);
+        var result = await _kepwareApiClient.GenericConfig.InsertItemAsync<ChannelCollection, Channel>(channel);
 
         // Assert
         result.ShouldBeFalse();
         _httpMessageHandlerMock.VerifyRequest(HttpMethod.Post, $"{TEST_ENDPOINT}{endpoint}", Times.Once());
-        _loggerMock.Verify(logger => 
+        _loggerMockGeneric.Verify(logger => 
             logger.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
@@ -69,12 +69,12 @@ public class InsertTests : TestApiClientBase
             .Throws(new HttpRequestException("Connection error"));
 
         // Act
-        var result = await _kepwareApiClient.InsertItemAsync<ChannelCollection, Channel>(channel);
+        var result = await _kepwareApiClient.GenericConfig.InsertItemAsync<ChannelCollection, Channel>(channel);
 
         // Assert
         result.ShouldBeFalse();
         _httpMessageHandlerMock.VerifyRequest(HttpMethod.Post, $"{TEST_ENDPOINT}{endpoint}", Times.Once());
-        _loggerMock.Verify(logger => 
+        _loggerMockGeneric.Verify(logger => 
             logger.Log(
                 LogLevel.Warning,
                 It.IsAny<EventId>(),
@@ -98,7 +98,7 @@ public class InsertTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var results = await _kepwareApiClient.InsertItemsAsync<DeviceTagCollection, Tag>(tags, owner: device);
+        var results = await _kepwareApiClient.GenericConfig.InsertItemsAsync<DeviceTagCollection, Tag>(tags, owner: device);
 
         // Assert
         results.ShouldAllBe(r => r == true);
@@ -125,14 +125,14 @@ public class InsertTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.MultiStatus, multiStatusResponse, "application/json");
 
         // Act
-        var results = await _kepwareApiClient.InsertItemsAsync<DeviceTagCollection, Tag>(tags, owner: device);
+        var results = await _kepwareApiClient.GenericConfig.InsertItemsAsync<DeviceTagCollection, Tag>(tags, owner: device);
 
         // Assert
         results.Length.ShouldBe(2);
         results[0].ShouldBeTrue();
         results[1].ShouldBeFalse();
         _httpMessageHandlerMock.VerifyRequest(HttpMethod.Post, $"{TEST_ENDPOINT}{endpoint}", Times.Once());
-        _loggerMock.Verify(logger => 
+        _loggerMockGeneric.Verify(logger => 
             logger.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
@@ -156,13 +156,13 @@ public class InsertTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var results = await _kepwareApiClient.InsertItemsAsync<ChannelCollection, Channel>(channels);
+        var results = await _kepwareApiClient.GenericConfig.InsertItemsAsync<ChannelCollection, Channel>(channels);
 
         // Assert
         results.Length.ShouldBe(1); // Nur der Advanced Simulator-Channel sollte eingefügt werden
         results[0].ShouldBeTrue();
         _httpMessageHandlerMock.VerifyRequest(HttpMethod.Post, $"{TEST_ENDPOINT}{endpoint}", Times.Once());
-        _loggerMock.Verify(logger => 
+        _loggerMockGeneric.Verify(logger => 
             logger.Log(
                 LogLevel.Warning,
                 It.IsAny<EventId>(),

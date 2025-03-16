@@ -12,10 +12,19 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace Kepware.Api
+namespace Kepware.Api.ClientHandler
 {
-    public partial class KepwareApiClient
+    public class AdminApiHandler
     {
+        private readonly KepwareApiClient m_kepwareApiClient;
+        private readonly ILogger<AdminApiHandler> m_logger;
+
+        public AdminApiHandler(KepwareApiClient kepwareApiClient, ILogger<AdminApiHandler> logger)
+        {
+            m_kepwareApiClient = kepwareApiClient;
+            m_logger = logger;
+        }
+
         #region AdminSettings
 
         /// <summary>
@@ -25,7 +34,7 @@ namespace Kepware.Api
         /// <returns>The current <see cref="AdminSettings"/> or null if retrieval fails.</returns>
         public Task<AdminSettings?> GetAdminSettingsAsync(CancellationToken cancellationToken = default)
         {
-            return LoadEntityAsync<AdminSettings>(name: null, cancellationToken);
+            return m_kepwareApiClient.GenericConfig.LoadEntityAsync<AdminSettings>(name: null, cancellationToken);
         }
 
         /// <summary>
@@ -57,7 +66,7 @@ namespace Kepware.Api
                     "application/json"
                 );
 
-                var response = await m_httpClient.PutAsync(endpoint, httpContent, cancellationToken).ConfigureAwait(false);
+                var response = await m_kepwareApiClient.HttpClient.PutAsync(endpoint, httpContent, cancellationToken).ConfigureAwait(false);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -71,8 +80,8 @@ namespace Kepware.Api
             }
             catch (HttpRequestException httpEx)
             {
-                m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_httpClient.BaseAddress);
-                m_blnIsConnected = null;
+                m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_kepwareApiClient.HttpClient.BaseAddress);
+                m_kepwareApiClient.OnHttpRequestException(httpEx);
             }
 
             return false;
@@ -89,7 +98,7 @@ namespace Kepware.Api
         /// <returns>A collection of <see cref="UaEndpoint"/> or null if retrieval fails.</returns>
         public Task<UaEndpointCollection?> GetUaEndpointListAsync(CancellationToken cancellationToken = default)
         {
-            return LoadCollectionAsync<UaEndpointCollection, UaEndpoint>(cancellationToken: cancellationToken);
+            return m_kepwareApiClient.GenericConfig.LoadCollectionAsync<UaEndpointCollection, UaEndpoint>(cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -100,7 +109,7 @@ namespace Kepware.Api
         /// <returns>The <see cref="UaEndpoint"/> configuration, or null if not found.</returns>
         public Task<UaEndpoint?> GetUaEndpointAsync(string name, CancellationToken cancellationToken = default)
         {
-            return LoadEntityAsync<UaEndpoint>(name, cancellationToken);
+            return m_kepwareApiClient.GenericConfig.LoadEntityAsync<UaEndpoint>(name, cancellationToken);
         }
 
         /// <summary>
@@ -118,21 +127,21 @@ namespace Kepware.Api
             try
             {
                 var endpointUrl = EndpointResolver.ResolveEndpoint<UaEndpoint>([endpoint.Name]);
-                var currentEndpoint = await LoadEntityByEndpointAsync<UaEndpoint>(endpointUrl, cancellationToken);
+                var currentEndpoint = await m_kepwareApiClient.GenericConfig.LoadEntityByEndpointAsync<UaEndpoint>(endpointUrl, cancellationToken);
 
                 if (currentEndpoint == null)
                 {
-                    return await InsertItemAsync(endpoint, cancellationToken: cancellationToken);
+                    return await m_kepwareApiClient.GenericConfig.InsertItemAsync(endpoint, cancellationToken: cancellationToken);
                 }
                 else
                 {
-                    return await UpdateItemAsync(endpoint: endpointUrl, item: endpoint, currentEntity: currentEndpoint, cancellationToken: cancellationToken);
+                    return await m_kepwareApiClient.GenericConfig.UpdateItemAsync(endpoint: endpointUrl, item: endpoint, currentEntity: currentEndpoint, cancellationToken: cancellationToken);
                 }
             }
             catch (HttpRequestException httpEx)
             {
-                m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_httpClient.BaseAddress);
-                m_blnIsConnected = null;
+                m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_kepwareApiClient.HttpClient.BaseAddress);
+                m_kepwareApiClient.OnHttpRequestException(httpEx);
             }
 
             return false;
@@ -145,7 +154,7 @@ namespace Kepware.Api
         /// <param name="cancellationToken">A token that can be used to request cancellation of the operation.</param>
         /// <returns>True if the endpoint was successfully deleted; otherwise, false.</returns>
         public Task<bool> DeleteUaEndpointAsync(string name, CancellationToken cancellationToken = default)
-            => DeleteItemAsync<UaEndpoint>(name, cancellationToken);
+            => m_kepwareApiClient.GenericConfig.DeleteItemAsync<UaEndpoint>(name, cancellationToken);
 
         #endregion
 
@@ -158,7 +167,7 @@ namespace Kepware.Api
         /// <returns>A collection of <see cref="ServerUserGroup"/> or null if retrieval fails.</returns>
         public Task<ServerUserGroupCollection?> GetServerUserGroupListAsync(CancellationToken cancellationToken = default)
         {
-            return LoadCollectionAsync<ServerUserGroupCollection, ServerUserGroup>(cancellationToken: cancellationToken);
+            return m_kepwareApiClient.GenericConfig.LoadCollectionAsync<ServerUserGroupCollection, ServerUserGroup>(cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -169,7 +178,7 @@ namespace Kepware.Api
         /// <returns>The <see cref="ServerUserGroup"/> configuration, or null if not found.</returns>
         public Task<ServerUserGroup?> GetServerUserGroupAsync(string name, CancellationToken cancellationToken = default)
         {
-            return LoadEntityAsync<ServerUserGroup>(name, cancellationToken);
+            return m_kepwareApiClient.GenericConfig.LoadEntityAsync<ServerUserGroup>(name, cancellationToken);
         }
 
         /// <summary>
@@ -187,21 +196,21 @@ namespace Kepware.Api
             try
             {
                 var endpointUrl = EndpointResolver.ResolveEndpoint<ServerUserGroup>([userGroup.Name]);
-                var currentGroup = await LoadEntityByEndpointAsync<ServerUserGroup>(endpointUrl, cancellationToken);
+                var currentGroup = await m_kepwareApiClient.GenericConfig.LoadEntityByEndpointAsync<ServerUserGroup>(endpointUrl, cancellationToken);
 
                 if (currentGroup == null)
                 {
-                    return await InsertItemAsync(userGroup, cancellationToken: cancellationToken);
+                    return await m_kepwareApiClient.GenericConfig.InsertItemAsync(userGroup, cancellationToken: cancellationToken);
                 }
                 else
                 {
-                    return await UpdateItemAsync(endpoint: endpointUrl, item: userGroup, currentEntity: currentGroup, cancellationToken: cancellationToken);
+                    return await m_kepwareApiClient.GenericConfig.UpdateItemAsync(endpoint: endpointUrl, item: userGroup, currentEntity: currentGroup, cancellationToken: cancellationToken);
                 }
             }
             catch (HttpRequestException httpEx)
             {
-                m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_httpClient.BaseAddress);
-                m_blnIsConnected = null;
+                m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_kepwareApiClient.HttpClient.BaseAddress);
+                m_kepwareApiClient.OnHttpRequestException(httpEx);
             }
 
             return false;
@@ -214,7 +223,7 @@ namespace Kepware.Api
         /// <param name="cancellationToken">A token that can be used to request cancellation of the operation.</param>
         /// <returns>True if the group was successfully deleted; otherwise, false.</returns>
         public Task<bool> DeleteServerUserGroupAsync(string name, CancellationToken cancellationToken = default)
-            => DeleteItemAsync<ServerUserGroup>(name, cancellationToken);
+            => m_kepwareApiClient.GenericConfig.DeleteItemAsync<ServerUserGroup>(name, cancellationToken);
 
         #endregion
 
@@ -226,7 +235,7 @@ namespace Kepware.Api
         /// <returns>A collection of <see cref="ServerUser"/> or null if retrieval fails.</returns>
         public Task<ServerUserCollection?> GetServerUserListAsync(CancellationToken cancellationToken = default)
         {
-            return LoadCollectionAsync<ServerUserCollection, ServerUser>(cancellationToken: cancellationToken);
+            return m_kepwareApiClient.GenericConfig.LoadCollectionAsync<ServerUserCollection, ServerUser>(cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -237,7 +246,7 @@ namespace Kepware.Api
         /// <returns>The <see cref="ServerUser"/> configuration, or null if not found.</returns>
         public Task<ServerUser?> GetServerUserAsync(string name, CancellationToken cancellationToken = default)
         {
-            return LoadEntityAsync<ServerUser>(name, cancellationToken);
+            return m_kepwareApiClient.GenericConfig.LoadEntityAsync<ServerUser>(name, cancellationToken);
         }
 
         /// <summary>
@@ -255,7 +264,7 @@ namespace Kepware.Api
             try
             {
                 var endpointUrl = EndpointResolver.ResolveEndpoint<ServerUser>([user.Name]);
-                var currentUser = await LoadEntityByEndpointAsync<ServerUser>(endpointUrl, cancellationToken);
+                var currentUser = await m_kepwareApiClient.GenericConfig.LoadEntityByEndpointAsync<ServerUser>(endpointUrl, cancellationToken);
 
                 if (currentUser == null)
                 {
@@ -264,7 +273,7 @@ namespace Kepware.Api
                         throw new ArgumentException("Password must be at least 14 characters long", nameof(user.Password));
 #pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
 
-                    return await InsertItemAsync<ServerUserCollection, ServerUser>(user, cancellationToken: cancellationToken);
+                    return await m_kepwareApiClient.GenericConfig.InsertItemAsync<ServerUserCollection, ServerUser>(user, cancellationToken: cancellationToken);
                 }
                 else
                 {
@@ -273,13 +282,13 @@ namespace Kepware.Api
                         throw new ArgumentException("Password must be at least 14 characters long", nameof(user.Password));
 #pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
 
-                    return await UpdateItemAsync(endpoint: endpointUrl, item: user, currentEntity: currentUser, cancellationToken: cancellationToken);
+                    return await m_kepwareApiClient.GenericConfig.UpdateItemAsync(endpoint: endpointUrl, item: user, currentEntity: currentUser, cancellationToken: cancellationToken);
                 }
             }
             catch (HttpRequestException httpEx)
             {
-                m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_httpClient.BaseAddress);
-                m_blnIsConnected = null;
+                m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_kepwareApiClient.HttpClient.BaseAddress);
+                m_kepwareApiClient.OnHttpRequestException(httpEx);
             }
 
             return false;
@@ -292,7 +301,7 @@ namespace Kepware.Api
         /// <param name="cancellationToken">A token that can be used to request cancellation of the operation.</param>
         /// <returns>True if the user was successfully deleted; otherwise, false.</returns>
         public Task<bool> DeleteServerUserAsync(string name, CancellationToken cancellationToken = default)
-            => DeleteItemAsync<ServerUser>(name, cancellationToken);
+            => m_kepwareApiClient.GenericConfig.DeleteItemAsync<ServerUser>(name, cancellationToken);
 
         #endregion
 
@@ -305,7 +314,7 @@ namespace Kepware.Api
         /// <returns>A collection of <see cref="ProjectPermission"/> or null if retrieval fails.</returns>
         public Task<ProjectPermissionCollection?> GetProjectPermissionListAsync(CancellationToken cancellationToken = default)
         {
-            return LoadCollectionAsync<ProjectPermissionCollection, ProjectPermission>(cancellationToken: cancellationToken);
+            return m_kepwareApiClient.GenericConfig.LoadCollectionAsync<ProjectPermissionCollection, ProjectPermission>(cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -328,7 +337,7 @@ namespace Kepware.Api
         public Task<ProjectPermission?> GetProjectPermissionAsync(string serverUserGroupName, ProjectPermissionName projectPermissionName, CancellationToken cancellationToken = default)
         {
             var endpoint = EndpointResolver.ResolveEndpoint<ProjectPermission>([serverUserGroupName, projectPermissionName]);
-            return LoadEntityByEndpointAsync<ProjectPermission>(endpoint, cancellationToken);
+            return m_kepwareApiClient.GenericConfig.LoadEntityByEndpointAsync<ProjectPermission>(endpoint, cancellationToken);
         }
 
         /// <summary>
@@ -354,7 +363,7 @@ namespace Kepware.Api
             try
             {
                 var endpointUrl = EndpointResolver.ResolveEndpoint<ProjectPermission>([serverUserGroupName, projectPermission.Name]);
-                var existingPermission = await LoadEntityByEndpointAsync<ProjectPermission>(endpointUrl, cancellationToken);
+                var existingPermission = await m_kepwareApiClient.GenericConfig.LoadEntityByEndpointAsync<ProjectPermission>(endpointUrl, cancellationToken);
 
                 if (existingPermission == null)
                 {
@@ -362,13 +371,13 @@ namespace Kepware.Api
                 }
                 else
                 {
-                    return await UpdateItemAsync(endpoint: endpointUrl, item: projectPermission, currentEntity: existingPermission, cancellationToken: cancellationToken);
+                    return await m_kepwareApiClient.GenericConfig.UpdateItemAsync(endpoint: endpointUrl, item: projectPermission, currentEntity: existingPermission, cancellationToken: cancellationToken);
                 }
             }
             catch (HttpRequestException httpEx)
             {
-                m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_httpClient.BaseAddress);
-                m_blnIsConnected = null;
+                m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_kepwareApiClient.HttpClient.BaseAddress);
+                m_kepwareApiClient.OnHttpRequestException(httpEx);
             }
 
             return false;
