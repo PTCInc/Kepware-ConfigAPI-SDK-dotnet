@@ -89,6 +89,24 @@ namespace Kepware.Api.Model.Services
             }
         }
 
+
+        /// <summary>
+        /// Awaits the completion of the job asynchronously.
+        /// If the job is completed successfully, the task result will contain <see langword="true"/>.
+        /// You can call this method multiple times to get the result, it will not re-run the job or wait again for the completion.
+        /// It is safe to call this method after the job has been completed.
+        /// This is thread-safe.
+        /// </summary>
+        /// <param name="waitDelayBetweenCompletionPolls">The delay between completion polls.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="ApiResponse{T}"/> indicating the job completion status.</returns>
+        /// <exception cref="ObjectDisposedException">Thrown if the object has been disposed.</exception>
+        public Task<ApiResponse<bool>> AwaitCompletionAsync(TimeSpan waitDelayBetweenCompletionPolls, CancellationToken cancellationToken = default)
+        {
+            WaitDelayBetweenCompletionPolls = waitDelayBetweenCompletionPolls;
+            return AwaitCompletionAsync(cancellationToken);
+        }
+
         private static async Task<ApiResponse<bool>> AwaitCompletionAsync(string jobHref, KepServerJobPromise kepServerJobPromise, HttpClient httpClient, CancellationToken cancellationToken)
         {
             using var timeoutCts = new CancellationTokenSource(kepServerJobPromise.JobTimeToLive);

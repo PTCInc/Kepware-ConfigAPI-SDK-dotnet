@@ -23,6 +23,7 @@ namespace Kepware.Api.Test.ApiClient
         protected readonly Mock<HttpMessageHandler> _httpMessageHandlerMock;
         protected readonly Mock<ILogger<KepwareApiClient>> _loggerMock;
         protected readonly Mock<ILogger<AdminApiHandler>> _loggerMockAdmin;
+        protected readonly Mock<ILogger<ProjectApiHandler>> _loggerMockProject;
         protected readonly Mock<ILogger<GenericApiHandler>> _loggerMockGeneric;
         protected readonly Mock<ILoggerFactory> _loggerFactoryMock;
         protected readonly KepwareApiClient _kepwareApiClient;
@@ -33,6 +34,7 @@ namespace Kepware.Api.Test.ApiClient
             _loggerMock = new Mock<ILogger<KepwareApiClient>>();
             _loggerMockAdmin = new Mock<ILogger<AdminApiHandler>>();
             _loggerMockGeneric = new Mock<ILogger<GenericApiHandler>>();
+            _loggerMockProject = new Mock<ILogger<ProjectApiHandler>>();
             _loggerFactoryMock = new Mock<ILoggerFactory>();
 
             _loggerFactoryMock.Setup(factory => factory.CreateLogger(It.IsAny<string>())).Returns((string name) =>
@@ -43,6 +45,8 @@ namespace Kepware.Api.Test.ApiClient
                     return _loggerMockAdmin.Object;
                 else if (name == typeof(GenericApiHandler).FullName)
                     return _loggerMockGeneric.Object;
+                else if (name == typeof(ProjectApiHandler).FullName)
+                    return _loggerMockProject.Object;
                 else
                     return Mock.Of<ILogger>();
             });

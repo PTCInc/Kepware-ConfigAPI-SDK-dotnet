@@ -91,10 +91,6 @@ namespace Kepware.Api.Serializer
             {
                 return (JsonTypeInfo<T>)(object)Default.ProjectPermission;
             }
-            else if (typeof(T) == typeof(ProjectProperties))
-            {
-                return (JsonTypeInfo<T>)(object)Default.ProjectProperties;
-            }
             else if (typeof(T) == typeof(DefaultEntity))
             {
                 return (JsonTypeInfo<T>)(object)Default.DefaultEntity;

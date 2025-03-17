@@ -147,8 +147,8 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(jobStatus), "application/json");
 
             // Act
-            var result = await _kepwareApiClient.ApiServices.ReinitializeRuntimeAsync(TimeSpan.FromSeconds(2));
-            var completionResult = await result.AwaitCompletionAsync();
+            var result = await _kepwareApiClient.ApiServices.ReinitializeRuntimeAsync(TimeSpan.FromSeconds(1));
+            var completionResult = await result.AwaitCompletionAsync(TimeSpan.FromMilliseconds(100));
 
             // Assert
             completionResult.Value.ShouldBeFalse();
@@ -173,7 +173,7 @@ namespace Kepware.Api.Test.ApiClient
 
             // Act
             var result = await _kepwareApiClient.ApiServices.ReinitializeRuntimeAsync(TimeSpan.FromSeconds(5));
-            var completionResult = await result.AwaitCompletionAsync();
+            var completionResult = await result.AwaitCompletionAsync(TimeSpan.FromMilliseconds(100));
 
             // Assert
             completionResult.Value.ShouldBeFalse();

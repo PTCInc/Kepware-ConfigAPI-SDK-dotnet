@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -128,6 +129,76 @@ namespace Kepware.Api.ClientHandler
 
             return (inserts, updates, deletes);
         }
+        #endregion
+
+        #region ProjectProperties
+
+        /// <summary>
+        /// Gets the project properties from the Kepware server.
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public async Task<Project?> GetProjectPropertiesAsync(CancellationToken cancellationToken = default)
+        {
+            var project = await m_kepwareApiClient.GenericConfig.LoadEntityAsync<Project>(name: null, cancellationToken: cancellationToken).ConfigureAwait(false);
+            return project;
+
+        }
+
+        /// <summary>
+        /// Sets the project properties on the Kepware server.
+        /// </summary>
+        /// <param name="project"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public async Task<bool> SetProjectPropertiesAsync(Project project, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var currentProject = await m_kepwareApiClient.GenericConfig.LoadEntityAsync<Project>(name: null, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                if (currentProject == null)
+                {
+                    throw new InvalidOperationException("Failed to retrieve current settings");
+                }
+
+                var endpoint = EndpointResolver.ResolveEndpoint<Project>();
+                var diff = project.GetUpdateDiff(currentProject);
+
+                // Need to ensure ProjectId is captured. GetUpdateDiff doesn't return ProjectId on non_NamedEntity types
+                diff.Add(Properties.ProjectId, KepJsonContext.WrapInJsonElement(currentProject.ProjectId));
+
+                m_logger.LogInformation("Updating Project Property Settings on {Endpoint}, values {Diff}", endpoint, diff);
+
+                HttpContent httpContent = new StringContent(
+                         JsonSerializer.Serialize(diff, KepJsonContext.Default.DictionaryStringJsonElement),
+                         Encoding.UTF8,
+                         "application/json"
+                     );
+
+                var response = await m_kepwareApiClient.HttpClient.PutAsync(endpoint, httpContent, cancellationToken).ConfigureAwait(false);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var message = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                    m_logger.LogError("Failed to update Project Property Settings from {Endpoint}: {ReasonPhrase}\n{Message}", endpoint, response.ReasonPhrase, message);
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            catch (HttpRequestException httpEx)
+            {
+                m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_kepwareApiClient.HttpClient.BaseAddress);
+                m_kepwareApiClient.OnHttpRequestException(httpEx);
+            }
+
+            return false;
+        }
+
         #endregion
 
         #region LoadProject

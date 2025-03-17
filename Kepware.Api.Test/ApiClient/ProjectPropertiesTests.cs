@@ -27,7 +27,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(projectPropSettings), "application/json");
 
             // Act
-            var result = await _kepwareApiClient.GetProjectPropertiesAsync();
+            var result = await _kepwareApiClient.Project.GetProjectPropertiesAsync();
 
             // Assert
             result.ShouldNotBeNull();
@@ -47,11 +47,11 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
 
             // Act
-            var result = await _kepwareApiClient.GetProjectPropertiesAsync();
+            var result = await _kepwareApiClient.Project.GetProjectPropertiesAsync();
 
             // Assert
             result.ShouldBeNull();
-            _loggerMock.Verify(logger =>
+            _loggerMockGeneric.Verify(logger =>
                 logger.Log(
                     LogLevel.Warning,
                     It.IsAny<EventId>(),
@@ -69,11 +69,11 @@ namespace Kepware.Api.Test.ApiClient
                 .ThrowsAsync(new HttpRequestException("Network error"));
 
             // Act
-            var result = await _kepwareApiClient.GetProjectPropertiesAsync();
+            var result = await _kepwareApiClient.Project.GetProjectPropertiesAsync();
 
             // Assert
             result.ShouldBeNull();
-            _loggerMock.Verify(logger =>
+            _loggerMockGeneric.Verify(logger =>
                 logger.Log(
                     LogLevel.Warning,
                     It.IsAny<EventId>(),
@@ -91,11 +91,11 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.NotFound, "Not Found");
 
             // Act
-            var result = await _kepwareApiClient.GetProjectPropertiesAsync();
+            var result = await _kepwareApiClient.Project.GetProjectPropertiesAsync();
 
             // Assert
             result.ShouldBeNull();
-            _loggerMock.Verify(logger =>
+            _loggerMockGeneric.Verify(logger =>
                 logger.Log(
                     LogLevel.Warning,
                     It.IsAny<EventId>(),
@@ -113,11 +113,11 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.Unauthorized, "Unauthorized");
 
             // Act
-            var result = await _kepwareApiClient.GetProjectPropertiesAsync();
+            var result = await _kepwareApiClient.Project.GetProjectPropertiesAsync();
 
             // Assert
             result.ShouldBeNull();
-            _loggerMock.Verify(logger =>
+            _loggerMockGeneric.Verify(logger =>
                 logger.Log(
                     LogLevel.Warning,
                     It.IsAny<EventId>(),
@@ -147,7 +147,7 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.OK);
 
             // Act
-            var result = await _kepwareApiClient.SetProjectPropertiesAsync(newSettings);
+            var result = await _kepwareApiClient.Project.SetProjectPropertiesAsync(newSettings);
 
             // Assert
             result.ShouldBeTrue();
@@ -165,7 +165,7 @@ namespace Kepware.Api.Test.ApiClient
 
             // Act & Assert
             await Should.ThrowAsync<InvalidOperationException>(async () =>
-                await _kepwareApiClient.SetProjectPropertiesAsync(newSettings));
+                await _kepwareApiClient.Project.SetProjectPropertiesAsync(newSettings));
 
             _httpMessageHandlerMock.VerifyRequest(HttpMethod.Get, $"{TEST_ENDPOINT}{ENDPOINT_PROJECT}", Times.Once());
             _httpMessageHandlerMock.VerifyRequest(HttpMethod.Put, $"{TEST_ENDPOINT}{ENDPOINT_PROJECT}", Times.Never());
@@ -186,13 +186,13 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.BadRequest, "Invalid setting value");
 
             // Act
-            var result = await _kepwareApiClient.SetProjectPropertiesAsync(newSettings);
+            var result = await _kepwareApiClient.Project.SetProjectPropertiesAsync(newSettings);
 
             // Assert
             result.ShouldBeFalse();
             _httpMessageHandlerMock.VerifyRequest(HttpMethod.Get, $"{TEST_ENDPOINT}{ENDPOINT_PROJECT}", Times.Once());
             _httpMessageHandlerMock.VerifyRequest(HttpMethod.Put, $"{TEST_ENDPOINT}{ENDPOINT_PROJECT}", Times.Once());
-            _loggerMock.Verify(logger =>
+            _loggerMockProject.Verify(logger =>
                 logger.Log(
                     LogLevel.Error,
                     It.IsAny<EventId>(),
@@ -217,13 +217,13 @@ namespace Kepware.Api.Test.ApiClient
                 .ThrowsAsync(new HttpRequestException("Network error during update"));
 
             // Act
-            var result = await _kepwareApiClient.SetProjectPropertiesAsync(newSettings);
+            var result = await _kepwareApiClient.Project.SetProjectPropertiesAsync(newSettings);
 
             // Assert
             result.ShouldBeFalse();
             _httpMessageHandlerMock.VerifyRequest(HttpMethod.Get, $"{TEST_ENDPOINT}{ENDPOINT_PROJECT}", Times.Once());
             _httpMessageHandlerMock.VerifyRequest(HttpMethod.Put, $"{TEST_ENDPOINT}{ENDPOINT_PROJECT}", Times.Once());
-            _loggerMock.Verify(logger =>
+            _loggerMockProject.Verify(logger =>
                 logger.Log(
                     LogLevel.Warning,
                     It.IsAny<EventId>(),
@@ -248,13 +248,13 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.Unauthorized, "Unauthorized");
 
             // Act
-            var result = await _kepwareApiClient.SetProjectPropertiesAsync(newSettings);
+            var result = await _kepwareApiClient.Project.SetProjectPropertiesAsync(newSettings);
 
             // Assert
             result.ShouldBeFalse();
             _httpMessageHandlerMock.VerifyRequest(HttpMethod.Get, $"{TEST_ENDPOINT}{ENDPOINT_PROJECT}", Times.Once());
             _httpMessageHandlerMock.VerifyRequest(HttpMethod.Put, $"{TEST_ENDPOINT}{ENDPOINT_PROJECT}", Times.Once());
-            _loggerMock.Verify(logger =>
+            _loggerMockProject.Verify(logger =>
                 logger.Log(
                     LogLevel.Error,
                     It.IsAny<EventId>(),
@@ -279,13 +279,13 @@ namespace Kepware.Api.Test.ApiClient
                 .ReturnsResponse(HttpStatusCode.Forbidden, "Forbidden");
 
             // Act
-            var result = await _kepwareApiClient.SetProjectPropertiesAsync(newSettings);
+            var result = await _kepwareApiClient.Project.SetProjectPropertiesAsync(newSettings);
 
             // Assert
             result.ShouldBeFalse();
             _httpMessageHandlerMock.VerifyRequest(HttpMethod.Get, $"{TEST_ENDPOINT}{ENDPOINT_PROJECT}", Times.Once());
             _httpMessageHandlerMock.VerifyRequest(HttpMethod.Put, $"{TEST_ENDPOINT}{ENDPOINT_PROJECT}", Times.Once());
-            _loggerMock.Verify(logger =>
+            _loggerMockProject.Verify(logger =>
                 logger.Log(
                     LogLevel.Error,
                     It.IsAny<EventId>(),
@@ -301,7 +301,8 @@ namespace Kepware.Api.Test.ApiClient
         private static Project CreateTestProjectProperties()
         {
             var project = new Project();
-            var settings = new ProjectProperties(project)
+
+            _ = new ProjectProperties(project)
             {
                 //ProjectId = 1291004473,
                 Title = "Default Project",
