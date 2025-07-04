@@ -36,6 +36,7 @@ namespace Kepware.Api.Test.ApiClient
 
         #region GetProductInfoAsync - SupportsJsonProjectLoadService
 
+        //TODO: Add more test cases for TKS versions as well. Different product name
         [Theory]
         [InlineData("KEPServerEX", "12", 6, 17, true)]  // Supports JSON Project Load Service (6.17+)
         [InlineData("KEPServerEX", "12", 6, 16, false)] // Does not support it (6.16)
