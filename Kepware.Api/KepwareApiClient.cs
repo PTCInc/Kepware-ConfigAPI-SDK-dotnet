@@ -33,6 +33,7 @@ namespace Kepware.Api
         private const string ENDPOINT_STATUS = "/config/v1/status";
         private const string ENDPOINT_DOC = "/config/v1/doc";
         private const string ENDPOINT_ABOUT = "/config/v1/about";
+        private const string ENDPOINT_PROJECT = "/config/v1/project";
 
         private readonly ILogger<KepwareApiClient> m_logger;
         private readonly HttpClient m_httpClient;
@@ -243,7 +244,8 @@ namespace Kepware.Api
             bool hasValidCredentials = false;
             try
             {
-                var response = await m_httpClient.GetAsync(ENDPOINT_DOC, cancellationToken).ConfigureAwait(false);
+                
+                var response = await m_httpClient.GetAsync(ENDPOINT_PROJECT, cancellationToken).ConfigureAwait(false);
                 hasValidCredentials = response.IsSuccessStatusCode;
                 if (hasValidCredentials)
                 {
