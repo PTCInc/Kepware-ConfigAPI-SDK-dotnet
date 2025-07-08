@@ -100,6 +100,9 @@ namespace Kepware.Api.Test.ApiClient
 
             _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, $"{TEST_ENDPOINT}/config/v1/doc")
                 .ReturnsResponse(HttpStatusCode.OK, statusResponse, "application/json");
+
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, $"{TEST_ENDPOINT}/config/v1/project")
+                .ReturnsResponse(HttpStatusCode.OK, "[]", "application/json");
         }
 
         protected Channel CreateTestChannel(string name = "TestChannel", string driver = "Advanced Simulator")
