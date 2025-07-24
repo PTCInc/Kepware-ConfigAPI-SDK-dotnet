@@ -119,7 +119,7 @@ namespace Kepware.Api.ClientHandler
 
                     foreach (var tagGroup in tagGroupCompare.UnchangedItems.Concat(tagGroupCompare.ChangedItems))
                     {
-                        var tagGroupTagCompare = await m_kepwareApiClient.GenericConfig.CompareAndApply<DeviceTagGroupTagCollection, Tag>(tagGroup.Left!.Tags, tagGroup.Right!.Tags, tagGroup.Right, cancellationToken).ConfigureAwait(false);
+                        var tagGroupTagCompare = await m_kepwareApiClient.GenericConfig.CompareAndApply<DeviceTagCollection, Tag>(tagGroup.Left!.Tags, tagGroup.Right!.Tags, tagGroup.Right, cancellationToken).ConfigureAwait(false);
 
                         updates += tagGroupTagCompare.ChangedItems.Count;
                         inserts += tagGroupTagCompare.ItemsOnlyInLeft.Count;
@@ -376,7 +376,7 @@ namespace Kepware.Api.ClientHandler
 
             foreach (var tagGroup in tagGroupCompare.UnchangedItems.Concat(tagGroupCompare.ChangedItems))
             {
-                var tagGroupTagCompare = await apiClient.GenericConfig.CompareAndApply<DeviceTagGroupTagCollection, Tag>(tagGroup.Left!.Tags, tagGroup.Right!.Tags, tagGroup.Right, cancellationToken: cancellationToken).ConfigureAwait(false);
+                var tagGroupTagCompare = await apiClient.GenericConfig.CompareAndApply<DeviceTagCollection, Tag>(tagGroup.Left!.Tags, tagGroup.Right!.Tags, tagGroup.Right, cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 ret.inserts = tagGroupTagCompare.ItemsOnlyInLeft.Count;
                 ret.updates = tagGroupTagCompare.ChangedItems.Count;
@@ -407,7 +407,7 @@ namespace Kepware.Api.ClientHandler
             {
                 // Load the Tag Groups and Tags of the current Tag Group
                 tagGroup.TagGroups = await apiClient.GenericConfig.LoadCollectionAsync<DeviceTagGroupCollection, DeviceTagGroup>(tagGroup, cancellationToken).ConfigureAwait(false);
-                tagGroup.Tags = await apiClient.GenericConfig.LoadCollectionAsync<DeviceTagGroupTagCollection, Tag>(tagGroup, cancellationToken).ConfigureAwait(false);
+                tagGroup.Tags = await apiClient.GenericConfig.LoadCollectionAsync<DeviceTagCollection, Tag>(tagGroup, cancellationToken).ConfigureAwait(false);
 
                 // Recursively load the Tag Groups and Tags of the child Tag Groups
                 if (tagGroup.TagGroups != null && tagGroup.TagGroups.Count > 0)

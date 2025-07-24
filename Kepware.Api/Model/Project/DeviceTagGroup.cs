@@ -11,7 +11,7 @@ namespace Kepware.Api.Model
     /// <summary>
     /// Represents a tag group in a device
     /// </summary>
-    [RecursiveEndpoint("/config/v1/project/channels/{channelName}/devices/{deviceName}", "/tag_groups/{groupName}", typeof(DeviceTagGroup))]
+    [RecursiveEndpoint("/config/v1/project/channels/{channelName}/devices/{deviceName}", "/tag_groups/{groupName}", typeof(DeviceTagGroup), suffix: "/tag_groups/{groupName}")]
     public class DeviceTagGroup : NamedEntity
     {
         public DeviceTagGroup()
@@ -37,7 +37,7 @@ namespace Kepware.Api.Model
         [YamlIgnore]
         [JsonPropertyName("tags")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public DeviceTagGroupTagCollection? Tags { get; set; }
+        public DeviceTagCollection? Tags { get; set; }
 
         /// <summary>
         /// Recursively cleans up the tag group and all its children

@@ -352,7 +352,7 @@ namespace Kepware.Api.Test.ApiClient
                                    .ReturnsResponse(tagsJson, "application/json");
 
             // Act
-            var result = await _kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagGroupTagCollection, Tag>(new DeviceTagGroup("B Registers", new Device("16 Bit Device", "Data Type Examples")));
+            var result = await _kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagCollection, Tag>(new DeviceTagGroup("B Registers", new Device("16 Bit Device", "Data Type Examples")));
 
             // Assert
             Assert.NotNull(result);
@@ -363,7 +363,7 @@ namespace Kepware.Api.Test.ApiClient
 
         #endregion
 
-        #region LoadEntityAsync - Exception Fall
+        #region LoadEntityAsync - Exception Fail
 
         [Fact]
         public async Task LoadEntityAsync_ShouldThrowInvalidOperationException_WhenLoadRecursiveEndpointWithStringList()
@@ -371,7 +371,7 @@ namespace Kepware.Api.Test.ApiClient
             // Act & Assert
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await _kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagGroupTagCollection, Tag>(["Data Type Examples", "16 Bit Device", "B Registers"]);
+                await _kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagCollection, Tag>(["Data Type Examples", "16 Bit Device", "B Registers"]);
             });
 
             Assert.Equal("Recursive endpoint does not support string list item name", exception.Message);

@@ -56,7 +56,7 @@ namespace Kepware.Api.Test.Util
             var owner = new DeviceTagGroup("Values", new DeviceTagGroup("B Registers", new Device("16 Bit Device", new Channel("Data Type Examples"))));
 
             // Act
-            var endpoint = EndpointResolver.ResolveEndpoint<DeviceTagGroupTagCollection>(owner);
+            var endpoint = EndpointResolver.ResolveEndpoint<DeviceTagCollection>(owner);
 
             // Assert
             Assert.Equal("/config/v1/project/channels/Data%20Type%20Examples/devices/16%20Bit%20Device/tag_groups/B%20Registers/tag_groups/Values/tags", endpoint);
@@ -98,7 +98,7 @@ namespace Kepware.Api.Test.Util
 
             // Act & Assert
             var exception = Assert.Throws<InvalidOperationException>(() =>
-                EndpointResolver.ResolveEndpoint<DeviceTagGroupTagCollection>(owner, "Boolean1")
+                EndpointResolver.ResolveEndpoint<DeviceTagCollection>(owner, "Boolean1")
             );
 
             Assert.Equal("Recursive endpoint does not support item name", exception.Message);

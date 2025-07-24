@@ -310,7 +310,7 @@ namespace Kepware.Api.ClientHandler
                 for (int i = 0; i < totalPageCount; i++)
                 {
                     var pageItems = items.Skip(i * pageSize).Take(pageSize).ToList();
-                    m_logger.LogInformation("Inserting {NumItems} {TypeName} on {Endpoint} in batch {BatchNr} of {TotalBatches} ...", pageItems.Count, typeof(K).Name, endpoint, i + 1, totalPageCount);
+                    m_logger.LogInformation("Inserting {NumItems} {TypeName}(s) on {Endpoint} in batch {BatchNr} of {TotalBatches} ...", pageItems.Count, typeof(K).Name, endpoint, i + 1, totalPageCount);
 
                     var jsonContent = JsonSerializer.Serialize(pageItems, KepJsonContext.GetJsonListTypeInfo<K>());
                     HttpContent httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");

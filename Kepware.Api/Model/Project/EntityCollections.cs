@@ -36,7 +36,7 @@ namespace Kepware.Api.Model
     /// <summary>
     /// Represents the collection of tags in a device
     /// </summary>
-    [Endpoint("/config/v1/project/channels/{channelName}/devices/{deviceName}/tags")]
+    [RecursiveEndpoint("/config/v1/project/channels/{channelName}/devices/{deviceName}", "/tag_groups/{groupName}", typeof(DeviceTagGroup), suffix: "/tags")]
     public class DeviceTagCollection : EntityCollection<Tag>
     {
         /// <summary>
@@ -150,27 +150,6 @@ namespace Kepware.Api.Model
         public DeviceTagGroupCollection() { }
     }
 
-    /// <summary>
-    /// Represents the collection of tag in a tag group
-    /// </summary>
-    [RecursiveEndpoint("/config/v1/project/channels/{channelName}/devices/{deviceName}", "/tag_groups/{groupName}", typeof(DeviceTagGroup), suffix: "/tags")]
-    public class DeviceTagGroupTagCollection : EntityCollection<Tag>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DeviceTagGroupTagCollection"/> class.
-        /// </summary>
-        public DeviceTagGroupTagCollection() { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DeviceTagGroupTagCollection"/> class.
-        /// </summary>
-        public DeviceTagGroupTagCollection(IEnumerable<Tag> collection)
-            : base(collection)
-        {
-
-        }
-
-    }
 
     /// <summary>
     /// Represents the collection of phonebooks in a channel

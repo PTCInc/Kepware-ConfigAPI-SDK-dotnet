@@ -258,7 +258,7 @@ namespace Kepware.Api.TestIntg.ApiClient
             var tagList = await AddSimulatorTestTags(device);
 
             // Act
-            var result = await _kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagGroupTagCollection, Tag>(device);
+            var result = await _kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagCollection, Tag>(device);
 
             // Assert
             Assert.NotNull(result);
@@ -318,7 +318,7 @@ namespace Kepware.Api.TestIntg.ApiClient
                 var tagList = await AddSimulatorTestTags(tagGroup);
 
                 // Act
-                var result = await _kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagGroupTagCollection, Tag>(tagGroup);
+                var result = await _kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagCollection, Tag>(tagGroup);
 
                 // Assert
                 Assert.NotNull(result);
