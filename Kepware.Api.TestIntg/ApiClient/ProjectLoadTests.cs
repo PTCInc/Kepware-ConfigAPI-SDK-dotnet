@@ -163,7 +163,7 @@ namespace Kepware.Api.TestIntg.ApiClient
                 var thisName = parentName + "/" + ExpectedTagGroup.Name;
                 if (ExpectedTagGroup.Tags?.Count > 0 || ActualTagGroup.Tags?.Count > 0)
                 {
-                    var tagCompareResult = EntityCompare.Compare<DeviceTagGroupTagCollection, Tag>(ExpectedTagGroup.Tags, ExpectedTagGroup.Tags);
+                    var tagCompareResult = EntityCompare.Compare<DeviceTagCollection, Tag>(ExpectedTagGroup.Tags, ExpectedTagGroup.Tags);
                     tagCompareResult.ShouldNotBeNull();
                     tagCompareResult.UnchangedItems.ShouldNotBeEmpty($"All tags in device {thisName} should be unchanged.");
                     tagCompareResult.ChangedItems.ShouldBeEmpty($"No tags in device {thisName} should be changed.");

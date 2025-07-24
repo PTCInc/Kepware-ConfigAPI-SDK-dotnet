@@ -37,7 +37,7 @@ namespace Kepware.Api.Model
         [YamlIgnore]
         [JsonPropertyName("tags")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public DeviceTagGroupTagCollection? Tags { get; set; }
+        public DeviceTagCollection? Tags { get; set; }
 
         /// <summary>
         /// Recursively cleans up the tag group and all its children
