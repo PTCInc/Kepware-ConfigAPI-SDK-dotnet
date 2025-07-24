@@ -146,7 +146,7 @@ namespace Kepware.Api.ClientHandler
         /// Gets the project properties from the Kepware server.
         /// </summary>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <returns>A <see cref="Project"/> or null if retrieval fails.</returns>
         /// <exception cref="InvalidOperationException"></exception>
         public async Task<Project?> GetProjectPropertiesAsync(CancellationToken cancellationToken = default)
         {
@@ -160,7 +160,7 @@ namespace Kepware.Api.ClientHandler
         /// </summary>
         /// <param name="project"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating whether the update was successful.</returns>
         /// <exception cref="InvalidOperationException"></exception>
         public async Task<bool> SetProjectPropertiesAsync(Project project, CancellationToken cancellationToken = default)
         {
@@ -217,7 +217,7 @@ namespace Kepware.Api.ClientHandler
         /// </summary>
         /// <param name="blnLoadFullProject">Indicates whether to load the full project.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the loaded project.</returns>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the loaded <see cref="Project"/>.</returns>
         /// <remarks>NOTE: When loading a full project, the project will be loaded via the JsonProjectLoad service if supported by the server. (Kepware Server 6.17+
         /// and Thingworx Kepware Server 1.10+) Otherwise, the project will be loaded by recursively loading all objects in the project.</remarks>
         public async Task<Project> LoadProject(bool blnLoadFullProject = false, CancellationToken cancellationToken = default)

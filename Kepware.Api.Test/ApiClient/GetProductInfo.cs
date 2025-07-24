@@ -39,8 +39,11 @@ namespace Kepware.Api.Test.ApiClient
         [Theory]
         [InlineData("KEPServerEX", "12", 6, 17, true)]  // Supports JSON Project Load Service (6.17+)
         [InlineData("KEPServerEX", "12", 6, 16, false)] // Does not support it (6.16)
-        [InlineData("ThingWorxKepwareEdge", "13", 1, 10, true)] // Supports it (1.10+)
+        [InlineData("ThingworxKepwareServer", "12", 6, 17, true)]  // Supports JSON Project Load Service (6.17+)
+        [InlineData("ThingworxKepwareServer", "12", 6, 16, false)] // Does not support it (6.16)
+        [InlineData("ThingWorxKepwareEdge", "13", 1, 10, true)] // Supports JSON Project Load Service (1.10+)
         [InlineData("ThingWorxKepwareEdge", "13", 1, 9, false)] // Does not support it (1.9)
+        [InlineData("Kepware Edge", "13", 1, 0, true)] // Supports JSON Project Load Service
         [InlineData("UnknownProduct", "99", 10, 0, false)] // Unknown product, should be false
         public async Task GetProductInfoAsync_ShouldReturnCorrect_SupportsJsonProjectLoadService(
             string productName, string productId, int majorVersion, int minorVersion, bool expectedResult)
@@ -61,8 +64,10 @@ namespace Kepware.Api.Test.ApiClient
         #region GetProductInfoAsync - ProductType
 
         [Theory]
-        [InlineData("KEPServerEX", "12", ProductType.KEPServerEX)]
-        [InlineData("ThingWorxKepwareEdge", "13", ProductType.ThingWorxKepwareEdge)]
+        [InlineData("KEPServerEX", "12", ProductType.KepwareServer)]
+        [InlineData("ThingworxKepwareServer", "12", ProductType.KepwareServer)]
+        [InlineData("ThingWorxKepwareEdge", "13", ProductType.KepwareEdge)]
+        [InlineData("Kepware Edge", "13", ProductType.KepwareEdge)]
         [InlineData("UnknownProduct", "99", ProductType.Unknown)]
         [InlineData("InvalidProduct", "abc", ProductType.Unknown)] // Invalid ID, should be Unknown
         public async Task GetProductInfoAsync_ShouldReturnCorrect_ProductType(

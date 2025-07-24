@@ -50,6 +50,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docfx", "docfx", "{EF3D2F75
 		docs\docfx\toc.yml = docs\docfx\toc.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kepware.Api.TestIntg", "Kepware.Api.TestIntg\Kepware.Api.TestIntg.csproj", "{5FF0BFA8-5429-4823-9B18-05EB2E6779AE}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{457CB96C-D60B-4994-B87C-BCDBF4035D58}"
 	ProjectSection(SolutionItems) = preProject
 		docs\docfx\docs\toc.yml = docs\docfx\docs\toc.yml
@@ -77,6 +79,10 @@ Global
 		{E5F9DE9E-F9F2-4683-A7A9-ACE8501F7566}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5F9DE9E-F9F2-4683-A7A9-ACE8501F7566}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5F9DE9E-F9F2-4683-A7A9-ACE8501F7566}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FF0BFA8-5429-4823-9B18-05EB2E6779AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FF0BFA8-5429-4823-9B18-05EB2E6779AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FF0BFA8-5429-4823-9B18-05EB2E6779AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FF0BFA8-5429-4823-9B18-05EB2E6779AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

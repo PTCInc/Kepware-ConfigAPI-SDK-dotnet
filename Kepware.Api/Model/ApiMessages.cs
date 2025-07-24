@@ -66,13 +66,14 @@ namespace Kepware.Api.Model
         /// </summary>
         Unknown = 0,
         /// <summary>
-        /// Thing worx Kepware Edge.
+        /// Kepware Edge - This covers Edge branded products including Thingworx Kepware Edge.
         /// </summary>
-        ThingWorxKepwareEdge = 13,
+        KepwareEdge = 13,
         /// <summary>
-        /// KEPServerEX.
+        /// Kepware Server - This covers all Kepware branded products including KEPServerEX,
+        /// Thingworx Kepware Server, and future products that use the Kepware Server codebase.
         /// </summary>
-        KEPServerEX = 12
+        KepwareServer = 12
     }
 
     /// <summary>
@@ -149,8 +150,9 @@ namespace Kepware.Api.Model
         /// </summary>
         [JsonIgnore]
         public bool SupportsJsonProjectLoadService =>
-            (ProductType == ProductType.KEPServerEX && (ProductVersionMajor > 6 || (ProductVersionMajor == 6 && ProductVersionMinor >= 17))) ||
-            (ProductType == ProductType.ThingWorxKepwareEdge && (ProductVersionMajor > 1 || (ProductVersionMajor == 1 && ProductVersionMinor >= 10)));
+            (ProductType == ProductType.KepwareServer && (ProductVersionMajor > 6 || (ProductVersionMajor == 6 && ProductVersionMinor >= 17))) ||
+            (ProductType == ProductType.KepwareEdge && (ProductVersionMajor > 1 || (ProductVersionMajor == 1 && ProductVersionMinor >= 10))) ||
+            (ProductType == ProductType.KepwareEdge && ProductName == "Kepware Edge");
     }
 
 

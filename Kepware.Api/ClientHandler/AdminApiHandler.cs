@@ -88,7 +88,7 @@ namespace Kepware.Api.ClientHandler
             }
             catch (HttpRequestException httpEx)
             {
-                m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_kepwareApiClient.HttpClient.BaseAddress);
+                m_logger.LogWarning("Failed to connect to {BaseAddress}, Reason: {Message}", m_kepwareApiClient.HttpClient.BaseAddress, httpEx.Message);
                 m_kepwareApiClient.OnHttpRequestException(httpEx);
             }
 
@@ -148,7 +148,7 @@ namespace Kepware.Api.ClientHandler
             }
             catch (HttpRequestException httpEx)
             {
-                m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_kepwareApiClient.HttpClient.BaseAddress);
+                m_logger.LogWarning("Failed to connect to {BaseAddress}, Reason: {Message}", m_kepwareApiClient.HttpClient.BaseAddress, httpEx.Message);
                 m_kepwareApiClient.OnHttpRequestException(httpEx);
             }
 
@@ -217,7 +217,7 @@ namespace Kepware.Api.ClientHandler
             }
             catch (HttpRequestException httpEx)
             {
-                m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_kepwareApiClient.HttpClient.BaseAddress);
+                m_logger.LogWarning("Failed to connect to {BaseAddress}, Reason: {Message}", m_kepwareApiClient.HttpClient.BaseAddress, httpEx.Message);
                 m_kepwareApiClient.OnHttpRequestException(httpEx);
             }
 
@@ -295,7 +295,7 @@ namespace Kepware.Api.ClientHandler
             }
             catch (HttpRequestException httpEx)
             {
-                m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_kepwareApiClient.HttpClient.BaseAddress);
+                m_logger.LogWarning("Failed to connect to {BaseAddress}, Reason: {Message}", m_kepwareApiClient.HttpClient.BaseAddress, httpEx.Message);
                 m_kepwareApiClient.OnHttpRequestException(httpEx);
             }
 
@@ -384,7 +384,7 @@ namespace Kepware.Api.ClientHandler
             }
             catch (HttpRequestException httpEx)
             {
-                m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_kepwareApiClient.HttpClient.BaseAddress);
+                m_logger.LogWarning("Failed to connect to {BaseAddress}, Reason: {Message}", m_kepwareApiClient.HttpClient.BaseAddress, httpEx.Message);
                 m_kepwareApiClient.OnHttpRequestException(httpEx);
             }
 

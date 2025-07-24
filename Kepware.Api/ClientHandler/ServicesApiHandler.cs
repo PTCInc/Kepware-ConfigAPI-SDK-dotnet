@@ -37,7 +37,7 @@ namespace Kepware.Api.ClientHandler
         /// Initiates the Reinitialize Runtime service.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains a KepServerJobPromise.</returns>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="KepServerJobPromise"/>.</returns>
         public Task<KepServerJobPromise> ReinitializeRuntimeAsync(CancellationToken cancellationToken = default)
             => ReinitializeRuntimeAsync(TimeSpan.FromSeconds(30), cancellationToken);
 
@@ -46,7 +46,7 @@ namespace Kepware.Api.ClientHandler
         /// </summary>
         /// <param name="timeToLive">The job's desired Time to Live (timeout).</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains a KepServerJobPromise.</returns>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="KepServerJobPromise"/>.</returns>
         public async Task<KepServerJobPromise> ReinitializeRuntimeAsync(TimeSpan timeToLive, CancellationToken cancellationToken = default)
         {
             if (timeToLive.TotalSeconds < 1)
@@ -63,8 +63,16 @@ namespace Kepware.Api.ClientHandler
 
             var response = await m_kepwareApiClient.HttpClient.PutAsync(ENDPOINT_REINITIALIZE_RUNTIME, httpContent, cancellationToken).ConfigureAwait(false);
 
-
             var message = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new KepServerJobPromise(
+                    ENDPOINT_REINITIALIZE_RUNTIME, 
+                    timeToLive, 
+                    (ApiResponseCode)(int)response.StatusCode, 
+                    $"ReinitializeRuntimeAsync request failed with status code {(ApiResponseCode)(int)response.StatusCode} and message: {message}");
+            }
 
             try
             {
@@ -94,7 +102,7 @@ namespace Kepware.Api.ClientHandler
         /// <param name="channelName">The name of the channel.</param>
         /// <param name="deviceName">The name of the device.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains a KepServerJobPromise.</returns>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="KepServerJobPromise"/>.</returns>
         /// <remarks>
         /// Jobs are automatically cleaned up after their wait time has expired. This wait time is configurable.
         /// 
@@ -113,7 +121,7 @@ namespace Kepware.Api.ClientHandler
         /// <param name="deviceName">The name of the device.</param>
         /// <param name="timeToLive">The job's desired Time to Live (timeout).</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains a KepServerJobPromise.</returns>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="KepServerJobPromise"/>.</returns>
         /// <remarks>
         /// Jobs are automatically cleaned up after their wait time has expired. This wait time is configurable.
         /// 
@@ -141,6 +149,15 @@ namespace Kepware.Api.ClientHandler
             var response = await m_kepwareApiClient.HttpClient.PutAsync(endpoint, httpContent, cancellationToken).ConfigureAwait(false);
 
             var message = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new KepServerJobPromise(
+                    endpoint,
+                    timeToLive,
+                    (ApiResponseCode)(int)response.StatusCode,
+                    $"AutomaticTagGeneration request failed with status code {(ApiResponseCode)(int)response.StatusCode} and message: {message}");
+            }
 
             try
             {

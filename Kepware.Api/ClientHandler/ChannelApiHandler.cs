@@ -35,7 +35,7 @@ namespace Kepware.Api.ClientHandler
         /// <param name="driverName">The name of the driver.</param>
         /// <param name="properties">The properties to set on the channel.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the created or loaded channel.</returns>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the created or loaded <see cref="Channel"/>.</returns>
         /// <exception cref="ArgumentException">Thrown when the channel name or driver name is null or empty.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the channel cannot be created or loaded.</exception>
         public async Task<Channel> GetOrCreateChannelAsync(string name, string driverName, IDictionary<string, object>? properties = null, CancellationToken cancellationToken = default)
@@ -76,6 +76,24 @@ namespace Kepware.Api.ClientHandler
         }
         #endregion
 
+        #region GetChannelAsync
+        /// <summary>
+        /// Gets  a channel with the specified name and driver.
+        /// </summary>
+        /// <param name="name">The name of the channel.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the loaded <see cref="Channel"/> or null if it does not exist.</returns>
+        /// <exception cref="ArgumentException">Thrown when the channel name or driver name is null or empty.</exception>
+        public async Task<Channel?> GetChannelAsync(string name, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException("Channel name cannot be null or empty", nameof(name));
+
+            return await m_kepwareApiClient.GenericConfig.LoadEntityAsync<Channel>(name, cancellationToken: cancellationToken);
+
+        }
+        #endregion
+
         #region CreateChannelAsync
 
         /// <summary>
@@ -85,7 +103,7 @@ namespace Kepware.Api.ClientHandler
         /// <param name="driverName">The name of the driver.</param>
         /// <param name="properties">The properties to set on the channel.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the created channel, or null if creation failed.</returns>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the created <see cref="Channel"/>, or null if creation failed.</returns>
         /// <exception cref="ArgumentException">Thrown when the channel name or driver name is null or empty.</exception>
         public async Task<Channel?> CreateChannelAsync(string name, string driverName, IDictionary<string, object>? properties = null, CancellationToken cancellationToken = default)
         {

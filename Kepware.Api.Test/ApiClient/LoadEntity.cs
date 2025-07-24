@@ -196,7 +196,7 @@ namespace Kepware.Api.Test.ApiClient
         #endregion
 
         #region LoadEntityAsync - Device with DynamicProperties
-
+        // TODO: Add these types of test for other entities (Device, TagGroup, Tag, etc.)
         [Fact]
         public async Task LoadEntityAsync_ShouldReturnDevice_WithCorrectDynamicProperties()
         {

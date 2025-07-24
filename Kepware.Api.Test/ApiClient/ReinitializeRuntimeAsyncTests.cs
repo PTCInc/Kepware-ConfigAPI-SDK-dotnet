@@ -46,11 +46,16 @@ namespace Kepware.Api.Test.ApiClient
 
             // Act
             var result = await _kepwareApiClient.ApiServices.ReinitializeRuntimeAsync(TimeSpan.FromSeconds(30));
-
+            var jobResult = await result.AwaitCompletionAsync();
+            
             // Assert
             result.ShouldNotBeNull();
             result.Endpoint.ShouldBe("/config/v1/project/services/ReinitializeRuntime");
             result.JobTimeToLive.ShouldBe(TimeSpan.FromSeconds(30));
+            jobResult.Value.ShouldBeFalse();
+            jobResult.IsSuccess.ShouldBeFalse();
+            jobResult.ResponseCode.ShouldBe(ApiResponseCode.BadRequest);
+            
         }
 
         [Fact]
@@ -111,6 +116,7 @@ namespace Kepware.Api.Test.ApiClient
             // Assert
             completionResult.Value.ShouldBeTrue();
             completionResult.IsSuccess.ShouldBeTrue();
+            completionResult.ResponseCode.ShouldBe(ApiResponseCode.Success);
         }
 
         [Fact]
@@ -133,6 +139,7 @@ namespace Kepware.Api.Test.ApiClient
             // Assert
             completionResult.Value.ShouldBeTrue();
             completionResult.IsSuccess.ShouldBeTrue();
+            completionResult.ResponseCode.ShouldBe(ApiResponseCode.Success);
         }
 
         [Fact]
@@ -153,6 +160,8 @@ namespace Kepware.Api.Test.ApiClient
             // Assert
             completionResult.Value.ShouldBeFalse();
             completionResult.IsSuccess.ShouldBeFalse();
+            completionResult.ResponseCode.ShouldBe(ApiResponseCode.Timeout);
+
         }
 
         [Fact]
@@ -178,6 +187,8 @@ namespace Kepware.Api.Test.ApiClient
             // Assert
             completionResult.Value.ShouldBeFalse();
             completionResult.IsSuccess.ShouldBeFalse();
+            completionResult.ResponseCode.ShouldBe(ApiResponseCode.ServiceUnavailable);
+            completionResult.Message.ShouldBe(jobStatusFailed.Message);
         }
     }
 }

@@ -48,11 +48,15 @@ namespace Kepware.Api.Test.ApiClient
 
             // Act
             var result = await _kepwareApiClient.ApiServices.AutomaticTagGenerationAsync(UNIT_TEST_CHANNEL, UNIT_TEST_DEVICE, TimeSpan.FromSeconds(30));
+            var jobResult = await result.AwaitCompletionAsync();
 
             // Assert
             result.ShouldNotBeNull();
             result.Endpoint.ShouldBe(ENDPOINT_TAG_GENERATION);
             result.JobTimeToLive.ShouldBe(TimeSpan.FromSeconds(30));
+            jobResult.Value.ShouldBeFalse();
+            jobResult.IsSuccess.ShouldBeFalse();
+            jobResult.ResponseCode.ShouldBe(ApiResponseCode.BadRequest);
         }
 
         [Fact]
@@ -113,6 +117,7 @@ namespace Kepware.Api.Test.ApiClient
             // Assert
             completionResult.Value.ShouldBeTrue();
             completionResult.IsSuccess.ShouldBeTrue();
+            completionResult.ResponseCode.ShouldBe(ApiResponseCode.Success);
         }
 
         [Fact]
@@ -135,6 +140,7 @@ namespace Kepware.Api.Test.ApiClient
             // Assert
             completionResult.Value.ShouldBeTrue();
             completionResult.IsSuccess.ShouldBeTrue();
+            completionResult.ResponseCode.ShouldBe(ApiResponseCode.Success);
         }
 
         [Fact]
@@ -155,6 +161,7 @@ namespace Kepware.Api.Test.ApiClient
             // Assert
             completionResult.Value.ShouldBeFalse();
             completionResult.IsSuccess.ShouldBeFalse();
+            completionResult.ResponseCode.ShouldBe(ApiResponseCode.Timeout);
         }
 
         [Fact]
@@ -180,6 +187,8 @@ namespace Kepware.Api.Test.ApiClient
             // Assert
             completionResult.Value.ShouldBeFalse();
             completionResult.IsSuccess.ShouldBeFalse();
+            completionResult.ResponseCode.ShouldBe(ApiResponseCode.ServiceUnavailable);
+            completionResult.Message.ShouldBe(jobStatusFailed.Message);
         }
     }
 }

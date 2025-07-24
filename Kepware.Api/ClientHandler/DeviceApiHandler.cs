@@ -38,7 +38,7 @@ namespace Kepware.Api.ClientHandler
         /// <param name="driverName">The name of the driver.</param>
         /// <param name="properties">The properties to set on the device.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the created or loaded device.</returns>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the created or loaded <see cref="Device"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when the channel is null.</exception>
         /// <exception cref="ArgumentException">Thrown when the device name is null or empty.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the device cannot be created or loaded.</exception>
@@ -90,6 +90,41 @@ namespace Kepware.Api.ClientHandler
         }
         #endregion
 
+        #region GetDeviceAsync
+        /// <summary>
+        /// Gets or creates a device with the specified name and driver in the specified channel.
+        /// </summary>
+        /// <param name="channel">The channel to which the device belongs.</param>
+        /// <param name="name">The name of the device.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the loaded <see cref="Device"/> or null if it does not exist.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the channel is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when the device name is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the device cannot be created or loaded.</exception>
+        public async Task<Device?> GetDeviceAsync(Channel channel, string name, CancellationToken cancellationToken = default)
+        {
+            if (channel == null)
+                throw new ArgumentNullException(nameof(channel));
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException("Device name cannot be null or empty", nameof(name));
+
+            var device = await m_kepwareApiClient.GenericConfig.LoadEntityAsync<Device>(name, channel, cancellationToken: cancellationToken);
+
+            if (device != null)
+            {
+                device.Tags = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagCollection, Tag>(device, cancellationToken: cancellationToken).ConfigureAwait(false);
+                device.TagGroups = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagGroupCollection, DeviceTagGroup>(device, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                if (device.TagGroups != null)
+                {
+                    await ProjectApiHandler.LoadTagGroupsRecursiveAsync(m_kepwareApiClient, device.TagGroups, cancellationToken: cancellationToken).ConfigureAwait(false);
+                }
+            }
+
+            return device;
+        }
+        #endregion
+
         #region CreateDeviceAsync
         /// <summary>
         /// Creates a new device with the specified name and driver in the specified channel.
@@ -99,7 +134,7 @@ namespace Kepware.Api.ClientHandler
         /// <param name="driverName">The name of the driver.</param>
         /// <param name="properties">The properties to set on the device.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the created device, or null if creation failed.</returns>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the created <see cref="Device"/>, or null if creation failed.</returns>
         /// <exception cref="ArgumentNullException">Thrown when the channel is null.</exception>
         /// <exception cref="ArgumentException">Thrown when the device name is null or empty.</exception>
         public async Task<Device?> CreateDeviceAsync(Channel channel, string name, string? driverName = default, IDictionary<string, object>? properties = null, CancellationToken cancellationToken = default)

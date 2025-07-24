@@ -1,0 +1,856 @@
+[
+  {
+    "namespace": "abb_totalflow",
+    "display_name": "ABB Totalflow",
+    "doc_channels": "/config/v1/doc/drivers/ABB%20Totalflow/channels",
+    "doc_devices": "/config/v1/doc/drivers/ABB%20Totalflow/devices",
+    "doc_meter_groups": "/config/v1/doc/drivers/ABB%20Totalflow/meter_groups",
+    "doc_meters": "/config/v1/doc/abb_totalflow_meters"
+  },
+  {
+    "namespace": "advanced_simulator",
+    "display_name": "Advanced Simulator",
+    "doc_channels": "/config/v1/doc/drivers/Advanced%20Simulator/channels",
+    "doc_devices": "/config/v1/doc/drivers/Advanced%20Simulator/devices"
+  },
+  {
+    "namespace": "a-b_bulletin_900",
+    "display_name": "Allen-Bradley Bulletin 900",
+    "doc_channels": "/config/v1/doc/drivers/Allen-Bradley%20Bulletin%20900/channels",
+    "doc_devices": "/config/v1/doc/drivers/Allen-Bradley%20Bulletin%20900/devices"
+  },
+  {
+    "namespace": "a-b_bulletin_1609",
+    "display_name": "Allen-Bradley Bulletin 1609",
+    "doc_channels": "/config/v1/doc/drivers/Allen-Bradley%20Bulletin%201609/channels",
+    "doc_devices": "/config/v1/doc/drivers/Allen-Bradley%20Bulletin%201609/devices"
+  },
+  {
+    "namespace": "controllogix_ethernet",
+    "display_name": "Allen-Bradley ControlLogix Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Allen-Bradley%20ControlLogix%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Allen-Bradley%20ControlLogix%20Ethernet/devices"
+  },
+  {
+    "namespace": "controllogix_unsolicited_ethernet",
+    "display_name": "Allen-Bradley ControlLogix Server Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Allen-Bradley%20ControlLogix%20Server%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Allen-Bradley%20ControlLogix%20Server%20Ethernet/devices"
+  },
+  {
+    "namespace": "df1",
+    "display_name": "Allen-Bradley DF1",
+    "doc_channels": "/config/v1/doc/drivers/Allen-Bradley%20DF1/channels",
+    "doc_devices": "/config/v1/doc/drivers/Allen-Bradley%20DF1/devices"
+  },
+  {
+    "namespace": "allenbradley_ethernet",
+    "display_name": "Allen-Bradley Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Allen-Bradley%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Allen-Bradley%20Ethernet/devices"
+  },
+  {
+    "namespace": "allenbradley_micro800_ethernet",
+    "display_name": "Allen-Bradley Micro800 Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Allen-Bradley%20Micro800%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Allen-Bradley%20Micro800%20Ethernet/devices"
+  },
+  {
+    "namespace": "allenbradley_micro800_serial",
+    "display_name": "Allen-Bradley Micro800 Serial",
+    "doc_channels": "/config/v1/doc/drivers/Allen-Bradley%20Micro800%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Allen-Bradley%20Micro800%20Serial/devices"
+  },
+  {
+    "namespace": "ab_unsolicited_ethernet",
+    "display_name": "Allen-Bradley Server Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Allen-Bradley%20Server%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Allen-Bradley%20Server%20Ethernet/devices"
+  },
+  {
+    "namespace": "alstom_redundant_ethernet",
+    "display_name": "Alstom Redundant Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Alstom%20Redundant%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Alstom%20Redundant%20Ethernet/devices"
+  },
+  {
+    "namespace": "analog_devices",
+    "display_name": "Analog Devices",
+    "doc_channels": "/config/v1/doc/drivers/Analog%20Devices/channels",
+    "doc_devices": "/config/v1/doc/drivers/Analog%20Devices/devices"
+  },
+  {
+    "namespace": "aromat_ethernet",
+    "display_name": "Aromat Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Aromat%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Aromat%20Ethernet/devices"
+  },
+  {
+    "namespace": "aromat",
+    "display_name": "Aromat Serial",
+    "doc_channels": "/config/v1/doc/drivers/Aromat%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Aromat%20Serial/devices"
+  },
+  {
+    "namespace": "directnet",
+    "display_name": "AutomationDirect DirectNet",
+    "doc_channels": "/config/v1/doc/drivers/AutomationDirect%20DirectNet/channels",
+    "doc_devices": "/config/v1/doc/drivers/AutomationDirect%20DirectNet/devices"
+  },
+  {
+    "namespace": "plcdirect_ebc",
+    "display_name": "AutomationDirect EBC",
+    "doc_channels": "/config/v1/doc/drivers/AutomationDirect%20EBC/channels",
+    "doc_devices": "/config/v1/doc/drivers/AutomationDirect%20EBC/devices"
+  },
+  {
+    "namespace": "plcdirect_ecom",
+    "display_name": "AutomationDirect ECOM",
+    "doc_channels": "/config/v1/doc/drivers/AutomationDirect%20ECOM/channels",
+    "doc_devices": "/config/v1/doc/drivers/AutomationDirect%20ECOM/devices"
+  },
+  {
+    "namespace": "ksequence",
+    "display_name": "AutomationDirect K Sequence",
+    "doc_channels": "/config/v1/doc/drivers/AutomationDirect%20K%20Sequence/channels",
+    "doc_devices": "/config/v1/doc/drivers/AutomationDirect%20K%20Sequence/devices"
+  },
+  {
+    "namespace": "productivity_3000_ethernet",
+    "display_name": "AutomationDirect Productivity Series Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/AutomationDirect%20Productivity%20Series%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/AutomationDirect%20Productivity%20Series%20Ethernet/devices"
+  },
+  {
+    "namespace": "bacnet",
+    "display_name": "BACnet/IP",
+    "doc_channels": "/config/v1/doc/drivers/BACnet%2FIP/channels",
+    "doc_devices": "/config/v1/doc/drivers/BACnet%2FIP/devices"
+  },
+  {
+    "namespace": "beckhoff_twincat",
+    "display_name": "Beckhoff TwinCAT",
+    "doc_channels": "/config/v1/doc/drivers/Beckhoff%20TwinCAT/channels",
+    "doc_devices": "/config/v1/doc/drivers/Beckhoff%20TwinCAT/devices"
+  },
+  {
+    "namespace": "bristol_bsap_ip",
+    "display_name": "Bristol BSAP IP",
+    "doc_channels": "/config/v1/doc/drivers/Bristol%20BSAP%20IP/channels",
+    "doc_devices": "/config/v1/doc/drivers/Bristol%20BSAP%20IP/devices"
+  },
+  {
+    "namespace": "busware_ethernet",
+    "display_name": "Busware Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Busware%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Busware%20Ethernet/devices"
+  },
+  {
+    "namespace": "codesys",
+    "display_name": "CODESYS",
+    "doc_channels": "/config/v1/doc/drivers/CODESYS/channels",
+    "doc_devices": "/config/v1/doc/drivers/CODESYS/devices"
+  },
+  {
+    "namespace": "mtrim",
+    "display_name": "Contrex M-Series",
+    "doc_channels": "/config/v1/doc/drivers/Contrex%20M-Series/channels",
+    "doc_devices": "/config/v1/doc/drivers/Contrex%20M-Series/devices"
+  },
+  {
+    "namespace": "contrex",
+    "display_name": "Contrex Serial",
+    "doc_channels": "/config/v1/doc/drivers/Contrex%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Contrex%20Serial/devices"
+  },
+  {
+    "namespace": "custom_interface",
+    "display_name": "Custom Interface",
+    "doc_channels": "/config/v1/doc/drivers/Custom%20Interface/channels",
+    "doc_devices": "/config/v1/doc/drivers/Custom%20Interface/devices"
+  },
+  {
+    "namespace": "cutlerhammer",
+    "display_name": "Cutler-Hammer D50/300",
+    "doc_channels": "/config/v1/doc/drivers/Cutler-Hammer%20D50%2F300/channels",
+    "doc_devices": "/config/v1/doc/drivers/Cutler-Hammer%20D50%2F300/devices"
+  },
+  {
+    "namespace": "cutlerhammer_elc_ethernet",
+    "display_name": "Cutler-Hammer ELC Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Cutler-Hammer%20ELC%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Cutler-Hammer%20ELC%20Ethernet/devices"
+  },
+  {
+    "namespace": "cutlerhammer_elc_serial",
+    "display_name": "Cutler-Hammer ELC Serial",
+    "doc_channels": "/config/v1/doc/drivers/Cutler-Hammer%20ELC%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Cutler-Hammer%20ELC%20Serial/devices"
+  },
+  {
+    "namespace": "dataforth_isolynx",
+    "display_name": "Dataforth IsoLynx",
+    "doc_channels": "/config/v1/doc/drivers/Dataforth%20IsoLynx/channels",
+    "doc_devices": "/config/v1/doc/drivers/Dataforth%20IsoLynx/devices"
+  },
+  {
+    "namespace": "ddeclient",
+    "display_name": "DDE Client",
+    "doc_channels": "/config/v1/doc/drivers/DDE%20Client/channels",
+    "doc_devices": "/config/v1/doc/drivers/DDE%20Client/devices"
+  },
+  {
+    "namespace": "dnp_master_ethernet",
+    "display_name": "DNP Client Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/DNP%20Client%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/DNP%20Client%20Ethernet/devices"
+  },
+  {
+    "namespace": "dnp_master_serial",
+    "display_name": "DNP Client Serial",
+    "doc_channels": "/config/v1/doc/drivers/DNP%20Client%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/DNP%20Client%20Serial/devices"
+  },
+  {
+    "namespace": "enron_modbus",
+    "display_name": "Enron Modbus",
+    "doc_channels": "/config/v1/doc/drivers/Enron%20Modbus/channels",
+    "doc_devices": "/config/v1/doc/drivers/Enron%20Modbus/devices",
+    "doc_meter_groups": "/config/v1/doc/drivers/Enron%20Modbus/meter_groups",
+    "doc_meters": "/config/v1/doc/enron_meters"
+  },
+  {
+    "namespace": "euromap_63",
+    "display_name": "EUROMAP 63",
+    "doc_channels": "/config/v1/doc/drivers/EUROMAP%2063/channels",
+    "doc_devices": "/config/v1/doc/drivers/EUROMAP%2063/devices"
+  },
+  {
+    "namespace": "ge_focas1_ethernet",
+    "display_name": "Fanuc Focas Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Fanuc%20Focas%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Fanuc%20Focas%20Ethernet/devices"
+  },
+  {
+    "namespace": "ge_focas1_hssb",
+    "display_name": "Fanuc Focas HSSB",
+    "doc_channels": "/config/v1/doc/drivers/Fanuc%20Focas%20HSSB/channels",
+    "doc_devices": "/config/v1/doc/drivers/Fanuc%20Focas%20HSSB/devices"
+  },
+  {
+    "namespace": "fisher_roc_ethernet",
+    "display_name": "Fisher ROC Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Fisher%20ROC%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Fisher%20ROC%20Ethernet/devices",
+    "doc_meter_groups": "/config/v1/doc/drivers/Fisher%20ROC%20Ethernet/meter_groups",
+    "doc_meters": "/config/v1/doc/fisher_roc_ethernet_meters"
+  },
+  {
+    "namespace": "fisher_rocplus_ethernet",
+    "display_name": "Fisher ROC Plus Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Fisher%20ROC%20Plus%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Fisher%20ROC%20Plus%20Ethernet/devices",
+    "doc_meter_groups": "/config/v1/doc/drivers/Fisher%20ROC%20Plus%20Ethernet/meter_groups",
+    "doc_meters": "/config/v1/doc/fisher_rocplus_ethernet_meters"
+  },
+  {
+    "namespace": "fisher_rocplus_serial",
+    "display_name": "Fisher ROC Plus Serial",
+    "doc_channels": "/config/v1/doc/drivers/Fisher%20ROC%20Plus%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Fisher%20ROC%20Plus%20Serial/devices",
+    "doc_meter_groups": "/config/v1/doc/drivers/Fisher%20ROC%20Plus%20Serial/meter_groups",
+    "doc_meters": "/config/v1/doc/fisher_rocplus_serial_meters"
+  },
+  {
+    "namespace": "fisher_roc_serial",
+    "display_name": "Fisher ROC Serial",
+    "doc_channels": "/config/v1/doc/drivers/Fisher%20ROC%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Fisher%20ROC%20Serial/devices",
+    "doc_meter_groups": "/config/v1/doc/drivers/Fisher%20ROC%20Serial/meter_groups",
+    "doc_meters": "/config/v1/doc/fisher_roc_serial_meters"
+  },
+  {
+    "namespace": "fuji_flex",
+    "display_name": "Fuji Flex",
+    "doc_channels": "/config/v1/doc/drivers/Fuji%20Flex/channels",
+    "doc_devices": "/config/v1/doc/drivers/Fuji%20Flex/devices"
+  },
+  {
+    "namespace": "ge_ccm",
+    "display_name": "GE CCM",
+    "doc_channels": "/config/v1/doc/drivers/GE%20CCM/channels",
+    "doc_devices": "/config/v1/doc/drivers/GE%20CCM/devices"
+  },
+  {
+    "namespace": "ge_ethernet",
+    "display_name": "GE Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/GE%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/GE%20Ethernet/devices"
+  },
+  {
+    "namespace": "ge_ethernet_global_data",
+    "display_name": "GE Ethernet Global Data",
+    "doc_channels": "/config/v1/doc/drivers/GE%20Ethernet%20Global%20Data/channels",
+    "doc_devices": "/config/v1/doc/drivers/GE%20Ethernet%20Global%20Data/devices"
+  },
+  {
+    "namespace": "gesnp",
+    "display_name": "GE SNP",
+    "doc_channels": "/config/v1/doc/drivers/GE%20SNP/channels",
+    "doc_devices": "/config/v1/doc/drivers/GE%20SNP/devices"
+  },
+  {
+    "namespace": "gesnpx",
+    "display_name": "GE SNPX",
+    "doc_channels": "/config/v1/doc/drivers/GE%20SNPX/channels",
+    "doc_devices": "/config/v1/doc/drivers/GE%20SNPX/devices"
+  },
+  {
+    "namespace": "honeywell_hc900_ethernet",
+    "display_name": "Honeywell HC900 Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Honeywell%20HC900%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Honeywell%20HC900%20Ethernet/devices"
+  },
+  {
+    "namespace": "honeywell_udc_ethernet",
+    "display_name": "Honeywell UDC Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Honeywell%20UDC%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Honeywell%20UDC%20Ethernet/devices"
+  },
+  {
+    "namespace": "honeywell_udc",
+    "display_name": "Honeywell UDC Serial",
+    "doc_channels": "/config/v1/doc/drivers/Honeywell%20UDC%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Honeywell%20UDC%20Serial/devices"
+  },
+  {
+    "namespace": "iai_super_sel",
+    "display_name": "IA Super SEL",
+    "doc_channels": "/config/v1/doc/drivers/IA%20Super%20SEL/channels",
+    "doc_devices": "/config/v1/doc/drivers/IA%20Super%20SEL/devices"
+  },
+  {
+    "namespace": "idec",
+    "display_name": "Idec Serial",
+    "doc_channels": "/config/v1/doc/drivers/Idec%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Idec%20Serial/devices"
+  },
+  {
+    "namespace": "iec_60870_5_101_master",
+    "display_name": "IEC 60870-5-101 Client",
+    "doc_channels": "/config/v1/doc/drivers/IEC%2060870-5-101%20Client/channels",
+    "doc_devices": "/config/v1/doc/drivers/IEC%2060870-5-101%20Client/devices"
+  },
+  {
+    "namespace": "iec_60870_5_104_master",
+    "display_name": "IEC 60870-5-104 Client",
+    "doc_channels": "/config/v1/doc/drivers/IEC%2060870-5-104%20Client/channels",
+    "doc_devices": "/config/v1/doc/drivers/IEC%2060870-5-104%20Client/devices"
+  },
+  {
+    "namespace": "iec_61850_mms_client",
+    "display_name": "IEC 61850 MMS Client",
+    "doc_channels": "/config/v1/doc/drivers/IEC%2061850%20MMS%20Client/channels",
+    "doc_devices": "/config/v1/doc/drivers/IEC%2061850%20MMS%20Client/devices"
+  },
+  {
+    "namespace": "iotechpointscan100",
+    "display_name": "IOtech PointScan 100",
+    "doc_channels": "/config/v1/doc/drivers/IOtech%20PointScan%20100/channels",
+    "doc_devices": "/config/v1/doc/drivers/IOtech%20PointScan%20100/devices"
+  },
+  {
+    "namespace": "keyence_kv_ethernet",
+    "display_name": "Keyence KV Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Keyence%20KV%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Keyence%20KV%20Ethernet/devices"
+  },
+  {
+    "namespace": "kraussmaffei_mc4_ethernet",
+    "display_name": "KraussMaffei MC4 Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/KraussMaffei%20MC4%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/KraussMaffei%20MC4%20Ethernet/devices"
+  },
+  {
+    "namespace": "lufkin_modbus",
+    "display_name": "Lufkin Modbus Serial",
+    "doc_channels": "/config/v1/doc/drivers/Lufkin%20Modbus%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Lufkin%20Modbus%20Serial/devices"
+  },
+  {
+    "namespace": "memory_based",
+    "display_name": "Memory Based",
+    "doc_channels": "/config/v1/doc/drivers/Memory%20Based/channels",
+    "doc_devices": "/config/v1/doc/drivers/Memory%20Based/devices"
+  },
+  {
+    "namespace": "mettler_toledo_serial",
+    "display_name": "Mettler Toledo Serial",
+    "doc_channels": "/config/v1/doc/drivers/Mettler%20Toledo%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Mettler%20Toledo%20Serial/devices"
+  },
+  {
+    "namespace": "micro_dci",
+    "display_name": "Micro DCI",
+    "doc_channels": "/config/v1/doc/drivers/Micro%20DCI/channels",
+    "doc_devices": "/config/v1/doc/drivers/Micro%20DCI/devices"
+  },
+  {
+    "namespace": "mitsubishi_cnc_ethernet",
+    "display_name": "Mitsubishi CNC Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Mitsubishi%20CNC%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Mitsubishi%20CNC%20Ethernet/devices"
+  },
+  {
+    "namespace": "mitsubishi_ethernet",
+    "display_name": "Mitsubishi Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Mitsubishi%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Mitsubishi%20Ethernet/devices"
+  },
+  {
+    "namespace": "mitsubishifx",
+    "display_name": "Mitsubishi FX",
+    "doc_channels": "/config/v1/doc/drivers/Mitsubishi%20FX/channels",
+    "doc_devices": "/config/v1/doc/drivers/Mitsubishi%20FX/devices"
+  },
+  {
+    "namespace": "mitsubishifxnet",
+    "display_name": "Mitsubishi FX Net",
+    "doc_channels": "/config/v1/doc/drivers/Mitsubishi%20FX%20Net/channels",
+    "doc_devices": "/config/v1/doc/drivers/Mitsubishi%20FX%20Net/devices"
+  },
+  {
+    "namespace": "mitsubishi_serial",
+    "display_name": "Mitsubishi Serial",
+    "doc_channels": "/config/v1/doc/drivers/Mitsubishi%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Mitsubishi%20Serial/devices"
+  },
+  {
+    "namespace": "modbus_ascii",
+    "display_name": "Modbus ASCII Serial",
+    "doc_channels": "/config/v1/doc/drivers/Modbus%20ASCII%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Modbus%20ASCII%20Serial/devices"
+  },
+  {
+    "namespace": "modbus_plus",
+    "display_name": "Modbus Plus",
+    "doc_channels": "/config/v1/doc/drivers/Modbus%20Plus/channels",
+    "doc_devices": "/config/v1/doc/drivers/Modbus%20Plus/devices"
+  },
+  {
+    "namespace": "modbus",
+    "display_name": "Modbus RTU Serial",
+    "doc_channels": "/config/v1/doc/drivers/Modbus%20RTU%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Modbus%20RTU%20Serial/devices"
+  },
+  {
+    "namespace": "modbus_unsolicited",
+    "display_name": "Modbus RTU Server Serial",
+    "doc_channels": "/config/v1/doc/drivers/Modbus%20RTU%20Server%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Modbus%20RTU%20Server%20Serial/devices"
+  },
+  {
+    "namespace": "modbus_ethernet",
+    "display_name": "Modbus TCP/IP Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Modbus%20TCP%2FIP%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Modbus%20TCP%2FIP%20Ethernet/devices"
+  },
+  {
+    "namespace": "mqtt_client",
+    "display_name": "MQTT Client",
+    "doc_channels": "/config/v1/doc/drivers/MQTT%20Client/channels",
+    "doc_devices": "/config/v1/doc/drivers/MQTT%20Client/devices"
+  },
+  {
+    "namespace": "mtconnect_client",
+    "display_name": "MTConnect Client",
+    "doc_channels": "/config/v1/doc/drivers/MTConnect%20Client/channels",
+    "doc_devices": "/config/v1/doc/drivers/MTConnect%20Client/devices"
+  },
+  {
+    "namespace": "omni_flow_computer",
+    "display_name": "Omni Flow Computer",
+    "doc_channels": "/config/v1/doc/drivers/Omni%20Flow%20Computer/channels",
+    "doc_devices": "/config/v1/doc/drivers/Omni%20Flow%20Computer/devices",
+    "doc_meter_groups": "/config/v1/doc/drivers/Omni%20Flow%20Computer/meter_groups",
+    "doc_meters": "/config/v1/doc/omni_meters"
+  },
+  {
+    "namespace": "omron_fins_ethernet",
+    "display_name": "Omron FINS Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Omron%20FINS%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Omron%20FINS%20Ethernet/devices"
+  },
+  {
+    "namespace": "omron_fins_serial",
+    "display_name": "Omron FINS Serial",
+    "doc_channels": "/config/v1/doc/drivers/Omron%20FINS%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Omron%20FINS%20Serial/devices"
+  },
+  {
+    "namespace": "omronhl",
+    "display_name": "Omron Host Link",
+    "doc_channels": "/config/v1/doc/drivers/Omron%20Host%20Link/channels",
+    "doc_devices": "/config/v1/doc/drivers/Omron%20Host%20Link/devices"
+  },
+  {
+    "namespace": "omron_nj_ethernet",
+    "display_name": "Omron NJ Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Omron%20NJ%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Omron%20NJ%20Ethernet/devices"
+  },
+  {
+    "namespace": "omron_process_suite",
+    "display_name": "Omron Process Suite",
+    "doc_channels": "/config/v1/doc/drivers/Omron%20Process%20Suite/channels",
+    "doc_devices": "/config/v1/doc/drivers/Omron%20Process%20Suite/devices"
+  },
+  {
+    "namespace": "omron_toolbus",
+    "display_name": "Omron Toolbus",
+    "doc_channels": "/config/v1/doc/drivers/Omron%20Toolbus/channels",
+    "doc_devices": "/config/v1/doc/drivers/Omron%20Toolbus/devices"
+  },
+  {
+    "namespace": "opcdaclient",
+    "display_name": "OPC DA Client",
+    "doc_channels": "/config/v1/doc/drivers/OPC%20DA%20Client/channels",
+    "doc_devices": "/config/v1/doc/drivers/OPC%20DA%20Client/devices"
+  },
+  {
+    "namespace": "opcuaclient",
+    "display_name": "OPC UA Client",
+    "doc_channels": "/config/v1/doc/drivers/OPC%20UA%20Client/channels",
+    "doc_devices": "/config/v1/doc/drivers/OPC%20UA%20Client/devices"
+  },
+  {
+    "namespace": "opcxmldaclient",
+    "display_name": "OPC XML-DA Client",
+    "doc_channels": "/config/v1/doc/drivers/OPC%20XML-DA%20Client/channels",
+    "doc_devices": "/config/v1/doc/drivers/OPC%20XML-DA%20Client/devices"
+  },
+  {
+    "namespace": "optilogic",
+    "display_name": "Optimation OptiLogic",
+    "doc_channels": "/config/v1/doc/drivers/Optimation%20OptiLogic/channels",
+    "doc_devices": "/config/v1/doc/drivers/Optimation%20OptiLogic/devices"
+  },
+  {
+    "namespace": "opto22_ethernet",
+    "display_name": "Opto 22 Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Opto%2022%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Opto%2022%20Ethernet/devices"
+  },
+  {
+    "namespace": "partlow_ascii",
+    "display_name": "Partlow ASCII",
+    "doc_channels": "/config/v1/doc/drivers/Partlow%20ASCII/channels",
+    "doc_devices": "/config/v1/doc/drivers/Partlow%20ASCII/devices"
+  },
+  {
+    "namespace": "philips_p8_pc20",
+    "display_name": "Philips P8/PC20",
+    "doc_channels": "/config/v1/doc/drivers/Philips%20P8%2FPC20/channels",
+    "doc_devices": "/config/v1/doc/drivers/Philips%20P8%2FPC20/devices"
+  },
+  {
+    "namespace": "ping",
+    "display_name": "Ping",
+    "doc_channels": "/config/v1/doc/drivers/Ping/channels",
+    "doc_devices": "/config/v1/doc/drivers/Ping/devices"
+  },
+  {
+    "namespace": "sattbus_ethernet",
+    "display_name": "SattBus Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/SattBus%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/SattBus%20Ethernet/devices"
+  },
+  {
+    "namespace": "scanivalve_ethernet",
+    "display_name": "Scanivalve Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Scanivalve%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Scanivalve%20Ethernet/devices"
+  },
+  {
+    "namespace": "siemens_s5_3964r",
+    "display_name": "Siemens S5 (3964R)",
+    "doc_channels": "/config/v1/doc/drivers/Siemens%20S5%20(3964R)/channels",
+    "doc_devices": "/config/v1/doc/drivers/Siemens%20S5%20(3964R)/devices"
+  },
+  {
+    "namespace": "siemens_s5",
+    "display_name": "Siemens S5 (AS511)",
+    "doc_channels": "/config/v1/doc/drivers/Siemens%20S5%20(AS511)/channels",
+    "doc_devices": "/config/v1/doc/drivers/Siemens%20S5%20(AS511)/devices"
+  },
+  {
+    "namespace": "s7_mpi",
+    "display_name": "Siemens S7 MPI",
+    "doc_channels": "/config/v1/doc/drivers/Siemens%20S7%20MPI/channels",
+    "doc_devices": "/config/v1/doc/drivers/Siemens%20S7%20MPI/devices"
+  },
+  {
+    "namespace": "siemens_s7_plus_ethernet",
+    "display_name": "Siemens S7 Plus Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Siemens%20S7%20Plus%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Siemens%20S7%20Plus%20Ethernet/devices"
+  },
+  {
+    "namespace": "siemens_s7_200",
+    "display_name": "Siemens S7-200",
+    "doc_channels": "/config/v1/doc/drivers/Siemens%20S7-200/channels",
+    "doc_devices": "/config/v1/doc/drivers/Siemens%20S7-200/devices"
+  },
+  {
+    "namespace": "siemens_tcpip_ethernet",
+    "display_name": "Siemens TCP/IP Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Siemens%20TCP%2FIP%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Siemens%20TCP%2FIP%20Ethernet/devices"
+  },
+  {
+    "namespace": "siemens_tcpip_unsolicited_ethernet",
+    "display_name": "Siemens TCP/IP Server Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Siemens%20TCP%2FIP%20Server%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Siemens%20TCP%2FIP%20Server%20Ethernet/devices"
+  },
+  {
+    "namespace": "simatic505_ethernet",
+    "display_name": "Simatic/TI 505 Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Simatic%2FTI%20505%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Simatic%2FTI%20505%20Ethernet/devices"
+  },
+  {
+    "namespace": "simatic505_serial",
+    "display_name": "Simatic/TI 505 Serial",
+    "doc_channels": "/config/v1/doc/drivers/Simatic%2FTI%20505%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Simatic%2FTI%20505%20Serial/devices"
+  },
+  {
+    "namespace": "simulator",
+    "display_name": "Simulator",
+    "doc_channels": "/config/v1/doc/drivers/Simulator/channels",
+    "doc_devices": "/config/v1/doc/drivers/Simulator/devices"
+  },
+  {
+    "namespace": "ethertrak",
+    "display_name": "SIXNET EtherTRAK",
+    "doc_channels": "/config/v1/doc/drivers/SIXNET%20EtherTRAK/channels",
+    "doc_devices": "/config/v1/doc/drivers/SIXNET%20EtherTRAK/devices"
+  },
+  {
+    "namespace": "sixnet_udr",
+    "display_name": "SIXNET UDR",
+    "doc_channels": "/config/v1/doc/drivers/SIXNET%20UDR/channels",
+    "doc_devices": "/config/v1/doc/drivers/SIXNET%20UDR/devices"
+  },
+  {
+    "namespace": "snmp",
+    "display_name": "SNMP",
+    "doc_channels": "/config/v1/doc/drivers/SNMP/channels",
+    "doc_devices": "/config/v1/doc/drivers/SNMP/devices"
+  },
+  {
+    "namespace": "squared",
+    "display_name": "SquareD Serial",
+    "doc_channels": "/config/v1/doc/drivers/SquareD%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/SquareD%20Serial/devices"
+  },
+  {
+    "namespace": "system_monitor",
+    "display_name": "System Monitor",
+    "doc_channels": "/config/v1/doc/drivers/System%20Monitor/channels",
+    "doc_devices": "/config/v1/doc/drivers/System%20Monitor/devices"
+  },
+  {
+    "namespace": "unitelway",
+    "display_name": "Telemecanique Uni-Telway",
+    "doc_channels": "/config/v1/doc/drivers/Telemecanique%20Uni-Telway/channels",
+    "doc_devices": "/config/v1/doc/drivers/Telemecanique%20Uni-Telway/devices"
+  },
+  {
+    "namespace": "thermowestronics_ethernet",
+    "display_name": "Thermo Westronics Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Thermo%20Westronics%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Thermo%20Westronics%20Ethernet/devices"
+  },
+  {
+    "namespace": "thermowestronics_serial",
+    "display_name": "Thermo Westronics Serial",
+    "doc_channels": "/config/v1/doc/drivers/Thermo%20Westronics%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Thermo%20Westronics%20Serial/devices"
+  },
+  {
+    "namespace": "tiway_host_adapter",
+    "display_name": "TIWAY Host Adapter",
+    "doc_channels": "/config/v1/doc/drivers/TIWAY%20Host%20Adapter/channels",
+    "doc_devices": "/config/v1/doc/drivers/TIWAY%20Host%20Adapter/devices"
+  },
+  {
+    "namespace": "torque_tool_ethernet",
+    "display_name": "Torque Tool Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Torque%20Tool%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Torque%20Tool%20Ethernet/devices"
+  },
+  {
+    "namespace": "toshiba_ethernet",
+    "display_name": "Toshiba Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Toshiba%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Toshiba%20Ethernet/devices"
+  },
+  {
+    "namespace": "toshiba",
+    "display_name": "Toshiba Serial",
+    "doc_channels": "/config/v1/doc/drivers/Toshiba%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Toshiba%20Serial/devices"
+  },
+  {
+    "namespace": "toyopuc_serial",
+    "display_name": "Toyopuc PC2 Serial",
+    "doc_channels": "/config/v1/doc/drivers/Toyopuc%20PC2%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Toyopuc%20PC2%20Serial/devices"
+  },
+  {
+    "namespace": "toyopuc_ethernet_pc3",
+    "display_name": "Toyopuc PC3/PC2 Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Toyopuc%20PC3%2FPC2%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Toyopuc%20PC3%2FPC2%20Ethernet/devices"
+  },
+  {
+    "namespace": "triconex_ethernet",
+    "display_name": "Triconex Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Triconex%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Triconex%20Ethernet/devices"
+  },
+  {
+    "namespace": "userconfigdrv",
+    "display_name": "U-CON (user-configurable)",
+    "doc_channels": "/config/v1/doc/drivers/U-CON%20(user-configurable)/channels",
+    "doc_devices": "/config/v1/doc/drivers/U-CON%20(user-configurable)/devices"
+  },
+  {
+    "namespace": "universal_device",
+    "display_name": "Universal Device",
+    "doc_channels": "/config/v1/doc/drivers/Universal%20Device/channels",
+    "doc_devices": "/config/v1/doc/drivers/Universal%20Device/devices"
+  },
+  {
+    "namespace": "wago_ethernet",
+    "display_name": "Wago Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Wago%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Wago%20Ethernet/devices"
+  },
+  {
+    "namespace": "weatherford_8500",
+    "display_name": "Weatherford 8500 Serial",
+    "doc_channels": "/config/v1/doc/drivers/Weatherford%208500%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Weatherford%208500%20Serial/devices"
+  },
+  {
+    "namespace": "wits_level_0_active",
+    "display_name": "WITS Level 0 Active",
+    "doc_channels": "/config/v1/doc/drivers/WITS%20Level%200%20Active/channels",
+    "doc_devices": "/config/v1/doc/drivers/WITS%20Level%200%20Active/devices"
+  },
+  {
+    "namespace": "wits_level_0_passive",
+    "display_name": "WITS Level 0 Passive",
+    "doc_channels": "/config/v1/doc/drivers/WITS%20Level%200%20Passive/channels",
+    "doc_devices": "/config/v1/doc/drivers/WITS%20Level%200%20Passive/devices"
+  },
+  {
+    "namespace": "intouchclient",
+    "display_name": "Wonderware InTouch Client",
+    "doc_channels": "/config/v1/doc/drivers/Wonderware%20InTouch%20Client/channels",
+    "doc_devices": "/config/v1/doc/drivers/Wonderware%20InTouch%20Client/devices"
+  },
+  {
+    "namespace": "yaskawa_memobus_plus",
+    "display_name": "Yaskawa Memobus Plus (SA85)",
+    "doc_channels": "/config/v1/doc/drivers/Yaskawa%20Memobus%20Plus%20(SA85)/channels",
+    "doc_devices": "/config/v1/doc/drivers/Yaskawa%20Memobus%20Plus%20(SA85)/devices"
+  },
+  {
+    "namespace": "yaskawa_mp_ethernet",
+    "display_name": "Yaskawa MP Series Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Yaskawa%20MP%20Series%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Yaskawa%20MP%20Series%20Ethernet/devices"
+  },
+  {
+    "namespace": "yaskawa_mp_serial",
+    "display_name": "Yaskawa MP Series Serial",
+    "doc_channels": "/config/v1/doc/drivers/Yaskawa%20MP%20Series%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Yaskawa%20MP%20Series%20Serial/devices"
+  },
+  {
+    "namespace": "yokogawa_controller_serial",
+    "display_name": "Yokogawa Controller",
+    "doc_channels": "/config/v1/doc/drivers/Yokogawa%20Controller/channels",
+    "doc_devices": "/config/v1/doc/drivers/Yokogawa%20Controller/devices"
+  },
+  {
+    "namespace": "yokogawa_cx",
+    "display_name": "Yokogawa CX Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Yokogawa%20CX%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Yokogawa%20CX%20Ethernet/devices"
+  },
+  {
+    "namespace": "yokogawa_darwin",
+    "display_name": "Yokogawa Darwin Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Yokogawa%20Darwin%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Yokogawa%20Darwin%20Ethernet/devices"
+  },
+  {
+    "namespace": "yokogawa_darwin_serial",
+    "display_name": "Yokogawa Darwin Serial",
+    "doc_channels": "/config/v1/doc/drivers/Yokogawa%20Darwin%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Yokogawa%20Darwin%20Serial/devices"
+  },
+  {
+    "namespace": "yokogawa_dx",
+    "display_name": "Yokogawa DX Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Yokogawa%20DX%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Yokogawa%20DX%20Ethernet/devices"
+  },
+  {
+    "namespace": "yokogawa_dx_serial",
+    "display_name": "Yokogawa DX Serial",
+    "doc_channels": "/config/v1/doc/drivers/Yokogawa%20DX%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Yokogawa%20DX%20Serial/devices"
+  },
+  {
+    "namespace": "yokogawa_dxp",
+    "display_name": "Yokogawa DXP Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Yokogawa%20DXP%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Yokogawa%20DXP%20Ethernet/devices"
+  },
+  {
+    "namespace": "yokogawa_gx",
+    "display_name": "Yokogawa GX Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Yokogawa%20GX%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Yokogawa%20GX%20Ethernet/devices"
+  },
+  {
+    "namespace": "yokogawa_hr",
+    "display_name": "Yokogawa HR2400 Serial",
+    "doc_channels": "/config/v1/doc/drivers/Yokogawa%20HR2400%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Yokogawa%20HR2400%20Serial/devices"
+  },
+  {
+    "namespace": "yokogawa_mw",
+    "display_name": "Yokogawa MW Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Yokogawa%20MW%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Yokogawa%20MW%20Ethernet/devices"
+  },
+  {
+    "namespace": "yokogawa_mx",
+    "display_name": "Yokogawa MX Ethernet",
+    "doc_channels": "/config/v1/doc/drivers/Yokogawa%20MX%20Ethernet/channels",
+    "doc_devices": "/config/v1/doc/drivers/Yokogawa%20MX%20Ethernet/devices"
+  },
+  {
+    "namespace": "yokogawa_ys100_serial",
+    "display_name": "Yokogawa YS100 Serial",
+    "doc_channels": "/config/v1/doc/drivers/Yokogawa%20YS100%20Serial/channels",
+    "doc_devices": "/config/v1/doc/drivers/Yokogawa%20YS100%20Serial/devices"
+  }
+]

@@ -135,7 +135,7 @@ Add the following configuration to your `NuGet.config` file in the root of your 
 ### Driver Properties
 - **Supported Drivers:**
   ```csharp
-  var drivers = await api.SupportedDriversAsync();
+  var drivers = await api.GetSupportedDriversAsync();
   ```
   Retrieves a list of supported drivers and their details.
 
