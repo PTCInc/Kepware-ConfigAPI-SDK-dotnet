@@ -37,7 +37,7 @@ jobs:
           path: ./KepwareSync.Service
           setAllVars: true
       - name: Use Release Drafter
-        if: ${{ github.event_name != 'pull_request' && matrix.platform == 'ubuntu' }}
+        if: ${{ github.event_name != 'pull_request'}}
         id: drafter
         uses: release-drafter/release-drafter@v6
         with:
