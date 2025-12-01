@@ -24,7 +24,7 @@ namespace Kepware.SyncService
             
             var configuration = cfgBuilder.Build();
             builder.Configuration.AddConfiguration(configuration);
-
+            Console.WriteLine("Dumb stuff");    
             var app = new AppRunner(builder);
 
             // Binder
