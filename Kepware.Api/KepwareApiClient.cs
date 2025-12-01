@@ -33,6 +33,7 @@ namespace Kepware.Api
         private const string ENDPOINT_STATUS = "/config/v1/status";
         private const string ENDPOINT_DOC = "/config/v1/doc";
         private const string ENDPOINT_ABOUT = "/config/v1/about";
+        private const string ENDPOINT_PROJECT = "/config/v1/project";
 
         private readonly ILogger<KepwareApiClient> m_logger;
         private readonly HttpClient m_httpClient;
@@ -117,57 +118,89 @@ namespace Kepware.Api
 
         #region connection test & product info
         /// <summary>
-        /// Tests the connection to the Kepware server and checks if the server runtime is healthy. Uses the 
-        /// /config/v1/status endpoint for health verification.
+        /// Tests the connection to the Kepware server and checks if the server runtime is healthy. Also 
+        /// validates authentication credentials. 
+        /// Uses the /config/v1/status endpoint for health verification.
+        /// Uses the /config/v1/doc endpoint to verify credentials.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating whether the connection was successful.</returns>
 
         public async Task<bool> TestConnectionAsync(CancellationToken cancellationToken = default)
         {
-            bool blnIsConnected = false;
             try
             {
-                if (m_isConnected == null) // first time after connection change
+                if (m_isConnected != true) // already connected
                 {
                     m_logger.LogInformation("Connecting to {ClientName}-client at {BaseAddress}...", ClientName, m_httpClient.BaseAddress);
                 }
                 var response = await m_httpClient.GetAsync(ENDPOINT_STATUS, cancellationToken).ConfigureAwait(false);
 
-                if (response.IsSuccessStatusCode)
+                // check if the response is successful and contains a healthy status
+                // if the response is not successful, we assume the connection is not healthy
+                if (!response.IsSuccessStatusCode)
                 {
-                    var status = await JsonSerializer.DeserializeAsync(
+                    m_logger.LogWarning("Failed to connect to {ClientName}-client at {BaseAddress}, Reason: {ReasonPhrase}", ClientName, m_httpClient.BaseAddress, response.ReasonPhrase);
+                    m_isConnected = null; // set connection state to null if we cannot connect
+                    return false; // connection failed
+                }
+
+                // Deserialize the response content to check the status
+                var status = await JsonSerializer.DeserializeAsync(
                         await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false),
                         KepJsonContext.Default.ListApiStatus, cancellationToken)
                         .ConfigureAwait(false);
-                    if (status?.FirstOrDefault()?.Healthy == true)
-                    {
-                        blnIsConnected = true;
-                    }
-                }
 
-                if (m_isConnected == null || (m_isConnected != null && m_isConnected != blnIsConnected)) // first time after connection change or when connection is lost
+                // Check if the status is healthy
+                if (status?.FirstOrDefault()?.Healthy == false)
                 {
-                    if (!blnIsConnected)
-                    {
-                        m_logger.LogWarning("Failed to connect to {ClientName}-client at {BaseAddress}, Reason: {ReasonPhrase}", ClientName, m_httpClient.BaseAddress, response.ReasonPhrase);
-                    }
-                    else
-                    {
-                        var prodInfo = await GetProductInfoAsync(cancellationToken).ConfigureAwait(false);
-                        m_logger.LogInformation("Successfully connected to {ClientName}-client: {ProductName} {ProductVersion} on {BaseAddress}", ClientName, prodInfo?.ProductName, prodInfo?.ProductVersion, m_httpClient.BaseAddress);
-
-                        m_hasValidCredentials = await TestCredentialsAsync(cancellationToken).ConfigureAwait(false);
-                    }
+                    m_logger.LogWarning("Failed to connect to {ClientName}-client at {BaseAddress}, Reason: {String}", ClientName, m_httpClient.BaseAddress, "Server Status Check Failed");
+                    m_isConnected = null; // set connection state to null if we cannot connect
+                    return false; // connection failed
                 }
+
+                // If the connection is already healthy, we can return true immediately
+                if (m_isConnected == true ) 
+                {
+                    return true; // connection is healthy
+                }
+
+                // Inital connection attempt or a reconnection due to failure,
+                // we need to check the product info and credentials
+                var prodInfo = await GetProductInfoAsync(cancellationToken).ConfigureAwait(false);
+
+                // If we cannot get the product info, we assume the connection is not healthy
+                if (prodInfo == null) 
+                {
+                    m_isConnected = null; // set connection state to null if we cannot get product info
+                    return false;
+                }
+
+                // If we have a valid product info, we can check the credentials
+                m_hasValidCredentials = await TestCredentialsAsync(cancellationToken).ConfigureAwait(false);
+
+                // If we do not have valid credentials, we assume the connection is not healthy
+                if (m_hasValidCredentials != true)
+                {
+                    m_isConnected = null; // set connection state to null if we cannot connect or credentials are invalid
+                    m_logger.LogWarning("Connection to {ClientName}-client at {BaseAddress} failed because credentials are invalid", ClientName, m_httpClient.BaseAddress);
+                    return false;
+                }
+
+                m_logger.LogInformation("Successfully connected to {ClientName}-client: {ProductName} {ProductVersion} on {BaseAddress}", ClientName, prodInfo?.ProductName, prodInfo?.ProductVersion, m_httpClient.BaseAddress);
+
+                m_isConnected = true; // set connection state to true if we have a valid product info and credentials
+                return m_isConnected.Value; // return true if we have a valid connection
+
             }
             catch (HttpRequestException httpEx)
             {
                 if (m_isConnected == null || m_isConnected == true) // first time after connection change or when connection is lost
                     m_logger.LogWarning("Failed to connect to {ClientName}-client at {BaseAddress}, Reason: {Message}", ClientName, m_httpClient.BaseAddress, httpEx.Message);
             }
-            m_isConnected = blnIsConnected;
-            return blnIsConnected && m_hasValidCredentials == true;
+
+            // If we reach this point, we assume the connection is not healthy
+            return false;
         }
 
         /// <summary>
@@ -186,7 +219,6 @@ namespace Kepware.Api
                     var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                     var prodInfo = JsonSerializer.Deserialize(content, KepJsonContext.Default.ProductInfo);
 
-                    m_isConnected = true;
                     return prodInfo;
                 }
                 else
@@ -197,7 +229,6 @@ namespace Kepware.Api
             catch (HttpRequestException httpEx)
             {
                 m_logger.LogWarning(httpEx, "Failed to connect to {ClientName}-client at {BaseAddress}: {Message}", ClientName, m_httpClient.BaseAddress, httpEx.Message);
-                m_isConnected = null;
             }
             catch (JsonException jsonEx)
             {
@@ -212,7 +243,8 @@ namespace Kepware.Api
             bool hasValidCredentials = false;
             try
             {
-                var response = await m_httpClient.GetAsync(ENDPOINT_DOC, cancellationToken).ConfigureAwait(false);
+                
+                var response = await m_httpClient.GetAsync(ENDPOINT_PROJECT, cancellationToken).ConfigureAwait(false);
                 hasValidCredentials = response.IsSuccessStatusCode;
                 if (hasValidCredentials)
                 {
