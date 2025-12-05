@@ -1,13 +1,19 @@
 name: Container Image
 
 on:
+  workflow_dispatch:
+  workflow_run:
+    branches: [ "main" ]
+    workflows: ["Sync Service Build and Release"]
+    types:
+      - completed
   push:
     branches:
       - main
     paths:
-      - 'Kepware.Api/**'
+    #   - 'Kepware.Api/**'
       - 'KepwareSync.Service/**'
-      - '.github/workflows/docker-build-and-push.yml' 
+    #   - '.github/workflows/docker-build-and-push.yml' 
       - '!**/*.md' # Exclude markdown files
 
 jobs:
@@ -24,6 +30,7 @@ jobs:
       - uses: dotnet/nbgv@master
         id: nbgv
         with:
+          path: ./KepwareSync.Service
           setAllVars: true
 
       - name: Set up QEMU
