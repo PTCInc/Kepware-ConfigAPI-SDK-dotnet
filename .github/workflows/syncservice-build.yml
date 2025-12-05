@@ -1,0 +1,101 @@
+name: Sync Service Build and Release
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    branches: [ "main" ]
+    workflows: ["SDK Build and Release"]
+    types:
+      - completed
+    
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'KepwareSync.Service/**'
+    #   - '.github/workflows/syncservice-build.yml' 
+      - '!**/*.md' # Exclude markdown files
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'KepwareSync.Service/**'
+    #   - '.github/workflows/syncservice-build.yml'
+      - '!**/*.md' # Exclude markdown files
+
+jobs:
+  draft-release:
+    runs-on: ubuntu-latest
+    env:
+        PRODUCT: Kepware Sync Service
+    outputs:
+        tag_name: ${{ steps.drafter.outputs.tag_name }}
+        version: ${{ steps.nbgv.outputs.SemVer2 }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
+      - uses: dotnet/nbgv@master
+        id: nbgv
+        with:
+          path: ./KepwareSync.Service
+          setAllVars: true
+      - name: Use Release Drafter
+        if: ${{ github.event_name != 'pull_request'}}
+        id: drafter
+        uses: release-drafter/release-drafter@v6.1.0
+        with:
+          config-name: syncservice-release-drafter.yml
+          version: ${{ steps.nbgv.outputs.SemVer2 }}
+          name:  ${{ env.PRODUCT }} v${{ steps.nbgv.outputs.SemVer2 }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  build:
+    strategy:
+      matrix:
+        platform: [windows, ubuntu]
+    runs-on: ${{ matrix.platform }}-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      packages: write
+      actions: read
+      checks: write
+    needs: draft-release
+    env:
+        tag_name: ${{ needs.draft-release.outputs.tag_name }}
+        version: ${{ needs.draft-release.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build ./KepwareSync.Service/Kepware.SyncService.csproj --no-restore --configuration release
+      - name: dotnet publish
+        run: dotnet publish ./KepwareSync.Service/Kepware.SyncService.csproj --configuration release -o publish /p:UseAppHost=true
+      - name: Create and Upload Release Asset (Linux)
+        if: ${{ github.event_name != 'pull_request' && matrix.platform == 'ubuntu' }}
+        run: |
+            # Create the ZIP file with only the required files
+            zip -j Kepware.SyncService-${{ env.version }}-linux-x64.zip \
+                $(find . -path '**/publish/Kepware.SyncService') \
+                $(find . -path '**/publish/Kepware.SyncService.dbg') \
+                $(find . -path '**/publish/appsettings.json')
+            # Upload the ZIP file
+            gh release upload ${{env.tag_name}} Kepware.SyncService-${{ env.version }}-linux-x64.zip --clobber
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create and Upload Release Asset (Windows)
+        if: ${{ github.event_name != 'pull_request' && matrix.platform == 'windows' }}
+        run: |
+            # Create the ZIP file with only the required files
+            Compress-Archive -Path @(".\publish\Kepware.SyncService.exe",".\publish\Kepware.SyncService.pdb", ".\publish\appsettings.json") -DestinationPath Kepware.SyncService-${{ env.version }}-win-x64.zip
+            # Upload the ZIP file
+            gh release upload ${{env.tag_name}} Kepware.SyncService-${{ env.version }}-win-x64.zip --clobber
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
