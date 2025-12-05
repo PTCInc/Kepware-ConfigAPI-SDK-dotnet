@@ -11,7 +11,7 @@ The `Kepware.Api.Sample` project demonstrates how to use the `Kepware.Api` libra
 
 ## Prerequisites
 - A running Kepware server with the Configuration API enabled.
-- .NET SDK x.0 or later.
+- .NET SDK 8.0 or later.
 - Basic understanding of C# programming.
 
 ## Usage
@@ -28,7 +28,7 @@ The `Kepware.Api.Sample` project demonstrates how to use the `Kepware.Api` libra
                name: "sample",
                baseUrl: "https://localhost:57512",
                apiUserName: "Administrator",
-               apiPassword: "InrayTkeDocker2024!",
+               apiPassword: "StrongAdminPassword2025!",
                disableCertificateValidation: true
            );
        })
@@ -60,7 +60,7 @@ static async Task Main(string[] args)
                 name: "sample",
                 baseUrl: "https://localhost:57512",
                 apiUserName: "Administrator",
-                apiPassword: "InrayTkeDocker2024!",
+                apiPassword: "StrongAdminPassword2025!",
                 disableCertificateValidation: true
             );
         })
@@ -92,6 +92,6 @@ static async Task Main(string[] args)
 This sample project is provided "as is" under the MIT License. See the [LICENSE](../LICENSE.txt) file for details.
 
 ## Support
-For any issues, please open an Issue within the repository. For questions or feature requests, please open a Discussion thread within the repository. 
+For any issues, please open an Issue within the repository. For questions or feature requests, please open a Discussion thread within the repository.
 
 See [Repository Guidelines](../docs/repo-guidelines.md) for more information.

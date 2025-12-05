@@ -17,7 +17,7 @@ on:
     #   - 'Kepware.Api.Sample/**'
     #   - 'KepwareSync.Service/**'
     #   - '.github/workflows/nuget-test-and-build.yml'  
-      - '!*.md' # Exclude markdown files
+      - '!**/*.md' # Exclude markdown files
 
 jobs:
   draft-release:

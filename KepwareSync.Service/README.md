@@ -202,7 +202,7 @@ docker run -d \
   -e KEPWARE__PRIMARY__USERNAME=Administrator \
   -e KEPWARE__PRIMARY__PASSWORD=StrongAdminPassword2025! \
   -e KEPWARE__PRIMARY__HOST=https://localhost:57512 \
-  ghcr.io/bobiene/kepware-sync-service:latest
+  kepware-sync-service:latest
 ```
 
 This command:
@@ -223,28 +223,26 @@ version: '3.8'
 
 services:
   kepware:
-    image: inrayhub.azurecr.io/kepware_edge:1.9-beta
+    image: kepedge:<version>
     pull_policy: always
     networks:
-      - tke_network
+      - ke_network
     ports:
       - "57513:57513"
       - "49330:49330"
     environment:
       - EDGEADMINPW=StrongAdminPassword2025!
-      - LICENSE_SERVER_ADDRESS=192.168.189.81
-      - TZ=UTC
     volumes:
       - ./data/config:/opt/tkedge/v1/.config
     restart: unless-stopped
 
   kepware-sync:
-    image: ghcr.io/bobiene/kepware-sync-service:latest
+    image: kepware-sync-service:latest
     pull_policy: always
     depends_on:
       - kepware
     networks:
-      - tke_network
+      - ke_network
     volumes:
       - config_volume:/app/config
     environment:
@@ -260,7 +258,7 @@ services:
     depends_on:
       - kepware-sync
     networks:
-      - tke_network
+      - ke_network
     environment:
       - GIT_SYNC_REPO=https://your-repo.git
       - GIT_SYNC_BRANCH=main
@@ -273,7 +271,7 @@ volumes:
   config_volume:
 
 networks:
-  tke_network:
+  ke_network:
     driver: bridge
 ```
 
@@ -286,6 +284,6 @@ networks:
 This tool is provided "as is" under the MIT License. See the [LICENSE](../LICENSE.txt) file for details.
 
 ## Support
-For any issues, please open an Issue within the repository. For questions or feature requests, please open a Discussion thread within the repository. 
+For any issues, please open an Issue within the repository. For questions or feature requests, please open a Discussion thread within the repository.
 
 See [Repository Guidelines](../docs/repo-guidelines.md) for more information.
