@@ -1,5 +1,6 @@
-﻿name-template: 'v$RESOLVED_VERSION'
-tag-template: 'v$RESOLVED_VERSION'
+﻿# name-template: 'Kepware.Api SDK v$RESOLVED_VERSION'
+tag-template: 'Kepware.Api_v$RESOLVED_VERSION'
+tag-prefix: 'Kepware.Api_'
 commitish: refs/heads/main
 version-resolver:
   major:
