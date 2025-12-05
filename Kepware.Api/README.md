@@ -6,30 +6,30 @@
 ## Overview
 The `Kepware.Api` library provides a robust client implementation to interact with the Kepware Configuration API. It supports managing channels, devices, tags, and other configurations programmatically while ensuring secure and efficient communication.
 
-This package is designed to work with all versions of Kepware that support the Configuration API including Thingworx Kepware Server (TKS), Thingworx Kepware Edge (TKE) and KEPServerEX (KEP). For reference, Kepware Server in this documentation will refer to both TKS and KEP versions.
+This package is designed to work with all versions of Kepware that support the Configuration API including Kepware Server (KS), and Kepware Edge (KE). For reference, Kepware Server in this documentation will also imply Thingworx Kepware Server and KEPServerEX versions prior to v7.0 when v6.x is referenced.
 
 ## Features
 1. Connect to Kepware Configuration APIs securely with HTTPS and optional certificate validation.
 2. Perform CRUD operations for the following Kepware configuration objects:
 
-| Features      | TKS/KEP       | TKE           |
+| Features      | KS       | KE           |
 | :----------:  | :----------:  | :----------:  |
 | **Project Properties** <br /> *(Get Only)* | Y | Y |
 | **Connectivity** <br /> *(Channel, Devices, Tags, Tag Groups)* | Y | Y |
 | **Administration** <br /> *(User Groups, Users, UA Endpoints, Local License Server)* | Y[^1] | Y |
-| **Product Info and Health Status[^4]** | Y | Y |
-| **Export Project[^2]**| Y | Y |
+| **Product Info and Health Status** | Y[^4] | Y |
+| **Export Project**| Y[^2] | Y |
 | **Import Project (via CompareAndApply)[^3]**| Y | Y |
-| **Import Project (via JsonProjectLoad Service)[^2]**| N | N |
+| **Import Project (via JsonProjectLoad Service)**| N[^2] | N |
 
 [^1]: UA Endpoints and Local License Server supported for Kepware Edge only
-[^2]: JsonProjectLoad was added to Kepware Server v6.17 / Kepware Edge v1.10 and later builds, the SDK detects the server version and uses the appropriate service or loads the project by multiple requests if using KepwareApiClient.LoadProject.
+[^2]: JsonProjectLoad was added to Kepware Server v6.17 and later builds, the SDK detects the server version and uses the appropriate service or loads the project by multiple requests if using KepwareApiClient.LoadProject.
 [^3]: CompareAndApply is handled by the SDK, it compares the source project with the server project and applies the changes. The JsonProjectLoad service is a direct call to the server to load a project.
-[^4]: Added to Kepware Server v6.13 / Kepware Edge v1.5 and later builds
+[^4]: Added to Kepware Server v6.13 and later builds
 
 3. Configuration API *Services* implemented:
 
-| Services      | TKS/KEP       | TKE           |
+| Services      | KS       | KE           |
 | :----------:  | :----------:  | :----------:  |
 | **TagGeneration** <br /> *(for supported drivers)* | Y | Y |
 | **ReinitializeRuntime** | Y* | Y |
@@ -42,25 +42,7 @@ This package is designed to work with all versions of Kepware that support the C
 
 ## Installation
 
-To install the package via the GitHub NuGet feed, you need to configure your project to use the GitHub Packages repository.
-
-### Add the GitHub NuGet source
-
-Add the following configuration to your `NuGet.config` file in the root of your project or in the global configuration directory:
-
-```xml
-<configuration>
-  <packageSources>
-    <add key="GitHub" value="https://nuget.pkg.github.com/YourUsername/index.json" />
-  </packageSources>
-  <packageSourceCredentials>
-    <GitHub>
-      <add key="Username" value="YourUsername" />
-      <add key="ClearTextPassword" value="YOUR_PERSONAL_ACCESS_TOKEN" />
-    </GitHub>
-  </packageSourceCredentials>
-</configuration>
-```
+Kepware.Api NuGet package is available from NuGet repository.
 
 1. Add the `Kepware.Api` library to your project as a reference.
    ```bash
@@ -73,7 +55,7 @@ Add the following configuration to your `NuGet.config` file in the root of your 
        name: "default",
        baseUrl: "https://localhost:57512",
        apiUserName: "Administrator",
-       apiPassword: "password",
+       apiPassword: "StrongAdminPassword2025!",
        disableCertificateValidation: true
    );
    ```
