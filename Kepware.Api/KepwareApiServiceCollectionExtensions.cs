@@ -160,11 +160,11 @@ namespace Kepware.Api
                 client.BaseAddress = options.HostUri;
                 client.Timeout = options.Timeout;
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
-                client.DefaultRequestHeaders.Add("User-Agent", "KepwareSync");
+                client.DefaultRequestHeaders.Add("User-Agent", "Kepware.Api Client");
 
-                if (!string.IsNullOrEmpty(options.Username) && !string.IsNullOrEmpty(options.Password))
+                if (!string.IsNullOrEmpty(options.Username))
                 {
-                    string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{options.Username}:{options.Password}"));
+                    string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{options.Username}:{options.Password ?? string.Empty}"));
                     client.DefaultRequestHeaders.Add("Authorization", $"Basic {credentials}");
                 }
 
