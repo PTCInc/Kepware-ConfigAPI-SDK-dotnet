@@ -150,9 +150,12 @@ namespace Kepware.Api.Model
         /// </summary>
         [JsonIgnore]
         public bool SupportsJsonProjectLoadService =>
+            // Supported in KEPServerEX 6.17+, ThingWorx Kepware Server 6.17+, Kepware Edge, and ThingWorx Kepware Edge 1.10+
+            // Kepware Edge and ThingWorx Kepware Edge use the same ProductType and are differentiated by ProductName
             (ProductType == ProductType.KepwareServer && (ProductVersionMajor > 6 || (ProductVersionMajor == 6 && ProductVersionMinor >= 17))) ||
             (ProductType == ProductType.KepwareEdge && (ProductVersionMajor > 1 || (ProductVersionMajor == 1 && ProductVersionMinor >= 10))) ||
             (ProductType == ProductType.KepwareEdge && ProductName == "Kepware Edge");
+        
     }
 
 
