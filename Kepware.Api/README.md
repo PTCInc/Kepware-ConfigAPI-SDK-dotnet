@@ -9,18 +9,19 @@ The `Kepware.Api` library provides a robust client implementation to interact wi
 This package is designed to work with all versions of Kepware that support the Configuration API including Kepware Server (KS), and Kepware Edge (KE). For reference, Kepware Server in this documentation will also imply Thingworx Kepware Server and KEPServerEX versions prior to v7.0 when v6.x is referenced.
 
 ## Features
+
 1. Connect to Kepware Configuration APIs securely with HTTPS and optional certificate validation.
 2. Perform CRUD operations for the following Kepware configuration objects:
 
-| Features      | KS       | KE           |
-| :----------:  | :----------:  | :----------:  |
-| **Project Properties** <br /> *(Get Only)* | Y | Y |
+| Features     | KS           | KE           |
+| :----------: | :----------: | :----------: |
+| **Project Properties** | Y | Y |
 | **Connectivity** <br /> *(Channel, Devices, Tags, Tag Groups)* | Y | Y |
 | **Administration** <br /> *(User Groups, Users, UA Endpoints, Local License Server)* | Y[^1] | Y |
 | **Product Info and Health Status** | Y[^4] | Y |
-| **Export Project**| Y[^2] | Y |
-| **Import Project (via CompareAndApply)[^3]**| Y | Y |
-| **Import Project (via JsonProjectLoad Service)**| N[^2] | N |
+| **Export Project** | Y[^2] | Y |
+| **Import Project (via JsonProjectLoad Service)** | N[^2] | N |
+| **Import Project (via CompareAndApply)[^3]** | Y | Y |
 
 [^1]: UA Endpoints and Local License Server supported for Kepware Edge only
 [^2]: JsonProjectLoad was added to Kepware Server v6.17 and later builds, the SDK detects the server version and uses the appropriate service or loads the project by multiple requests if using KepwareApiClient.LoadProject.
@@ -29,12 +30,12 @@ This package is designed to work with all versions of Kepware that support the C
 
 3. Configuration API *Services* implemented:
 
-| Services      | KS       | KE           |
-| :----------:  | :----------:  | :----------:  |
+| Services     | KS           | KE           |
+| :----------: | :----------: | :----------: |
 | **TagGeneration** <br /> *(for supported drivers)* | Y | Y |
 | **ReinitializeRuntime** | Y* | Y |
-| **ProjectLoad and ProjectSave**| N | N |
-| **JsonProjectLoad\*\*** <br /> *(used for import project feature)*| Y | Y |
+| **ProjectLoad and ProjectSave** | N | N |
+| **JsonProjectLoad\*\*** <br /> *(used for import project feature)* | Y | Y |
 
 4.  Synchronize configurations between your application and Kepware server.
 5.  Supports advanced operations like project comparison, entity synchronization, and driver property queries.
