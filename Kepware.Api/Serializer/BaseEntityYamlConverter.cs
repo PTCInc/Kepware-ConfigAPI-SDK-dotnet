@@ -80,6 +80,15 @@ namespace Kepware.Api.Serializer
                 {
                     entity.Description = value?.ToString() ?? string.Empty;
                 }
+                else if (key == "client_interfaces")
+                {
+                    // Flatten the client_interfaces sequence into the DynamicProperties map.
+                    // Nested values overwrite top-level ones (nested wins).
+                    if (!m_nonpersistetDynamicProps.Contains(key))
+                    {
+                        ClientInterfacesFlattener.FlattenFromObject(value, entity.DynamicProperties);
+                    }
+                }
                 else
                 {
                     if (!m_nonpersistetDynamicProps.Contains(key))
@@ -161,13 +170,34 @@ namespace Kepware.Api.Serializer
                     emitter.Emit(new Scalar(entity.Description));
                 }
 
-                // Serialize DynamicProperties directly at the top level
+                // Emit grouped client_interfaces if present in dynamic properties
+                var clientInterfacesElement = ClientInterfacesFlattener.BuildClientInterfacesArrayFromDynamicProperties(entity.DynamicProperties);
+                if (clientInterfacesElement.HasValue)
+                {
+                    emitter.Emit(new Scalar("client_interfaces"));
+                    SerializeJsonValue(emitter, clientInterfacesElement.Value, nestedObjectSerializer);
+                }
+
+                // Serialize remaining DynamicProperties at the top level, skipping interface-prefixed keys
                 foreach (var property in entity.DynamicProperties)
                 {
                     if (m_nonpersistetDynamicProps.Contains(property.Key))
                     {
                         continue;
                     }
+
+                    var idx = property.Key.IndexOf('.');
+                    if (idx > 0)
+                    {
+                        var prefix = property.Key.Substring(0, idx);
+                        // skip writing individual interface-prefixed keys because they are emitted
+                        // grouped in the client_interfaces sequence above
+                        if (ClientInterfacesFlattener.IsInterfacePrefix(prefix))
+                        {
+                            continue;
+                        }
+                    }
+
                     emitter.Emit(new Scalar(property.Key));
                     SerializeJsonValue(emitter, property.Value, nestedObjectSerializer);
                 }

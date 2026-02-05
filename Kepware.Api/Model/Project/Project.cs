@@ -15,6 +15,7 @@ namespace Kepware.Api.Model
     /// interfaces that Kepware supports.
     /// </summary>
     [Endpoint("/config/v1/project")]
+    [JsonConverter(typeof(ProjectPropertiesJsonConverter))]
     public class Project : DefaultEntity 
     // Updated from BaseEntity to leverage GetUpdateDiff methods for Project Properties updates
     {
@@ -28,6 +29,8 @@ namespace Kepware.Api.Model
         /// </summary>
         public Project()
         {
+            // Set flag to indicate that dynamic properties will include nested properties from client_interfaces
+            IncludesNestedDynamicProperties = true;
             ProjectProperties = new(this);
         }
 
@@ -79,6 +82,36 @@ namespace Kepware.Api.Model
 
             return await JsonSerializer.DeserializeAsync(stream, KepJsonContext.Default.Project, cancellationToken).ConfigureAwait(false) ??
                 throw new InvalidOperationException("CloneAsync failed");
+        }
+
+        /// <summary>
+        /// Normalizes nested properties by flattening the client_interfaces array from the Kepware API.
+        /// </summary>
+        /// <remarks>
+        /// If the Kepware API returns a nested client_interfaces array as a single dynamic property (full project load),
+        /// this method expands it into flattened dynamic properties so existing getters/setters can work.
+        /// </remarks>
+        protected override void NormalizeNestedProperties()
+        {
+            // If server returned a nested client_interfaces array as a single dynamic property,
+            // expand it into flattened dynamic properties so existing getters/setters can work.
+            if (DynamicProperties.TryGetValue("client_interfaces", out var ciElement) &&
+                ciElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+            {
+                foreach (var item in ciElement.EnumerateArray())
+                {
+                    if (item.ValueKind != System.Text.Json.JsonValueKind.Object) continue;
+                    foreach (var prop in item.EnumerateObject())
+                    {
+                        if (prop.NameEquals("common.ALLTYPES_NAME")) continue;
+                        // Overwrite existing keys — nested wins
+                        DynamicProperties[prop.Name] = prop.Value.Clone();
+                    }
+                }
+
+                // Remove the original nested property to avoid duplication
+                DynamicProperties.Remove("client_interfaces");
+            }
         }
 
     }

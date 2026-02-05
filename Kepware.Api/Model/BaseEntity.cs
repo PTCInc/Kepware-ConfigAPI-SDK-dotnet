@@ -43,7 +43,17 @@ namespace Kepware.Api.Model
     [DebuggerDisplay("{TypeName} - {Description}")]
     public abstract class BaseEntity : IEquatable<BaseEntity>
     {
+        private bool _dynamicPropertiesNormalized = false;
         private ulong? _hash;
+
+        /// <summary>
+        /// Flag indicating if the entity includes nested dynamic properties that require normalization.
+        /// </summary>
+        /// <remarks>
+        /// When set to true, accessing dynamic properties will trigger normalization via class overrides.
+        /// For example, the <see cref="Project"/> class sets this to true to handle nested client_interfaces arrays.
+        /// </remarks>
+        public bool IncludesNestedDynamicProperties = false;
 
         /// <summary>
         /// Unique hash representing the current state of the entity.
@@ -95,6 +105,8 @@ namespace Kepware.Api.Model
         /// <returns>The value of the property, or default if not found.</returns>
         public T? GetDynamicProperty<T>(string key)
         {
+            if (IncludesNestedDynamicProperties) EnsureDynamicPropertiesNormalized();
+
             if (DynamicProperties.TryGetValue(key, out var value))
             {
                 if (value is JsonElement jsonElement)
@@ -143,6 +155,7 @@ namespace Kepware.Api.Model
         /// <returns>The current instance for chaining.</returns>
         public BaseEntity SetDynamicProperty<T>(string key, T value)
         {
+            if (IncludesNestedDynamicProperties) EnsureDynamicPropertiesNormalized();
             if (value is null)
             {
                 if (DynamicProperties.ContainsKey(key))
@@ -167,8 +180,10 @@ namespace Kepware.Api.Model
         /// <param name="key">The key of the property.</param>
         /// <param name="value">The retrieved value, or null if not found.</param>
         /// <returns>True if the property exists, false otherwise.</returns>
-        public bool TryGetGetDynamicProperty<T>(string key, [NotNullWhen(true)] out T? value)
+        public bool TryGetDynamicProperty<T>(string key, [NotNullWhen(true)] out T? value)
         {
+            if (IncludesNestedDynamicProperties) EnsureDynamicPropertiesNormalized();
+            
             if (DynamicProperties.TryGetValue(key, out var jsonElement) &&
                 Convert.ChangeType(KepJsonContext.Unwrap(jsonElement), typeof(T)) is T convertedValue)
             {
@@ -193,6 +208,34 @@ namespace Kepware.Api.Model
                             )
                         )
                 );
+        }
+
+        /// <summary>
+        /// Ensures that dynamic properties are normalized. This method uses the Template Method pattern,
+        /// calling <see cref="NormalizeNestedProperties"/> to allow derived classes to customize normalization behavior.
+        /// </summary>
+        protected virtual void EnsureDynamicPropertiesNormalized()
+        {
+            if (_dynamicPropertiesNormalized) return;
+
+            // Call the hook method to allow derived classes to normalize their nested properties
+            NormalizeNestedProperties();
+
+            _dynamicPropertiesNormalized = true;
+        }
+
+        /// <summary>
+        /// Normalizes nested properties specific to this entity type. Override this method to implement
+        /// custom normalization logic (e.g., flattening nested arrays into dynamic properties).
+        /// </summary>
+        /// <remarks>
+        /// This method is called by <see cref="EnsureDynamicPropertiesNormalized"/> during property access.
+        /// Implement this in derived classes to handle entity-specific normalization.
+        /// For example, <see cref="Project"/> overrides this to flatten nested "client_interfaces" arrays.
+        /// </remarks>
+        protected virtual void NormalizeNestedProperties()
+        {
+            // Default implementation: no normalization. Derived classes override to add custom behavior.
         }
 
         /// <summary>
@@ -229,7 +272,7 @@ namespace Kepware.Api.Model
                 DynamicProperties.Remove(Properties.Description);
             }
 
-            if (TryGetGetDynamicProperty<string>(Properties.Channel.DeviceDriver, out var driver))
+            if (TryGetDynamicProperty<string>(Properties.Channel.DeviceDriver, out var driver))
             {
                 var defaultValues = await defaultValueProvider.GetDefaultValuesAsync(driver, TypeName, cancellationToken);
                 foreach (var prop in DynamicProperties.ToList())
