@@ -80,15 +80,16 @@ namespace Kepware.Api.Serializer
                 {
                     entity.Description = value?.ToString() ?? string.Empty;
                 }
-                else if (key == "client_interfaces")
-                {
-                    // Flatten the client_interfaces sequence into the DynamicProperties map.
-                    // Nested values overwrite top-level ones (nested wins).
-                    if (!m_nonpersistetDynamicProps.Contains(key))
-                    {
-                        ClientInterfacesFlattener.FlattenFromObject(value, entity.DynamicProperties);
-                    }
-                }
+                // TODO: Uncomment and test when adding YAML serialization is required. 
+                //else if (key == "client_interfaces")
+                //{
+                //    // Flatten the client_interfaces sequence into the DynamicProperties map.
+                //    // Nested values overwrite top-level ones (nested wins).
+                //    if (!m_nonpersistetDynamicProps.Contains(key))
+                //    {
+                //        ClientInterfacesFlattener.FlattenFromObject(value, entity.DynamicProperties);
+                //    }
+                //}
                 else
                 {
                     if (!m_nonpersistetDynamicProps.Contains(key))
@@ -169,14 +170,15 @@ namespace Kepware.Api.Serializer
                     emitter.Emit(new Scalar("common.ALLTYPES_DESCRIPTION"));
                     emitter.Emit(new Scalar(entity.Description));
                 }
-
+                
+                // TODO: Uncomment and test when adding YAML serialization is required.    
                 // Emit grouped client_interfaces if present in dynamic properties
-                var clientInterfacesElement = ClientInterfacesFlattener.BuildClientInterfacesArrayFromDynamicProperties(entity.DynamicProperties);
-                if (clientInterfacesElement.HasValue)
-                {
-                    emitter.Emit(new Scalar("client_interfaces"));
-                    SerializeJsonValue(emitter, clientInterfacesElement.Value, nestedObjectSerializer);
-                }
+                //var clientInterfacesElement = ClientInterfacesFlattener.BuildClientInterfacesArrayFromDynamicProperties(entity.DynamicProperties);
+                //if (clientInterfacesElement.HasValue)
+                //{
+                //    emitter.Emit(new Scalar("client_interfaces"));
+                //    SerializeJsonValue(emitter, clientInterfacesElement.Value, nestedObjectSerializer);
+                //}
 
                 // Serialize remaining DynamicProperties at the top level, skipping interface-prefixed keys
                 foreach (var property in entity.DynamicProperties)
