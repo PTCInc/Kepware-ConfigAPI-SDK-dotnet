@@ -75,16 +75,22 @@ namespace Kepware.Api.ClientHandler
         /// <returns>A task that represents the asynchronous operation. The task result contains a tuple with the counts of inserts, updates, and deletes.</returns>
         public async Task<(int inserts, int updates, int deletes)> CompareAndApply(Project sourceProject, Project projectFromApi, CancellationToken cancellationToken = default)
         {
+            int inserts = 0, updates = 0, deletes = 0;
+
             if (sourceProject.Hash != projectFromApi.Hash)
             {
                 m_logger.LogInformation("Project properties has changed. Updating project properties...");
-                var result = await SetProjectPropertiesAsync(projectFromApi, cancellationToken: cancellationToken).ConfigureAwait(false);
-                if (!result)
+                var result = await SetProjectPropertiesAsync(sourceProject, cancellationToken: cancellationToken).ConfigureAwait(false);
+                if (result)
+                {
+                    updates += 1;
+                }
+                else
                 {
                     m_logger.LogError("Failed to update project properties...");
                 }
             }
-            int inserts = 0, updates = 0, deletes = 0;
+            
 
             var channelCompare = await m_kepwareApiClient.GenericConfig.CompareAndApply<ChannelCollection, Channel>(sourceProject.Channels, projectFromApi.Channels,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
