@@ -20,14 +20,6 @@ namespace Kepware.Api.Test.ApiClient
 {
     public class ProjectLoadTests : TestApiClientBase
     {
-        private const string ENDPONT_FULL_PROJECT = "/config/v1/project?content=serialize";
-
-        private async Task ConfigureToServeFullProject()
-        {
-            var jsonData = await File.ReadAllTextAsync("_data/simdemo_en-us.json");
-            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + ENDPONT_FULL_PROJECT)
-                                   .ReturnsResponse(jsonData, "application/json");
-        }
 
         private async Task ConfigureToServeEndpoints()
         {

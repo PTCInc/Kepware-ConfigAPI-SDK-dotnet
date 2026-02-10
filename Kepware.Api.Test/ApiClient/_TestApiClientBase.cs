@@ -59,9 +59,9 @@ namespace Kepware.Api.Test.ApiClient
             _kepwareApiClient = new KepwareApiClient("TestClient", new KepwareApiClientOptions { HostUri = httpClient.BaseAddress }, _loggerFactoryMock.Object, httpClient);
         }
 
-        protected static async Task<JsonProjectRoot> LoadJsonTestDataAsync()
+        protected static async Task<JsonProjectRoot> LoadJsonTestDataAsync(string filePath = "_data/simdemo_en-us.json")
         {
-            var json = await File.ReadAllTextAsync("_data/simdemo_en-us.json");
+            var json = await File.ReadAllTextAsync(filePath);
             return JsonSerializer.Deserialize<JsonProjectRoot>(json, KepJsonContext.Default.JsonProjectRoot)!;
         }
 
@@ -124,6 +124,14 @@ namespace Kepware.Api.Test.ApiClient
             return Enumerable.Range(1, count)
                 .Select(i => new Tag { Name = $"Tag{i}" })
                 .ToList();
+        }
+
+        private const string ENDPONT_FULL_PROJECT = "/config/v1/project?content=serialize";
+        protected async Task ConfigureToServeFullProject(string filePath = "_data/simdemo_en-us.json")
+        {
+            var jsonData = await File.ReadAllTextAsync(filePath);
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + ENDPONT_FULL_PROJECT)
+                                   .ReturnsResponse(jsonData, "application/json");
         }
     }
 }
