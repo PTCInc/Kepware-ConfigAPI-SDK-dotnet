@@ -8,7 +8,7 @@ using System.Text.Json;
 
 namespace Kepware.Api.TestIntg.ApiClient;
 
-public class UpdateTests : TestApiClientBase
+public class UpdateTests : TestIntgApiClientBase
 {
     [Fact]
     public async Task Update_Item_WhenSuccessful_ShouldReturnTrue()

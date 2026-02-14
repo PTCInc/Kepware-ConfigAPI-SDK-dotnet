@@ -14,7 +14,7 @@ using System.Text.Json;
 
 namespace Kepware.Api.TestIntg.ApiClient
 {
-    public class ProjectApiHandlerTests : TestApiClientBase
+    public class ProjectApiHandlerTests : TestIntgApiClientBase
     {
         private readonly ProjectApiHandler _projectApiHandler;
 
@@ -242,7 +242,6 @@ namespace Kepware.Api.TestIntg.ApiClient
         [Fact]
         public async Task LoadTagGroupsRecursiveAsync_ShouldLoadTagGroupsCorrectly()
         {
-            // TODO: Currently this test fails due to isse in EndpointResolver.
             try
             {
                 // Arrange

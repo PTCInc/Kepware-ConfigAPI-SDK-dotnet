@@ -12,7 +12,7 @@ using System.Net.Http.Json;
 
 namespace Kepware.Api.TestIntg.ApiClient
 {
-    public class ServerUserGroupTests : TestApiClientBase
+    public class ServerUserGroupTests : TestIntgApiClientBase
     {
 
         [Fact]

@@ -13,7 +13,7 @@ using Xunit;
 namespace Kepware.Api.TestIntg.ApiClient
 {
     [TestCaseOrderer("Xunit.Extensions.Ordering.TestCaseOrderer", "Xunit.Extensions.Ordering")]
-    public class LoadEntityTests : TestApiClientBase
+    public class LoadEntityTests : TestIntgApiClientBase
     {
         #region LoadEntityAsync - Channel (Collection)
 

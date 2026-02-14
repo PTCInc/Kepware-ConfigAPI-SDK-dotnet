@@ -9,7 +9,7 @@ using System.Text.Json;
 
 namespace Kepware.Api.TestIntg.ApiClient;
 
-public class InsertTests : TestApiClientBase
+public class InsertTests : TestIntgApiClientBase
 {
     [Fact]
     public async Task Insert_Item_WhenSuccessful_ShouldReturnTrue()
@@ -87,7 +87,6 @@ public class InsertTests : TestApiClientBase
     public async Task Insert_MultipleItems_WithUnsupportedDriver_ShouldSkipItems()
     {
         // Arrange
-        await ConfigureToServeDrivers();
         var channel1 = CreateTestChannel("Channel1", "UnsupportedDriver");
         var channel2 = CreateTestChannel("Channel2", "Simulator");
         var channels = new List<Channel> { channel1, channel2 };

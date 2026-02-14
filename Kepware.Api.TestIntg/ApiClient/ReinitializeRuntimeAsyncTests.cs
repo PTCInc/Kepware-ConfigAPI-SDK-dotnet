@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Kepware.Api.TestIntg.ApiClient
 {
-    public class ReinitializeRuntimeAsyncTests : TestApiClientBase
+    public class ReinitializeRuntimeAsyncTests : TestIntgApiClientBase
     {
 
         [Fact]

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Kepware.Api.TestIntg.ApiClient
 {
-    public class GetProductInfo : TestApiClientBase
+    public class GetProductInfo : TestIntgApiClientBase
     {
 
         [Fact]

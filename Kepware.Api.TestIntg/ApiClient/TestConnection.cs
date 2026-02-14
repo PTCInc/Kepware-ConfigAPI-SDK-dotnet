@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Kepware.Api.TestIntg.ApiClient
 {
-    public class TestConnection : TestApiClientBase
+    public class TestConnection : TestIntgApiClientBase
     {
         [Fact]
         public async Task TestConnectionAsync_ShouldReturnTrue_WhenApiIsHealthy()

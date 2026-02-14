@@ -13,7 +13,7 @@ using Kepware.Api.Model.Admin;
 
 namespace Kepware.Api.TestIntg.ApiClient
 {
-    public class AdminModelTests : TestApiClientBase
+    public class AdminModelTests : TestIntgApiClientBase
     {
 
         #region GetAdminSettingsAsync Tests
