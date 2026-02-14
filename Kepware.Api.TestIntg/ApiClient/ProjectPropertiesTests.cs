@@ -64,6 +64,15 @@ namespace Kepware.Api.TestIntg.ApiClient
 
             // Assert
             result.ShouldBeTrue();
+
+            // Verify the settings were actually applied
+            var updatedSettings = await _kepwareApiClient.Project.GetProjectPropertiesAsync();
+            updatedSettings.ShouldNotBeNull();
+            if (_productInfo.ProductId != "013")
+            {
+                updatedSettings.ProjectProperties.OpcDaMaxConnections.ShouldBe(newSettings.ProjectProperties.OpcDaMaxConnections);
+            }
+            updatedSettings.ProjectProperties.OpcUaMaxConnections.ShouldBe(newSettings.ProjectProperties.OpcUaMaxConnections);
         }
 
         [Fact]
