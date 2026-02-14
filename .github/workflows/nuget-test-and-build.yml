@@ -91,6 +91,7 @@ jobs:
   publish:
     # Publish the NuGet package and create release assets
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' }}
     needs: [ build, draft-release ]
     env:
         tag_name: ${{ needs.draft-release.outputs.tag_name }}
