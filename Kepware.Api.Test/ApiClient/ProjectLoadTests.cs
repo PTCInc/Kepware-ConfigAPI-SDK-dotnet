@@ -20,71 +20,63 @@ namespace Kepware.Api.Test.ApiClient
 {
     public class ProjectLoadTests : TestApiClientBase
     {
-        private const string ENDPONT_FULL_PROJECT = "/config/v1/project?content=serialize";
 
-        private async Task ConfigureToServeFullProject()
-        {
-            var jsonData = await File.ReadAllTextAsync("_data/simdemo_en-us.json");
-            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + ENDPONT_FULL_PROJECT)
-                                   .ReturnsResponse(jsonData, "application/json");
-        }
+        //private async Task ConfigureToServeEndpoints()
+        //{
+        //    var projectData = await LoadJsonTestDataAsync();
 
-        private async Task ConfigureToServeEndpoints()
-        {
-            var projectData = await LoadJsonTestDataAsync();
+        //    var channels = projectData.Project?.Channels?.Select(c => new Channel { Name = c.Name, Description = c.Description, DynamicProperties = c.DynamicProperties }).ToList() ?? [];
 
-            var channels = projectData.Project?.Channels?.Select(c => new Channel { Name = c.Name, Description = c.Description, DynamicProperties = c.DynamicProperties }).ToList() ?? [];
+        //    // Serve project details
+        //    _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project")
+        //                           .ReturnsResponse(JsonSerializer.Serialize(new Project { Description = projectData?.Project?.Description, DynamicProperties = projectData?.Project?.DynamicProperties ?? [] }), "application/json");
 
-            // Serve project details
-            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project")
-                                   .ReturnsResponse(JsonSerializer.Serialize(new Project { Description = projectData?.Project?.Description, DynamicProperties = projectData?.Project?.DynamicProperties ?? [] }), "application/json");
+        //    // Serve channels without nested devices
+        //    _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels")
+        //                           .ReturnsResponse(JsonSerializer.Serialize(channels), "application/json");
 
-            // Serve channels without nested devices
-            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels")
-                                   .ReturnsResponse(JsonSerializer.Serialize(channels), "application/json");
+        //    foreach (var channel in projectData?.Project?.Channels ?? [])
+        //    {
+        //        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + $"/config/v1/project/channels/{channel.Name}")
+        //                               .ReturnsResponse(JsonSerializer.Serialize(new Channel { Name = channel.Name, Description = channel.Description, DynamicProperties = channel.DynamicProperties }), "application/json");
 
-            foreach (var channel in projectData?.Project?.Channels ?? [])
-            {
-                _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + $"/config/v1/project/channels/{channel.Name}")
-                                       .ReturnsResponse(JsonSerializer.Serialize(new Channel { Name = channel.Name, Description = channel.Description, DynamicProperties = channel.DynamicProperties }), "application/json");
+        //        if (channel.Devices != null)
+        //        {
+        //            var devices = channel.Devices.Select(d => new Device { Name = d.Name, Description = d.Description, DynamicProperties = d.DynamicProperties }).ToList();
+        //            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + $"/config/v1/project/channels/{channel.Name}/devices")
+        //                                   .ReturnsResponse(JsonSerializer.Serialize(devices), "application/json");
 
-                if (channel.Devices != null)
-                {
-                    var devices = channel.Devices.Select(d => new Device { Name = d.Name, Description = d.Description, DynamicProperties = d.DynamicProperties }).ToList();
-                    _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + $"/config/v1/project/channels/{channel.Name}/devices")
-                                           .ReturnsResponse(JsonSerializer.Serialize(devices), "application/json");
-
-                    foreach (var device in channel.Devices)
-                    {
-                        var deviceEndpoint = TEST_ENDPOINT + $"/config/v1/project/channels/{channel.Name}/devices/{device.Name}";
-                        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, deviceEndpoint)
-                                               .ReturnsResponse(JsonSerializer.Serialize(new Device { Name = device.Name, Description = device.Description, DynamicProperties = device.DynamicProperties }), "application/json");
+        //            foreach (var device in channel.Devices)
+        //            {
+        //                var deviceEndpoint = TEST_ENDPOINT + $"/config/v1/project/channels/{channel.Name}/devices/{device.Name}";
+        //                _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, deviceEndpoint)
+        //                                       .ReturnsResponse(JsonSerializer.Serialize(new Device { Name = device.Name, Description = device.Description, DynamicProperties = device.DynamicProperties }), "application/json");
 
 
-                        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, deviceEndpoint + "/tags")
-                                              .ReturnsResponse(JsonSerializer.Serialize(device.Tags), "application/json");
+        //                _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, deviceEndpoint + "/tags")
+        //                                      .ReturnsResponse(JsonSerializer.Serialize(device.Tags), "application/json");
 
-                        ConfigureToServeEndpointsTagGroupsRecursive(deviceEndpoint, device.TagGroups ?? []);
-                    }
-                }
-            }
-        }
+        //                ConfigureToServeEndpointsTagGroupsRecursive(deviceEndpoint, device.TagGroups ?? []);
+        //            }
+        //        }
+        //    }
+        //}
 
-        private void ConfigureToServeEndpointsTagGroupsRecursive(string endpoint, IEnumerable<DeviceTagGroup> tagGroups)
-        {
-            var tagGroupEndpoint = endpoint + "/tag_groups";
+        //private void ConfigureToServeEndpointsTagGroupsRecursive(string endpoint, IEnumerable<DeviceTagGroup> tagGroups)
+        //{
+        //    var tagGroupEndpoint = endpoint + "/tag_groups";
 
-            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, tagGroupEndpoint)
-                                             .ReturnsResponse(JsonSerializer.Serialize(tagGroups), "application/json");
+        //    _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, tagGroupEndpoint)
+        //                                     .ReturnsResponse(JsonSerializer.Serialize(tagGroups), "application/json");
 
-            foreach (var tagGroup in tagGroups)
-            {
-                _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, string.Concat(tagGroupEndpoint, "/", tagGroup.Name, "/tags"))
-                                             .ReturnsResponse(JsonSerializer.Serialize(tagGroup.Tags), "application/json");
+        //    foreach (var tagGroup in tagGroups)
+        //    {
+        //        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, string.Concat(tagGroupEndpoint, "/", tagGroup.Name, "/tags"))
+        //                                     .ReturnsResponse(JsonSerializer.Serialize(tagGroup.Tags), "application/json");
 
-                ConfigureToServeEndpointsTagGroupsRecursive(string.Concat(tagGroupEndpoint, "/", tagGroup.Name), tagGroup.TagGroups ?? []);
-            }
-        }
+        //        ConfigureToServeEndpointsTagGroupsRecursive(string.Concat(tagGroupEndpoint, "/", tagGroup.Name), tagGroup.TagGroups ?? []);
+        //    }
+        //}
 
         [Theory]
         [InlineData("KEPServerEX", "12", 6, 17, true)]

@@ -1,0 +1,107 @@
+﻿{
+	"project": {
+		"common.ALLTYPES_DESCRIPTION": "Example project utilizing Simulator Driver.",
+		"servermain.PROJECT_TITLE": "Simulation Driver Demo",
+		"channels": [
+			{
+				"common.ALLTYPES_NAME": "ExistingChannel",
+				"common.ALLTYPES_DESCRIPTION": "Example Simulator Channel",
+				"servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator",
+				"servermain.CHANNEL_DIAGNOSTICS_CAPTURE": false,
+				"servermain.CHANNEL_UNIQUE_ID": 1704486747,
+				"servermain.CHANNEL_WRITE_OPTIMIZATIONS_METHOD": 2,
+				"servermain.CHANNEL_WRITE_OPTIMIZATIONS_DUTY_CYCLE": 10,
+				"servermain.CHANNEL_NON_NORMALIZED_FLOATING_POINT_HANDLING": 0,
+				"simulator.CHANNEL_ITEM_PERSISTENCE": false,
+				"simulator.CHANNEL_ITEM_PERSISTENCE_DATA_FILE": "C:\\ProgramData\\Kepware\\KEPServerEX\\V6\\Simulator\\Channel1.dat",
+				"devices": [
+
+				]
+			}
+		],
+		"aliases": [
+			{
+				"common.ALLTYPES_NAME": "Alias1",
+				"common.ALLTYPES_DESCRIPTION": "Example Alias",
+				"servermain.ALIAS_MAPPED_TO": "Channel1.Device1",
+				"servermain.ALIAS_SCAN_RATE_MILLISECONDS": 0
+			}
+		],
+		"client_interfaces": [
+			{
+				"common.ALLTYPES_NAME": "aeserverinterface",
+				"aeserverinterface.ENABLE_AE_SERVER": false,
+				"aeserverinterface.ENABLE_SIMPLE_EVENTS": true,
+				"aeserverinterface.MAX_SUBSCRIPTION_BUFFER_SIZE": 100,
+				"aeserverinterface.MIN_SUBSCRIPTION_BUFFER_TIME_MS": 1000,
+				"aeserverinterface.MIN_KEEP_ALIVE_TIME_MS": 1000
+			},
+			{
+				"common.ALLTYPES_NAME": "opcdaserver",
+				"opcdaserver.PROJECT_OPC_DA_1_ENABLED": true,
+				"opcdaserver.PROJECT_OPC_DA_2_ENABLED": true,
+				"opcdaserver.PROJECT_OPC_DA_3_ENABLED": true,
+				"opcdaserver.PROJECT_OPC_SHOW_HINTS_ON_BROWSE": false,
+				"opcdaserver.PROJECT_OPC_SHOW_TAG_PROPERTIES_ON_BROWSE": false,
+				"opcdaserver.PROJECT_OPC_SHUTDOWN_WAIT_SEC": 15,
+				"opcdaserver.PROJECT_OPC_SYNC_REQUEST_WAIT_SEC": 15,
+				"opcdaserver.PROJECT_OPC_ENABLE_DIAGS": false,
+				"opcdaserver.PROJECT_OPC_MAX_CONNECTIONS": 512,
+				"opcdaserver.PROJECT_OPC_MAX_TAG_GROUPS": 2000,
+				"opcdaserver.PROJECT_OPC_REJECT_UNSUPPORTED_LANG_ID": true,
+				"opcdaserver.PROJECT_OPC_IGNORE_DEADBAND_ON_CACHE": false,
+				"opcdaserver.PROJECT_OPC_IGNORE_BROWSE_FILTER": false,
+				"opcdaserver.PROJECT_OPC_205A_DATA_TYPE_SUPPORT": true,
+				"opcdaserver.PROJECT_OPC_SYNC_READ_ERROR_ON_BAD_QUALITY": false,
+				"opcdaserver.PROJECT_OPC_RETURN_INITIAL_UPDATES_IN_SINGLE_CALLBACK": false,
+				"opcdaserver.PROJECT_OPC_RESPECT_CLIENT_LANG_ID": true,
+				"opcdaserver.PROJECT_OPC_COMPLIANT_DATA_CHANGE": true,
+				"opcdaserver.PROJECT_OPC_IGNORE_GROUP_UPDATE_RATE": false
+			},
+			{
+				"common.ALLTYPES_NAME": "thingworxinterface",
+				"thingworxinterface.ENABLED": false,
+				"thingworxinterface.HOSTNAME": "localhost",
+				"thingworxinterface.PORT": 443,
+				"thingworxinterface.RESOURCE": "/Thingworx/WS",
+				"thingworxinterface.APPKEY": "",
+				"thingworxinterface.ALLOW_SELF_SIGNED_CERTIFICATE": false,
+				"thingworxinterface.TRUST_ALL_CERTIFICATES": false,
+				"thingworxinterface.DISABLE_ENCRYPTION": false,
+				"thingworxinterface.MAX_THING_COUNT": 500,
+				"thingworxinterface.THING_NAME": "KEPServerEX",
+				"thingworxinterface.PUBLISH_FLOOR_MSEC": 1000,
+				"thingworxinterface.LOGGING_ENABLED": false,
+				"thingworxinterface.LOG_LEVEL": 3,
+				"thingworxinterface.VERBOSE": false,
+				"thingworxinterface.STORE_AND_FORWARD_ENABLED": false,
+				"thingworxinterface.STORAGE_PATH": "C:\\ProgramData\\Kepware\\KEPServerEX\\V6\\",
+				"thingworxinterface.DATASTORE_MAXSIZE": 2048,
+				"thingworxinterface.FORWARD_MODE": 0,
+				"thingworxinterface.DATASTORE_ID": 421728385,
+				"thingworxinterface.DELAY_BETWEEN_PUBLISHES": 0,
+				"thingworxinterface.MAX_UPDATES_PER_PUBLISH": 25000,
+				"thingworxinterface.PROXY_ENABLED": false,
+				"thingworxinterface.PROXY_HOST": "localhost",
+				"thingworxinterface.PROXY_PORT": 3128,
+				"thingworxinterface.PROXY_USERNAME": "",
+				"thingworxinterface.PROXY_PASSWORD": ""
+			},
+			{
+				"common.ALLTYPES_NAME": "uaserverinterface",
+				"uaserverinterface.PROJECT_OPC_UA_ENABLE": true,
+				"uaserverinterface.PROJECT_OPC_UA_DIAGNOSTICS": false,
+				"uaserverinterface.PROJECT_OPC_UA_ANONYMOUS_LOGIN": false,
+				"uaserverinterface.PROJECT_OPC_UA_MAX_CONNECTIONS": 128,
+				"uaserverinterface.PROJECT_OPC_UA_MIN_SESSION_TIMEOUT_SEC": 15,
+				"uaserverinterface.PROJECT_OPC_UA_MAX_SESSION_TIMEOUT_SEC": 60,
+				"uaserverinterface.PROJECT_OPC_UA_TAG_CACHE_TIMEOUT_SEC": 5,
+				"uaserverinterface.PROJECT_OPC_UA_BROWSE_TAG_PROPERTIES": false,
+				"uaserverinterface.PROJECT_OPC_UA_BROWSE_ADDRESS_HINTS": false,
+				"uaserverinterface.PROJECT_OPC_UA_MAX_DATA_QUEUE_SIZE": 2,
+				"uaserverinterface.PROJECT_OPC_UA_MAX_RETRANSMIT_QUEUE_SIZE": 10,
+				"uaserverinterface.PROJECT_OPC_UA_MAX_NOTIFICATION_PER_PUBLISH": 65536
+			}
+		]
+	}
+}

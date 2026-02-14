@@ -12,7 +12,7 @@ using System.Net.Http.Json;
 
 namespace Kepware.Api.TestIntg.ApiClient
 {
-    public class ProjectPropertiesTests : TestApiClientBase
+    public class ProjectPropertiesTests : TestIntgApiClientBase
     {
 
         #region GetProjectPropertiesAsync Tests

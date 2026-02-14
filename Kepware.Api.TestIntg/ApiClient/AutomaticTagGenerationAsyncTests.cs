@@ -14,12 +14,8 @@ using Xunit.Extensions.Ordering;
 
 namespace Kepware.Api.TestIntg.ApiClient
 {
-    public class AutomaticTagGenerationAsyncTests : TestApiClientBase
+    public class AutomaticTagGenerationAsyncTests : TestIntgApiClientBase
     {
-        private const string UNIT_TEST_CHANNEL = "unitTestChannel";
-        private const string UNIT_TEST_DEVICE = "unitTestDevice";
-        private const string ENDPOINT_TAG_GENERATION = $"/config/v1/project/channels/{UNIT_TEST_CHANNEL}/devices/{UNIT_TEST_DEVICE}/services/TagGeneration";
-        private const string JOB_ENDPOINT = $"/config/v1/project/channels/{UNIT_TEST_CHANNEL}/devices/{UNIT_TEST_DEVICE}/services/TagGeneration/jobs/job123";
 
         [Fact]
         public async Task AutomaticTagGenerationAsync_ShouldReturnKepServerJobPromise_WhenApiResponseIsInvalid()

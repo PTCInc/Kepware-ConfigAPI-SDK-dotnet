@@ -13,7 +13,7 @@ using System.Net.Http.Json;
 namespace Kepware.Api.TestIntg.ApiClient
 {
     [TestCaseOrderer("Xunit.Extensions.Ordering.TestCaseOrderer", "Xunit.Extensions.Ordering")]
-    public class ServerUserTests : TestApiClientBase
+    public class ServerUserTests : TestIntgApiClientBase
     {
 
         [Fact]

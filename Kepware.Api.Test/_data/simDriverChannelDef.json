@@ -1,0 +1,181 @@
+{
+	"type_definition": {
+		"name": "Channel",
+		"collection": "channels",
+		"namespace": "servermain",
+		"can_create": true,
+		"can_delete": true,
+		"can_modify": true,
+		"auto_generated": false,
+		"requires_driver": true,
+		"access_controlled": true,
+		"child_collections": [
+			"devices",
+			"phonebooks"
+		]
+	},
+	"property_definitions": [
+		{
+			"symbolic_name": "common.ALLTYPES_NAME",
+			"display_name": "Name",
+			"display_description": "Specify the identity of this object.",
+			"group_name": "General",
+			"section_name": "Identification",
+			"read_only": false,
+			"type": "String",
+			"default_value": null,
+			"required": true,
+			"server_only": false,
+			"minimum_length": 1,
+			"maximum_length": 256
+		},
+		{
+			"symbolic_name": "common.ALLTYPES_DESCRIPTION",
+			"display_name": "Description",
+			"display_description": "Provide a brief summary of this object or its use.",
+			"group_name": "General",
+			"section_name": "Identification",
+			"read_only": false,
+			"type": "String",
+			"default_value": null,
+			"required": false,
+			"server_only": false,
+			"minimum_length": 0,
+			"maximum_length": 255
+		},
+		{
+			"symbolic_name": "servermain.MULTIPLE_TYPES_DEVICE_DRIVER",
+			"display_name": "Driver",
+			"display_description": "",
+			"group_name": "General",
+			"section_name": "Identification",
+			"read_only": true,
+			"type": "String",
+			"default_value": "Simulator",
+			"required": true,
+			"server_only": false,
+			"minimum_length": 0,
+			"maximum_length": -1
+		},
+		{
+			"symbolic_name": "servermain.CHANNEL_DIAGNOSTICS_CAPTURE",
+			"display_name": "Diagnostics Capture",
+			"display_description": "Select whether or not to make the channel's diagnostic information available to an OPC application.",
+			"group_name": "General",
+			"section_name": "Diagnostics",
+			"read_only": false,
+			"type": "EnableDisable",
+			"default_value": false,
+			"required": false,
+			"server_only": false
+		},
+		{
+			"symbolic_name": "servermain.CHANNEL_UNIQUE_ID",
+			"display_name": "Unique Id",
+			"display_description": "Unique identifier associated with this object.",
+			"group_name": "General",
+			"section_name": "Identification",
+			"read_only": false,
+			"type": "Integer",
+			"default_value": 1346702965,
+			"required": false,
+			"server_only": true,
+			"minimum_value": null,
+			"maximum_value": null
+		},
+		{
+			"symbolic_name": "servermain.CHANNEL_STATIC_TAG_COUNT",
+			"display_name": "Static Tags",
+			"display_description": "The total number of user defined tags assigned to the channel and all of its devices.",
+			"group_name": "General",
+			"section_name": "Tag Counts",
+			"read_only": true,
+			"type": "Integer",
+			"default_value": null,
+			"required": false,
+			"server_only": false,
+			"minimum_value": null,
+			"maximum_value": null
+		},
+		{
+			"symbolic_name": "servermain.CHANNEL_WRITE_OPTIMIZATIONS_METHOD",
+			"display_name": "Optimization Method",
+			"display_description": "Choose how write data is passed to the underlying communications driver when more than one write exists in the write queue.",
+			"group_name": "Write Optimizations",
+			"section_name": "Write Optimizations",
+			"read_only": false,
+			"type": "Enumeration",
+			"default_value": 2,
+			"required": false,
+			"server_only": false,
+			"enumeration": {
+				"Write All Values for All Tags": 0,
+				"Write Only Latest Value for Non-Boolean Tags": 1,
+				"Write Only Latest Value for All Tags": 2
+			}
+		},
+		{
+			"symbolic_name": "servermain.CHANNEL_WRITE_OPTIMIZATIONS_DUTY_CYCLE",
+			"display_name": "Duty Cycle",
+			"display_description": "Specify the ratio of write operations to read operations, based on one read per configurable number of writes.",
+			"group_name": "Write Optimizations",
+			"section_name": "Write Optimizations",
+			"read_only": false,
+			"type": "Integer",
+			"default_value": 10,
+			"required": false,
+			"server_only": false,
+			"minimum_value": 1,
+			"maximum_value": 10
+		},
+		{
+			"symbolic_name": "servermain.CHANNEL_NON_NORMALIZED_FLOATING_POINT_HANDLING",
+			"display_name": "Floating-Point Values",
+			"display_description": "Choose how to send invalid floating-point numbers to the client.",
+			"group_name": "Advanced",
+			"section_name": "Non-Normalized Float Handling",
+			"read_only": false,
+			"type": "Enumeration",
+			"default_value": 0,
+			"required": false,
+			"server_only": false,
+			"enumeration": {
+				"Replace with Zero": 0,
+				"Unmodified": 1
+			}
+		},
+		{
+			"symbolic_name": "simulator.CHANNEL_ITEM_PERSISTENCE",
+			"display_name": "Item Persistence",
+			"display_description": "Enable this option to save on shutdown and restore on startup of R, K, and S address contents.",
+			"group_name": "Persistence",
+			"section_name": "Persistence",
+			"read_only": false,
+			"type": "EnableDisable",
+			"default_value": false,
+			"required": false,
+			"server_only": false
+		},
+		{
+			"symbolic_name": "simulator.CHANNEL_ITEM_PERSISTENCE_DATA_FILE",
+			"display_name": "Data File",
+			"display_description": "Enter the full path and file name where item persistence data should be saved.",
+			"group_name": "Persistence",
+			"section_name": "Persistence",
+			"read_only": false,
+			"type": "LocalFileSpec",
+			"default_value": "C:\\ProgramData\\PTC\\Kepware Server\\V7\\Simulator\\.dat",
+			"required": false,
+			"server_only": false,
+			"minimum_length": 0,
+			"maximum_length": -1,
+			"enable": [
+				{
+					"depends_on": "simulator.CHANNEL_ITEM_PERSISTENCE",
+					"operation": "==",
+					"value": true
+				}
+			]
+		}
+	]
+}

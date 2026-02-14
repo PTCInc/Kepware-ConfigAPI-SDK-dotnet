@@ -421,7 +421,7 @@ namespace Kepware.Api.ClientHandler
         /// <param name="owner"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task DeleteItemAsync<T, K>(K item, NamedEntity? owner = null, CancellationToken cancellationToken = default)
+        public Task<bool> DeleteItemAsync<T, K>(K item, NamedEntity? owner = null, CancellationToken cancellationToken = default)
             where T : EntityCollection<K>
             where K : NamedEntity, new()
             => DeleteItemsAsync<T, K>([item], owner, cancellationToken);
@@ -435,12 +435,13 @@ namespace Kepware.Api.ClientHandler
         /// <param name="owner"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task DeleteItemsAsync<T, K>(List<K> items, NamedEntity? owner = null, CancellationToken cancellationToken = default)
+        // TODO: determine return options for mixed results (e.g. some deletes succeed and some fail) - currently returns false if any delete fails, but could also return a list of results for each item
+        public async Task<bool> DeleteItemsAsync<T, K>(List<K> items, NamedEntity? owner = null, CancellationToken cancellationToken = default)
             where T : EntityCollection<K>
             where K : NamedEntity, new()
         {
             if (items.Count == 0)
-                return;
+                return true;
             try
             {
                 var collectionEndpoint = EndpointResolver.ResolveEndpoint<T>(owner).TrimEnd('/');
@@ -455,14 +456,17 @@ namespace Kepware.Api.ClientHandler
                     {
                         var message = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                         m_logger.LogError("Failed to delete {TypeName} from {Endpoint}: {ReasonPhrase}\n{Message}", typeof(T).Name, endpoint, response.ReasonPhrase, message);
+                        return false;
                     }
                 }
+                return true;
             }
             catch (HttpRequestException httpEx)
             {
                 m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_httpClient.BaseAddress);
                 m_kepwareApiClient.OnHttpRequestException(httpEx);
             }
+            return false;
         }
         #endregion
 

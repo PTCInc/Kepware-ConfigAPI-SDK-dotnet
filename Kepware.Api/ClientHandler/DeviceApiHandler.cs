@@ -249,7 +249,7 @@ namespace Kepware.Api.ClientHandler
                 throw new ArgumentException("Channel name cannot be null or empty", nameof(channelName));
             if (string.IsNullOrEmpty(deviceName))
                 throw new ArgumentException("Device name cannot be null or empty", nameof(deviceName));
-            return m_kepwareApiClient.GenericConfig.DeleteItemAsync<Device>([deviceName, channelName], cancellationToken: cancellationToken);
+            return m_kepwareApiClient.GenericConfig.DeleteItemAsync<Device>([channelName, deviceName], cancellationToken: cancellationToken);
         }
         #endregion
         #endregion

@@ -59,9 +59,9 @@ namespace Kepware.Api.Test.ApiClient
             _kepwareApiClient = new KepwareApiClient("TestClient", new KepwareApiClientOptions { HostUri = httpClient.BaseAddress }, _loggerFactoryMock.Object, httpClient);
         }
 
-        protected static async Task<JsonProjectRoot> LoadJsonTestDataAsync()
+        protected static async Task<JsonProjectRoot> LoadJsonTestDataAsync(string filePath = "_data/simdemo_en-us.json")
         {
-            var json = await File.ReadAllTextAsync("_data/simdemo_en-us.json");
+            var json = await File.ReadAllTextAsync(filePath);
             return JsonSerializer.Deserialize<JsonProjectRoot>(json, KepJsonContext.Default.JsonProjectRoot)!;
         }
 
@@ -69,6 +69,14 @@ namespace Kepware.Api.Test.ApiClient
         {
             var jsonData = await File.ReadAllTextAsync("_data/doc_drivers.json");
             _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, $"{TEST_ENDPOINT}/config/v1/doc/drivers/")
+                .ReturnsResponse(HttpStatusCode.OK, jsonData, "application/json");
+        }
+
+        protected async Task ConfigureToServeSimDriver()
+        {
+            // Mock the simulator driver channels endpoint
+            var jsonData = await File.ReadAllTextAsync("_data/simDriverChannelDef.json");
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, $"{TEST_ENDPOINT}/config/v1/doc/drivers/Simulator/channels/")
                 .ReturnsResponse(HttpStatusCode.OK, jsonData, "application/json");
         }
 
@@ -124,6 +132,70 @@ namespace Kepware.Api.Test.ApiClient
             return Enumerable.Range(1, count)
                 .Select(i => new Tag { Name = $"Tag{i}" })
                 .ToList();
+        }
+
+        private const string ENDPONT_FULL_PROJECT = "/config/v1/project?content=serialize";
+        protected async Task ConfigureToServeFullProject(string filePath = "_data/simdemo_en-us.json")
+        {
+            var jsonData = await File.ReadAllTextAsync(filePath);
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + ENDPONT_FULL_PROJECT)
+                                   .ReturnsResponse(jsonData, "application/json");
+        }
+
+        protected async Task ConfigureToServeEndpoints(string filePath = "_data/simdemo_en-us.json")
+        {
+            var projectData = await LoadJsonTestDataAsync(filePath);
+
+            var channels = projectData.Project?.Channels?.Select(c => new Channel { Name = c.Name, Description = c.Description, DynamicProperties = c.DynamicProperties }).ToList() ?? [];
+
+            // Serve project details
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project")
+                                   .ReturnsResponse(JsonSerializer.Serialize(new Project { Description = projectData?.Project?.Description, DynamicProperties = projectData?.Project?.DynamicProperties ?? [] }), "application/json");
+
+            // Serve channels without nested devices
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels")
+                                   .ReturnsResponse(JsonSerializer.Serialize(channels), "application/json");
+
+            foreach (var channel in projectData?.Project?.Channels ?? [])
+            {
+                _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + $"/config/v1/project/channels/{channel.Name}")
+                                       .ReturnsResponse(JsonSerializer.Serialize(new Channel { Name = channel.Name, Description = channel.Description, DynamicProperties = channel.DynamicProperties }), "application/json");
+
+                if (channel.Devices != null)
+                {
+                    var devices = channel.Devices.Select(d => new Device { Name = d.Name, Description = d.Description, DynamicProperties = d.DynamicProperties }).ToList();
+                    _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + $"/config/v1/project/channels/{channel.Name}/devices")
+                                           .ReturnsResponse(JsonSerializer.Serialize(devices), "application/json");
+
+                    foreach (var device in channel.Devices)
+                    {
+                        var deviceEndpoint = TEST_ENDPOINT + $"/config/v1/project/channels/{channel.Name}/devices/{device.Name}";
+                        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, deviceEndpoint)
+                                               .ReturnsResponse(JsonSerializer.Serialize(new Device { Name = device.Name, Description = device.Description, DynamicProperties = device.DynamicProperties }), "application/json");
+
+
+                        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, deviceEndpoint + "/tags")
+                                              .ReturnsResponse(JsonSerializer.Serialize(device.Tags), "application/json");
+
+                        ConfigureToServeEndpointsTagGroupsRecursive(deviceEndpoint, device.TagGroups ?? []);
+                    }
+                }
+            }
+        }
+        private void ConfigureToServeEndpointsTagGroupsRecursive(string endpoint, IEnumerable<DeviceTagGroup> tagGroups)
+        {
+            var tagGroupEndpoint = endpoint + "/tag_groups";
+
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, tagGroupEndpoint)
+                                             .ReturnsResponse(JsonSerializer.Serialize(tagGroups), "application/json");
+
+            foreach (var tagGroup in tagGroups)
+            {
+                _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, string.Concat(tagGroupEndpoint, "/", tagGroup.Name, "/tags"))
+                                             .ReturnsResponse(JsonSerializer.Serialize(tagGroup.Tags), "application/json");
+
+                ConfigureToServeEndpointsTagGroupsRecursive(string.Concat(tagGroupEndpoint, "/", tagGroup.Name), tagGroup.TagGroups ?? []);
+            }
         }
     }
 }

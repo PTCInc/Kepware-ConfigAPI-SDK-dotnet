@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Kepware.Api.TestIntg.ApiClient
 {
-    public class ProjectPermissionTests : TestApiClientBase
+    public class ProjectPermissionTests : TestIntgApiClientBase
     {
 
         [Fact]
@@ -18,13 +18,6 @@ namespace Kepware.Api.TestIntg.ApiClient
             // Arrange
             var serverUserGroup = new ServerUserGroup { Name = "Administrators" };
             var projectPermissionName = ProjectPermissionName.ServermainAlias;
-            var projectPermission = new ProjectPermission
-            {
-                Name = projectPermissionName,
-                AddObject = true,
-                EditObject = true,
-                DeleteObject = false
-            };
 
             // Act
             var result = await _kepwareApiClient.Admin.GetProjectPermissionAsync(serverUserGroup, projectPermissionName);

@@ -14,7 +14,7 @@ using Xunit.Extensions.Ordering;
 namespace Kepware.Api.TestIntg.ApiClient
 {
     [TestCaseOrderer("Xunit.Extensions.Ordering.TestCaseOrderer", "Xunit.Extensions.Ordering")]
-    public class UaEndpointTests : TestApiClientBase
+    public class UaEndpointTests : TestIntgApiClientBase
     {
 
         [SkippableFact]

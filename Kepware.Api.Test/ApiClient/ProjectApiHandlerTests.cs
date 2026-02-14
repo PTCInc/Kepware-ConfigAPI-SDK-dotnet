@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Contrib.HttpClient;
 using Xunit;
+using System.Text.Json;
+using Shouldly;
 
 namespace Kepware.Api.Test.ApiClient
 {
@@ -326,6 +328,22 @@ namespace Kepware.Api.Test.ApiClient
             Assert.True(result);
         }
 
+        [Fact]
+        public async Task DeleteDeviceAsync_ItemByName_ShouldReturnTrue_WhenDeletionIsSuccessful()
+        {
+            // Arrange
+            var device = new Device { Name = "DeviceToDelete", Channel = new Channel { Name = "ExistingChannel" } };
+            var endpoint = $"/config/v1/project/channels/{device.Channel.Name}/devices/{device.Name}";
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Delete, TEST_ENDPOINT + endpoint)
+                                   .ReturnsResponse(HttpStatusCode.OK);
+
+            // Act
+            var result = await _projectApiHandler.Devices.DeleteDeviceAsync(device.Channel.Name, device.Name);
+
+            // Assert
+            Assert.True(result);
+        }
+
         #endregion
 
         #region Device Tag & Tag Group Tests
@@ -375,6 +393,83 @@ namespace Kepware.Api.Test.ApiClient
             Assert.Equal("TagGroup1", tagGroup.TagGroups.First().Name);
             Assert.NotNull(tagGroup2.TagGroups);
             Assert.Empty(tagGroup2.TagGroups);
+        }
+
+        #endregion
+
+        #region CompareAndApply Tests
+
+        [Theory]
+        [InlineData("KEPServerEX", "12", 6, 17)]  // Supports JSON Project Load Service (6.17+)
+        [InlineData("KEPServerEX", "12", 6, 16)] // Does not support it (6.16)
+        [InlineData("ThingworxKepwareServer", "12", 6, 17)]  // Supports JSON Project Load Service (6.17+)
+        [InlineData("ThingworxKepwareServer", "12", 6, 16)] // Does not support it (6.16)
+        [InlineData("ThingWorxKepwareEdge", "13", 1, 10)] // Supports JSON Project Load Service (1.10+)
+        [InlineData("ThingWorxKepwareEdge", "13", 1, 9)] // Does not support it (1.9)
+        [InlineData("Kepware Edge", "13", 1, 0)] // Supports JSON Project Load Service
+        [InlineData("UnknownProduct", "99", 10, 0)] // Unknown product, should be false
+        public async Task CompareAndApply_ShouldReturn2Inserts1Update1Delete_WhenSourceHas2ChannelsAndModifiedProperties(
+          string productName, string productId, int majorVersion, int minorVersion)
+        {
+            string filePath = "_data/sourceCompare.json";
+            // Arrange
+            ConfigureConnectedClient(productName, productId, majorVersion, minorVersion);
+            var about = await _kepwareApiClient.GetProductInfoAsync();
+            about.ShouldNotBeNull();
+
+            if (about.SupportsJsonProjectLoadService)
+            {
+                await ConfigureToServeFullProject(filePath);
+            }
+            else
+            {
+                 await ConfigureToServeEndpoints(filePath);
+            }
+
+            await ConfigureToServeDrivers();
+            await ConfigureToServeSimDriver();
+            var projectJson = await LoadJsonTestDataAsync(filePath);
+
+            // Mock project properties endpoint
+            var test = JsonSerializer.Serialize(projectJson.Project?.DynamicProperties);
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project")
+                                   .ReturnsResponse( test , "application/json")
+                                   .Verifiable();
+
+            // Mock channel creation POST requests
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Post, TEST_ENDPOINT + "/config/v1/project/channels")
+                                   .ReturnsResponse(HttpStatusCode.Created)
+                                   .Verifiable();
+
+            // Mock channel deletion for the existing channel that's not in source
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Delete, TEST_ENDPOINT + "/config/v1/project/channels/ExistingChannel")
+                                   .ReturnsResponse(HttpStatusCode.OK)
+                                   .Verifiable();
+
+            // Mock project properties update
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Put, TEST_ENDPOINT + "/config/v1/project")
+                                   .ReturnsResponse(HttpStatusCode.OK)
+                                   .Verifiable();
+
+            // Create source project with 2 new channels and modified properties
+            var newProject = new Project
+            {
+                Description = "Modified Project Description",
+                Channels = new ChannelCollection
+                {
+                    new Channel { Name = "NewChannel1", DynamicProperties = new Dictionary<string, JsonElement> { { "servermain.CHANNEL_UNIQUE_ID", JsonDocument.Parse($"592352578").RootElement }, {"servermain.MULTIPLE_TYPES_DEVICE_DRIVER", JsonDocument.Parse($"\"Simulator\"").RootElement} } },
+                    new Channel { Name = "NewChannel2", DynamicProperties = new Dictionary<string, JsonElement> { { "servermain.CHANNEL_UNIQUE_ID", JsonDocument.Parse($"592352577").RootElement }, {"servermain.MULTIPLE_TYPES_DEVICE_DRIVER", JsonDocument.Parse($"\"Simulator\"").RootElement} } }
+                }
+            };
+            newProject.SetDynamicProperty("uaserverinterface.PROJECT_OPC_UA_ANONYMOUS_LOGIN", false);
+
+            // Act
+            var result = await _projectApiHandler.CompareAndApply(newProject);
+
+            // Assert
+            Assert.Equal(2, result.inserts);  // 2 new channels added
+            Assert.Equal(1, result.updates);  // 1 project property update
+            Assert.Equal(1, result.deletes);  // 1 existing channel deleted
         }
 
         #endregion
