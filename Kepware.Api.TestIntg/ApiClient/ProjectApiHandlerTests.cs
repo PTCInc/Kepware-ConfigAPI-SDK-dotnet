@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Contrib.HttpClient;
 using Xunit;
+using Shouldly;
+using System.Text.Json;
 
 namespace Kepware.Api.TestIntg.ApiClient
 {
@@ -266,6 +268,57 @@ namespace Kepware.Api.TestIntg.ApiClient
             {
                 Assert.Fail($"Currently this test fails due to issue in EndpointResolver. Test failed with exception: \n {ex}");
             }
+
+            // Clean up
+            await DeleteAllChannelsAsync();
+        }
+
+        #endregion
+        #region CompareAndApply Tests
+
+        // [Fact]
+        // public async Task CompareAndApply_ShouldReturnNull_WhenHttpRequestFails()
+        // {
+        //     // Arrange
+        //     var newProject = new Project { Description = "Test Project" };
+
+        //     // Act
+        //     var result = await _badCredKepwareApiClient.Project.CompareAndApply(newProject);
+
+        //     // Assert
+        //     result.ShouldBeNull();
+        // }
+
+        [Fact]
+        public async Task CompareAndApply_ShouldReturnChanges()
+        {
+            // Arrange
+            var channel = CreateTestChannel("ExistingChannel1", "Simulator");
+            var r = await _kepwareApiClient.Project.Channels.GetOrCreateChannelAsync(channel.Name, channel.DeviceDriver!);
+            r.ShouldNotBeNull();
+
+            var existingProperties = await _kepwareApiClient.Project.GetProjectPropertiesAsync();
+            existingProperties.ShouldNotBeNull();
+
+            // Create source project with 2 new channels and modified properties
+            var newProject = new Project
+            {
+                Description = "Modified Project Description",
+                Channels = new ChannelCollection
+                {
+                    new Channel { Name = "NewChannel1", DynamicProperties = new Dictionary<string, JsonElement> { { "servermain.CHANNEL_UNIQUE_ID", JsonDocument.Parse($"592352578").RootElement }, {"servermain.MULTIPLE_TYPES_DEVICE_DRIVER", JsonDocument.Parse($"\"Simulator\"").RootElement} } },
+                    new Channel { Name = "NewChannel2", DynamicProperties = new Dictionary<string, JsonElement> { { "servermain.CHANNEL_UNIQUE_ID", JsonDocument.Parse($"592352577").RootElement }, {"servermain.MULTIPLE_TYPES_DEVICE_DRIVER", JsonDocument.Parse($"\"Simulator\"").RootElement} } }
+                }
+            };
+            newProject.SetDynamicProperty("uaserverinterface.PROJECT_OPC_UA_ANONYMOUS_LOGIN", !existingProperties?.ProjectProperties.OpcUaAllowAnonymousLogin);
+
+            // Act
+            var result = await _kepwareApiClient.Project.CompareAndApply(newProject);
+
+            // Assert
+            Assert.Equal(2, result.inserts);  // 2 new channels added
+            Assert.Equal(1, result.updates);  // 1 project property updates
+            Assert.Equal(1, result.deletes);  // 1 existing channel deleted
 
             // Clean up
             await DeleteAllChannelsAsync();
