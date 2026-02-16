@@ -73,7 +73,7 @@ jobs:
       - name: Create temporary global.json
         if: ${{ matrix.platform == 'ubuntu' }}
         run: |
-          'echo '{"sdk":{"version": "${{ steps.stepid.outputs.dotnet-version }}"}}' > ./global.json'
+          echo '{"sdk":{"version": "${{ steps.stepid.outputs.dotnet-version }}"}}' > ./global.json
       - name: Display dotnet version
         run: dotnet --version
       - name: Restore dependencies
