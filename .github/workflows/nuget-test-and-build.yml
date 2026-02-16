@@ -70,6 +70,10 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Create temporary global.json
+        if: ${{ matrix.platform == 'ubuntu' }}
+        run: |
+          'echo '{"sdk":{"version": "${{ steps.stepid.outputs.dotnet-version }}"}}' > ./global.json'
       - name: Display dotnet version
         run: dotnet --version
       - name: Restore dependencies
