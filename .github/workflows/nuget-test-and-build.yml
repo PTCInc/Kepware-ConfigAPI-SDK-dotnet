@@ -51,6 +51,7 @@ jobs:
     strategy:
       matrix:
         platform: [windows, ubuntu]
+        dotnet-verion: ['8.0.x', '9.0.x', '10.0.x']
     runs-on: ${{ matrix.platform }}-latest
     permissions:
       contents: write
@@ -68,18 +69,20 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Display dotnet version
+        run: dotnet --version
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
         run: dotnet build --no-restore --configuration release
       - name: Test
-        run: dotnet test Kepware.Api.Test/Kepware.Api.Test.csproj --no-build --verbosity normal --configuration Release  --logger "trx;LogFileName=${{ matrix.platform }}-test-results.trx"
-      - name: Publish Test Report (${{ matrix.platform }})
+        run: dotnet test Kepware.Api.Test/Kepware.Api.Test.csproj --no-build --verbosity normal --configuration Release  --logger "trx;LogFileName=${{ matrix.platform }}-${{ matrix.dotnet-version }}-test-results.trx"
+      - name: Publish Test Report (${{ matrix.platform }} .NET ${{ matrix.dotnet-version }})
         if: ${{ github.event_name == 'pull_request' }}
         uses: dorny/test-reporter@v1
         with:
-          name: .NET 9 Test Report (${{ matrix.platform }})
+          name: .NET ${{ matrix.dotnet-version }} Test Report (${{ matrix.platform }})
           path: "**/TestResults/**/*.trx"
           reporter: dotnet-trx
       - name: store NuGet package
