@@ -1,19 +1,19 @@
-# Unter https://aka.ms/customizecontainer erfahren Sie, wie Sie Ihren Debugcontainer anpassen und wie Visual Studio dieses Dockerfile verwendet, um Ihre Images für ein schnelleres Debuggen zu erstellen.
+# Learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging at https://aka.ms/customizecontainer
 
-# Diese ARGs ermöglichen den Austausch der Basis, die zum Erstellen des endgültigen Images beim Debuggen von VS verwendet wird.
+# These ARGs allow switching the base used to create the final image when debugging from VS.
 ARG LAUNCHING_FROM_VS
-# Hiermit wird das Basisimage für "final" festgelegt, jedoch nur, wenn LAUNCHING_FROM_VS definiert wurde.
+# This sets the base image for 'final', but only if LAUNCHING_FROM_VS is defined.
 ARG FINAL_BASE_IMAGE=${LAUNCHING_FROM_VS:+aotdebug}
 
-# Diese Stufe wird verwendet, wenn sie von VS im Schnellmodus ausgeführt wird (Standardeinstellung für Debugkonfiguration).
-FROM mcr.microsoft.com/dotnet/runtime:9.0 AS base
+# This stage is used when running from VS in Fast mode (Default for Debug configuration).
+FROM mcr.microsoft.com/dotnet/runtime:10.0 AS base
 USER $APP_UID
 WORKDIR /app
 
 
-# Diese Stufe wird zum Erstellen des Dienstprojekts verwendet.
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-# Installieren Sie clang/zlib1g-dev-Abhängigkeiten für die Veröffentlichung unter nativ
+# This stage is used to build the service project.
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+# Install clang/zlib1g-dev dependencies for native AOT publishing
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     clang zlib1g-dev
@@ -27,22 +27,22 @@ COPY . .
 WORKDIR "/src/KepwareSync.Service"
 RUN dotnet build "./Kepware.SyncService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# Diese Stufe wird verwendet, um das Dienstprojekt zu veröffentlichen, das in die letzte Phase kopiert werden soll.
+# This stage is used to publish the service project to be copied to the final stage.
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./Kepware.SyncService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=true
 
-# Diese Stufe wird als Basis für die letzte Stufe verwendet, wenn sie von VS gestartet wird, um das Debuggen im regulären Modus zu unterstützen (Standardwert, wenn die Debugkonfiguration nicht verwendet wird).
+# This stage is used as the base for the final stage when launched from VS to support debugging in regular mode (Default when not using Debug configuration).
 FROM base AS aotdebug
 USER root
-# Installieren Sie GDB, um natives Debuggen zu unterstützen.
+# Install GDB to support native debugging.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     gdb
 USER app
 
-# Diese Stufe wird in der Produktion oder bei Ausführung von VS im regulären Modus verwendet (Standard, wenn die Debugkonfiguration nicht verwendet wird).
-FROM ${FINAL_BASE_IMAGE:-mcr.microsoft.com/dotnet/runtime-deps:9.0} AS final
+# This stage is used in production or when running from VS in regular mode (Default when not using Debug configuration).
+FROM ${FINAL_BASE_IMAGE:-mcr.microsoft.com/dotnet/runtime-deps:10.0} AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["./Kepware.SyncService"]
