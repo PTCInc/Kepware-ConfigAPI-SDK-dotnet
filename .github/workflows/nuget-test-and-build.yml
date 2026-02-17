@@ -51,7 +51,6 @@ jobs:
     strategy:
       matrix:
         platform: [windows, ubuntu]
-        dotnet-version: ['8.0.x', '9.0.x', '10.0.x']
     runs-on: ${{ matrix.platform }}-latest
     permissions:
       contents: write
@@ -68,17 +67,13 @@ jobs:
           fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ matrix.dotnet-version }}
-      - name: Display dotnet version
-        run: dotnet --version
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
         run: dotnet build --no-restore --configuration release
       - name: Test
-        run: dotnet test Kepware.Api.Test/Kepware.Api.Test.csproj --no-build --verbosity normal --configuration Release  --logger "trx;LogFilePrefix=${{ matrix.platform }}-test-results-"
-      - name: Publish Test Report (${{ matrix.platform }} .NET ${{ matrix.dotnet-version }})
+        run: dotnet test Kepware.Api.Test/Kepware.Api.Test.csproj --no-build --verbosity normal --configuration Release  --logger "trx;LogFilePrefix=${{ matrix.platform }}-test-results"
+      - name: Publish Test Reports (${{ matrix.platform }})
         if: ${{ github.event_name == 'pull_request' }}
         uses: dorny/test-reporter@v1
         with:
