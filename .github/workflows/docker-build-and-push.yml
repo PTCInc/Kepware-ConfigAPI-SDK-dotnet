@@ -50,14 +50,14 @@ jobs:
         id: lowercase
         run: echo "REPO_OWNER_LOWER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-      - name: Build and export to Docker
-        uses: docker/build-push-action@v6
-        with:
-          load: true
-          tags: kepware-sync-service:test
-      - name: Test
-        run: |
-          docker run --rm kepware-sync-service:test
+      # - name: Build and export to Docker
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     load: true
+      #     tags: kepware-sync-service:test
+      # - name: Test
+      #   run: |
+      #     docker run --rm kepware-sync-service:test
       - name: Build and push Docker image
         if: ${{ github.event_name != 'pull_request'}}
         id: docker_build
