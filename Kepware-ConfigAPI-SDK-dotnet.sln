@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.13.35617.110
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11505.172 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kepware.SyncService", "KepwareSync.Service\Kepware.SyncService.csproj", "{19B2841F-01D1-4A7E-BE26-A93CF8C57628}"
 EndProject
@@ -10,7 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFiles", "SolutionFi
 		.copilot.json = .copilot.json
 		.dockerignore = .dockerignore
 		.gitignore = .gitignore
-		.runsettings = .runsettings
 		Directory.Build.props = Directory.Build.props
 		LICENSE.txt = LICENSE.txt
 		README.md = README.md
@@ -22,14 +21,16 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{A904D930-41F6-4016-A8BE-AED91D9E5B26}"
 	ProjectSection(SolutionItems) = preProject
 		.github\copilot-instructions.md = .github\copilot-instructions.md
-		.github\release-drafter.yml = .github\release-drafter.yml
+		.github\nuget-release-drafter.yml = .github\nuget-release-drafter.yml
+		.github\syncservice-release-drafter.yml = .github\syncservice-release-drafter.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{F0A34611-31AD-4698-A368-4D65F9A0F9D9}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\docfx-build-and-push.yml = .github\workflows\docfx-build-and-push.yml
 		.github\workflows\docker-build-and-push.yml = .github\workflows\docker-build-and-push.yml
-		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
+		.github\workflows\nuget-test-and-build.yml = .github\workflows\nuget-test-and-build.yml
+		.github\workflows\syncservice-build.yml = .github\workflows\syncservice-build.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kepware.Api.Sample", "Kepware.Api.Sample\Kepware.Api.Sample.csproj", "{C7A179F8-E6D4-4163-9780-23B866636A3F}"
