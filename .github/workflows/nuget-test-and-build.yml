@@ -70,10 +70,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
-      - name: Create temporary global.json
-        if: ${{ matrix.platform == 'ubuntu' }}
-        run: |
-          echo '{"sdk":{"version": "${{ steps.stepid.outputs.dotnet-version }}"}}' > ./global.json
       - name: Display dotnet version
         run: dotnet --version
       - name: Restore dependencies
@@ -81,12 +77,12 @@ jobs:
       - name: Build
         run: dotnet build --no-restore --configuration release
       - name: Test
-        run: dotnet test Kepware.Api.Test/Kepware.Api.Test.csproj --no-build --verbosity normal --configuration Release  --logger "trx;LogFileName=${{ matrix.platform }}-${{ matrix.dotnet-version }}-test-results.trx"
+        run: dotnet test Kepware.Api.Test/Kepware.Api.Test.csproj --no-build --verbosity normal --configuration Release  --logger "trx;LogFilePrefix=${{ matrix.platform }}-test-results-"
       - name: Publish Test Report (${{ matrix.platform }} .NET ${{ matrix.dotnet-version }})
         if: ${{ github.event_name == 'pull_request' }}
         uses: dorny/test-reporter@v1
         with:
-          name: .NET ${{ matrix.dotnet-version }} Test Report (${{ matrix.platform }})
+          name: .NET Test Reports (${{ matrix.platform }})
           path: "**/TestResults/**/*.trx"
           reporter: dotnet-trx
       - name: store NuGet package
