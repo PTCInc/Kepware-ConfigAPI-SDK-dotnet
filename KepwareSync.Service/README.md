@@ -1,6 +1,6 @@
 # KepwareSync.Service (Currently in Beta)
 
-[![Build Status](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions)
+[![Build Status](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions/workflows/syncservice-build.yml/badge.svg)](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions)
 [![Build Status](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions/workflows/docker-build-and-push.yml/badge.svg)](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions)
 
 ## Overview
@@ -149,6 +149,10 @@ The service also supports environment variables for configuration using `AddEnvi
 | `KEPWARE__PRIMARY__HOST`           | https://localhost:57512     |
 | `KEPWARE__DISABLECERTIFICATEVALIDATION` | true                  |
 | `STORAGE__DIRECTORY`               | ExportedYaml                |
+| `KEPWARE__SECONDARY__0__HOST`           | https://localhost:57513     |
+| `KEPWARE__SECONDARY__0__USERNAME` | SecondaryUser               |
+| `KEPWARE__SECONDARY__0__PASSWORD` | SecondaryPassword2025!         |
+| `SYNC__SYNCMODE`                  | TwoWay
 
 Set these variables in your system or Docker container to override appsettings.json.
 
@@ -178,8 +182,14 @@ The `appsettings.json` file provides an alternative way to configure `KepwareSyn
     ]
   },
   "Storage": {
-    "Directory": "ExportedYaml"
-  }
+    "Directory": "ExportedYaml",
+//    "PersistDefaultValue": true
+  },
+//  "Sync": {
+//    "SyncMode": "OneWay",
+//    "SyncDirection": "KepwareToDiskAndSecondary",
+//    "SyncThrottlingMs":  1000
+//  }
 }
 ```
 
