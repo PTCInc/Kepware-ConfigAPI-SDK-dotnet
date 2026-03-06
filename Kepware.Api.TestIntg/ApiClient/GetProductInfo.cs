@@ -30,6 +30,15 @@ namespace Kepware.Api.TestIntg.ApiClient
             Assert.Equal(_productInfo.ProductVersionBuild, result.ProductVersionBuild);
             Assert.Equal(_productInfo.ProductVersionPatch, result.ProductVersionPatch);
 
+            // Also verify that the ProductInfo property on the client is updated
+            Assert.NotNull(_kepwareApiClient.ProductInfo);
+            Assert.Equal(_productInfo.ProductId, _kepwareApiClient.ProductInfo.ProductId);
+            Assert.Equal(_productInfo.ProductName, _kepwareApiClient.ProductInfo.ProductName);
+            Assert.Equal(_productInfo.ProductVersion, _kepwareApiClient.ProductInfo.ProductVersion);
+            Assert.Equal(_productInfo.ProductVersionMajor, _kepwareApiClient.ProductInfo.ProductVersionMajor);
+            Assert.Equal(_productInfo.ProductVersionMinor, _kepwareApiClient.ProductInfo.ProductVersionMinor);
+            Assert.Equal(_productInfo.ProductVersionBuild, _kepwareApiClient.ProductInfo.ProductVersionBuild);
+            Assert.Equal(_productInfo.ProductVersionPatch, _kepwareApiClient.ProductInfo.ProductVersionPatch);
         }
 
     }

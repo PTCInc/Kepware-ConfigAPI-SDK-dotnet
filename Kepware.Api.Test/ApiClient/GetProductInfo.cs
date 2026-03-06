@@ -32,6 +32,16 @@ namespace Kepware.Api.Test.ApiClient
             Assert.Equal(240, result.ProductVersionBuild);
             Assert.Equal(0, result.ProductVersionPatch);
 
+            // Also verify that the ProductInfo property on the client is populated correctly
+            Assert.NotNull(_kepwareApiClient.ProductInfo);
+            Assert.Equal("012", _kepwareApiClient.ProductInfo.ProductId);
+            Assert.Equal("KEPServerEX", _kepwareApiClient.ProductInfo.ProductName);
+            Assert.Equal("V6.17.240.0", _kepwareApiClient.ProductInfo.ProductVersion);
+            Assert.Equal(6, _kepwareApiClient.ProductInfo.ProductVersionMajor);
+            Assert.Equal(17, _kepwareApiClient.ProductInfo.ProductVersionMinor);
+            Assert.Equal(240, _kepwareApiClient.ProductInfo.ProductVersionBuild);
+            Assert.Equal(0, _kepwareApiClient.ProductInfo.ProductVersionPatch);
+
         }
 
         #region GetProductInfoAsync - SupportsJsonProjectLoadService
@@ -57,6 +67,10 @@ namespace Kepware.Api.Test.ApiClient
             // Assert
             Assert.NotNull(result);
             Assert.Equal(expectedResult, result.SupportsJsonProjectLoadService);
+
+            // Also verify that the ProductInfo property on the client is populated correctly
+            Assert.NotNull(_kepwareApiClient.ProductInfo);
+            Assert.Equal(expectedResult, _kepwareApiClient.ProductInfo.SupportsJsonProjectLoadService);
         }
 
         #endregion
@@ -99,6 +113,9 @@ namespace Kepware.Api.Test.ApiClient
 
             // Assert
             Assert.Null(result);
+
+            // ProductInfo property should also be null on error
+            Assert.Null(_kepwareApiClient.ProductInfo); 
         }
 
         [Fact]
@@ -114,6 +131,9 @@ namespace Kepware.Api.Test.ApiClient
 
             // Assert
             Assert.Null(result);
+
+            // ProductInfo property should also be null on error
+            Assert.Null(_kepwareApiClient.ProductInfo);
         }
 
         [Fact]
@@ -128,6 +148,9 @@ namespace Kepware.Api.Test.ApiClient
 
             // Assert
             Assert.Null(result);
+
+            // ProductInfo property should also be null on error
+            Assert.Null(_kepwareApiClient.ProductInfo);
         }
         #endregion
     }
