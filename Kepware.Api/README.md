@@ -41,6 +41,88 @@ This package is designed to work with all versions of Kepware that support the C
 5.  Supports advanced operations like project comparison, entity synchronization, and driver property queries.
 6.  Built-in support for Dependency Injection to simplify integration.
 
+## Getting Started
+
+### Prerequisites
+- [.NET SDK 8.0+](https://dotnet.microsoft.com/download)
+- Kepware server reachable on HTTPS port **57512** (default) or HTTP **57412**
+
+### Step 1 — Install
+```bash
+dotnet add package Kepware.Api
+dotnet restore
+```
+
+### Step 2 — Register the client
+```csharp
+// Program.cs
+services.AddKepwareApiClient(
+    name:        "default",
+    baseUrl:     "https://localhost:57512",
+    apiUserName: "Administrator",
+    apiPassword: "YourPassword!",
+    disableCertificateValidation: true   // false + trusted cert in production
+);
+```
+
+### Step 3 — Configure credentials (never hard-code passwords)
+
+**Environment variables (recommended)**
+```bash
+# Linux/macOS
+export KEPWARE__PRIMARY__HOST=https://localhost:57512
+export KEPWARE__PRIMARY__USERNAME=Administrator
+export KEPWARE__PRIMARY__PASSWORD=YourPassword!
+
+# Windows PowerShell
+$env:KEPWARE__PRIMARY__HOST     = "https://localhost:57512"
+$env:KEPWARE__PRIMARY__USERNAME = "Administrator"
+$env:KEPWARE__PRIMARY__PASSWORD = "YourPassword!"
+```
+
+**appsettings.json** (add file to `.gitignore`)
+```json
+{
+  "Kepware": {
+    "Primary": {
+      "Host":     "https://localhost:57512",
+      "Username": "Administrator",
+      "Password": "YourPassword!"
+    },
+    "DisableCertificateValidation": true
+  }
+}
+```
+
+### Step 4 — End-to-end: list channels and devices
+```csharp
+var api = host.Services.GetRequiredService<KepwareApiClient>();
+
+if (!await api.TestConnectionAsync())
+{
+    Console.Error.WriteLine("Cannot connect — check host, port, and credentials.");
+    return;
+}
+
+var info = await api.GetProductInfoAsync();
+Console.WriteLine($"Connected: {info.ProductName} {info.ProductVersion}");
+
+var project = await api.LoadProject(blnLoadFullProject: false);
+foreach (var channel in project.Channels)
+{
+    Console.WriteLine($"Channel: {channel.Name}  Driver: {channel.DeviceDriver}");
+    foreach (var device in channel.Devices)
+        Console.WriteLine($"  Device: {device.Name}");
+}
+```
+
+**Expected output**
+```
+Connected: KEPServerEX 6.14.263.0
+Channel: SimulatorChannel  Driver: Simulator
+  Device: SimDevice1
+```
+
 ## Installation
 
 Kepware.Api NuGet package is available from NuGet repository.

@@ -9,6 +9,81 @@ The `Kepware.Api.Sample` project demonstrates how to use the `Kepware.Api` libra
 - Example for testing API connections.
 - HTTPS support with optional certificate validation.
 
+## Getting Started
+
+### Prerequisites
+- [.NET SDK 8.0+](https://dotnet.microsoft.com/download)
+- Kepware server reachable on HTTPS **57512** or HTTP **57412**
+
+### Step 1 — Clone and restore
+```bash
+git clone https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet.git
+cd Kepware-ConfigAPI-SDK-dotnet
+dotnet restore Kepware.Api.Sample/Kepware.Api.Sample.csproj
+```
+
+### Step 2 — Set credentials
+
+Open `Kepware.Api.Sample/Program.cs` and update:
+```csharp
+services.AddKepwareApiClient(
+    name:        "sample",
+    baseUrl:     "https://localhost:57512",   // ← your Kepware host
+    apiUserName: "Administrator",              // ← your username
+    apiPassword: "YourPassword!",              // ← your password
+    disableCertificateValidation: true
+);
+```
+
+Or supply via environment variables (no file edits needed):
+```bash
+# Linux/macOS
+export KEPWARE__PRIMARY__HOST=https://localhost:57512
+export KEPWARE__PRIMARY__USERNAME=Administrator
+export KEPWARE__PRIMARY__PASSWORD=YourPassword!
+
+# Windows PowerShell
+$env:KEPWARE__PRIMARY__HOST     = "https://localhost:57512"
+$env:KEPWARE__PRIMARY__USERNAME = "Administrator"
+$env:KEPWARE__PRIMARY__PASSWORD = "YourPassword!"
+```
+
+### Step 3 — Build and run
+```bash
+dotnet build Kepware.Api.Sample/Kepware.Api.Sample.csproj
+dotnet run  --project Kepware.Api.Sample/Kepware.Api.Sample.csproj
+```
+
+### Expected output
+```
+Connection successful.
+Channel 'Channel by Api' created.
+Device 'Device by Api' created.
+Tags applied: RampByApi, SineByApi, BooleanByApi
+
+Press <Enter> to exit...
+```
+
+The sample is fully **idempotent** — running it twice will not create duplicates.
+
+### What it does
+
+| Step | API call | Result |
+|---|---|---|
+| 1 | `TestConnectionAsync()` | Verifies server is reachable and credentials are valid |
+| 2 | `GetOrCreateChannelAsync("Channel by Api", "Simulator")` | Creates channel or reuses existing |
+| 3 | `GetOrCreateDeviceAsync(channel, "Device by Api")` | Creates device or reuses existing |
+| 4 | `CompareAndApply(desiredTags, device.Tags, device)` | Adds/updates tags without touching others |
+
+### Troubleshooting
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `TestConnectionAsync` → `false` | Wrong host/port | HTTPS default = **57512**, HTTP = **57412** |
+| TLS error | Self-signed cert | Set `disableCertificateValidation: true` for dev |
+| `401 Unauthorized` | Wrong credentials | Check username/password in Kepware User Manager |
+| Channel not created | Invalid driver name | Call `api.GetSupportedDriversAsync()` to list valid drivers |
+
 ## Prerequisites
 - A running Kepware server with the Configuration API enabled.
 - .NET SDK 8.0 or later.
