@@ -230,6 +230,23 @@ namespace Kepware.Api.ClientHandler
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
+            var project = await m_kepwareApiClient.GenericConfig.LoadEntityAsync<Project>(cancellationToken: cancellationToken).ConfigureAwait(false);
+
+            if (project == null)
+            {
+                m_logger.LogWarning("Failed to load project");
+                project = new Project();
+            }
+
+            // If not loading full project, return with just project properties.
+            if (!blnLoadFullProject)
+            {
+                m_logger.LogInformation("Loaded project properties in {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
+                return project;
+
+            }
+
+
             var productInfo = await m_kepwareApiClient.GetProductInfoAsync(cancellationToken).ConfigureAwait(false);
 
             if (blnLoadFullProject && productInfo?.SupportsJsonProjectLoadService == true)
@@ -280,7 +297,7 @@ namespace Kepware.Api.ClientHandler
             }
             else
             {
-                var project = await m_kepwareApiClient.GenericConfig.LoadEntityAsync<Project>(cancellationToken: cancellationToken).ConfigureAwait(false);
+                project = await m_kepwareApiClient.GenericConfig.LoadEntityAsync<Project>(cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 if (project == null)
                 {

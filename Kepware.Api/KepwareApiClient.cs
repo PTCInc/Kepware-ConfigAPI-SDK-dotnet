@@ -30,6 +30,7 @@ namespace Kepware.Api
         /// The value for an unknown client or hostname.
         /// </summary>
         public const string UNKNOWN = "Unknown";
+
         private const string ENDPOINT_STATUS = "/config/v1/status";
         private const string ENDPOINT_DOC = "/config/v1/doc";
         private const string ENDPOINT_ABOUT = "/config/v1/about";
@@ -40,6 +41,7 @@ namespace Kepware.Api
 
         private bool? m_isConnected = null;
         private bool? m_hasValidCredentials = null;
+        private ProductInfo? m_productInfo = null;
 
         /// <summary>
         /// Gets the name of the client instance.
@@ -50,6 +52,26 @@ namespace Kepware.Api
         /// Gets the hostname of the Kepware server the client is connecting to.
         /// </summary>
         public string ClientHostName => m_httpClient.BaseAddress?.Host ?? UNKNOWN;
+
+        /// <summary>
+        /// Gets the product information of the connected Kepware server, which includes 
+        /// product name and version information. This information is retrieved during <see cref="KepwareApiClient.TestConnectionAsync(CancellationToken)"/>
+        /// and <see cref="KepwareApiClient.GetProductInfoAsync(CancellationToken)"/> and cached for future use. 
+        /// If neither method has not been performed yet, it will attempt to retrieve the product information 
+        /// on demand. If the product information cannot be retrieved, it will return null.
+        /// </summary>
+        public ProductInfo? ProductInfo
+        {
+            get
+            {
+                if (m_productInfo == null)
+                {
+                    // Try to get the product info if we don't have it yet, this can happen if the connection test has not been called yet
+                    var _ = GetProductInfoAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                }
+                return m_productInfo;
+            }
+        }
 
         /// <summary>
         /// Gets the client options for the Kepware server connection.
@@ -206,9 +228,10 @@ namespace Kepware.Api
         /// <summary>
         /// Gets the product information from the Kepware server which includes product name and version information.
         /// Uses the /config/v1/about endpoint
+        /// Will update the client's product info property, which can be used in other calls to avoid calling the API multiple times for the same information.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the product information.</returns>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the product information. <see cref="Kepware.Api.Model.ProductInfo"/></returns>
         public async Task<ProductInfo?> GetProductInfoAsync(CancellationToken cancellationToken = default)
         {
             try
@@ -218,6 +241,9 @@ namespace Kepware.Api
                 {
                     var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                     var prodInfo = JsonSerializer.Deserialize(content, KepJsonContext.Default.ProductInfo);
+                    
+                    // Set Product Info for the client if we have a valid response, so we can use it in other calls without needing to call the API again
+                    m_productInfo = prodInfo;
 
                     return prodInfo;
                 }
@@ -235,6 +261,8 @@ namespace Kepware.Api
                 m_logger.LogWarning(jsonEx, "Failed to parse ProductInfo from {BaseAddress}", m_httpClient.BaseAddress);
             }
 
+            // If we cannot get the product info, we set it to null and return null
+            m_productInfo = null;
             return null;
         }
 
