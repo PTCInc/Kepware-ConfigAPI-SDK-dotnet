@@ -1,19 +1,23 @@
-# Kepware Configuration API SDK for .NET (Currently in Beta)
+# Kepware Configuration API SDK for .NET
 
+[![NuGet](https://img.shields.io/nuget/v/Kepware.Api.svg)](https://www.nuget.org/packages/Kepware.Api/)
+![Dynamic XML Badge](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fraw.githubusercontent.com%2FPTCInc%2FKepware-ConfigAPI-SDK-dotnet%2Frefs%2Fheads%2Fmain%2FKepware.Api%2FKepware.Api.csproj&query=%2F%2FTargetFrameworks&logo=.net&label=versions)
 [![Build Status](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions/workflows/nuget-test-and-build.yml/badge.svg)](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions)
+![NuGet Downloads](https://img.shields.io/nuget/dt/Kepware.Api?label=nuget%20downloads)
+
 [![Build Status](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions/workflows/docker-build-and-push.yml/badge.svg)](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions)
 [![Build Status](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions/workflows/syncservice-build.yml/badge.svg)](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions)
-[![NuGet](https://img.shields.io/nuget/v/Kepware.Api.svg)](https://www.nuget.org/packages/Kepware.Api/)
+
 
 
 ## Overview
 The Kepware Configuration API SDK for .NET provides tools and libraries to interact with the Kepware Configuration REST API, enabling configuration management for Kepware servers. This repository includes examples and utilities to streamline development for deployment tools, including a service for continuous synchronization and an API client library. 
 
-This package is designed to work with all versions of Kepware that support the Configuration API including Kepware Server (KS), Kepware Edge (KE), Thingworx Kepware Server (TKS), and KEPServerEX (KEP). For reference, Kepware Server in this documentation will also imply Thingworx Kepware Server and KEPServerEX versions prior to v7.0 when v6.x is referenced.
+This package is designed to work with all versions of Kepware that support the Configuration API including Kepware Server (KS), Kepware Edge (KE), Thingworx Kepware Server (TKS), and KEPServerEX (KEP). For reference, when Kepware Server v6.x is referenced in this documentation, this implies Thingworx Kepware Server and KEPServerEX branded products.
 
 ## Features
 - [**API Client Library**](./Kepware.Api/README.md): Simplify interaction with the Kepware Configuration API.
-- [**Service for Synchronization**](./KepwareSync.Service/README.md):
+- [**Service for Synchronization** (Currently in Beta)](./KepwareSync.Service/README.md):
   - Bi-directional synchronization between Kepware servers and local filesystems.
   - Support for one-way and two-way synchronization modes.
 - [**Sample Applications**](./Kepware.Api.Sample/README.md): Demonstrates API usage with real-world examples.
@@ -29,7 +33,7 @@ A .NET library providing an easy-to-use client for interacting with the Kepware 
 
 **API reference documentation is available on [Github Pages](https://ptcinc.github.io/Kepware-ConfigAPI-SDK-dotnet/api/Kepware.Api.html)**
 
-### 2. `KepwareSync.Service`
+### 2. `KepwareSync.Service` (Currently in Beta)
 A service application for synchronizing configurations between Kepware servers and the local filesystem. It supports monitoring and synchronization in real time.
 
 [Readme for KepwareSync.Service](./KepwareSync.Service/README.md)
