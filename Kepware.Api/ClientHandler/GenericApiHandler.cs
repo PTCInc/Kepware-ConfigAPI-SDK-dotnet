@@ -788,7 +788,7 @@ namespace Kepware.Api.ClientHandler
         }
         #endregion
 
-        #region private methods
+        #region private / internal methods
 
         #region deserialize
         protected Task<K?> DeserializeJsonAsync<K>(HttpResponseMessage httpResponse, CancellationToken cancellationToken = default)
@@ -824,6 +824,20 @@ namespace Kepware.Api.ClientHandler
             }
         }
         #endregion
+
+        /// <summary>
+        /// Clears any internal caches (supported drivers, supported channels/devices).
+        /// Called when the underlying connection is lost so subsequent calls re-fetch data.
+        /// </summary>
+        internal void InvalidateCaches()
+        {
+            // drop cached drivers so next call re-loads from /doc endpoint
+            m_cachedSupportedDrivers = null;
+
+            // clear cached channel/device property dictionaries
+            m_cachedSupportedChannels.Clear();
+            m_cachedSupportedDevices.Clear();
+        }
 
         #endregion
 

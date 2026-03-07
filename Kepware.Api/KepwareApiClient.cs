@@ -55,23 +55,11 @@ namespace Kepware.Api
 
         /// <summary>
         /// Gets the product information of the connected Kepware server, which includes 
-        /// product name and version information. This information is retrieved during <see cref="KepwareApiClient.TestConnectionAsync(CancellationToken)"/>
+        /// product name and version information. This caches the value during <see cref="KepwareApiClient.TestConnectionAsync(CancellationToken)"/>
         /// and <see cref="KepwareApiClient.GetProductInfoAsync(CancellationToken)"/> and cached for future use. 
-        /// If neither method has not been performed yet, it will attempt to retrieve the product information 
-        /// on demand. If the product information cannot be retrieved, it will return null.
+        /// It will return null if there is no cached value.
         /// </summary>
-        public ProductInfo? ProductInfo
-        {
-            get
-            {
-                if (m_productInfo == null)
-                {
-                    // Try to get the product info if we don't have it yet, this can happen if the connection test has not been called yet
-                    var _ = GetProductInfoAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-                }
-                return m_productInfo;
-            }
-        }
+        public ProductInfo? ProductInfo => m_productInfo;
 
         /// <summary>
         /// Gets the client options for the Kepware server connection.
@@ -163,7 +151,7 @@ namespace Kepware.Api
                 if (!response.IsSuccessStatusCode)
                 {
                     m_logger.LogWarning("Failed to connect to {ClientName}-client at {BaseAddress}, Reason: {ReasonPhrase}", ClientName, m_httpClient.BaseAddress, response.ReasonPhrase);
-                    m_isConnected = null; // set connection state to null if we cannot connect
+                    ClearConnectionState(); // set connection state to null if we cannot connect
                     return false; // connection failed
                 }
 
@@ -177,7 +165,7 @@ namespace Kepware.Api
                 if (status?.FirstOrDefault()?.Healthy == false)
                 {
                     m_logger.LogWarning("Failed to connect to {ClientName}-client at {BaseAddress}, Reason: {String}", ClientName, m_httpClient.BaseAddress, "Server Status Check Failed");
-                    m_isConnected = null; // set connection state to null if we cannot connect
+                    ClearConnectionState(); // set connection state to null if we cannot connect
                     return false; // connection failed
                 }
 
@@ -189,12 +177,12 @@ namespace Kepware.Api
 
                 // Inital connection attempt or a reconnection due to failure,
                 // we need to check the product info and credentials
-                var prodInfo = await GetProductInfoAsync(cancellationToken).ConfigureAwait(false);
+                _ = await GetProductInfoAsync(cancellationToken).ConfigureAwait(false);
 
                 // If we cannot get the product info, we assume the connection is not healthy
-                if (prodInfo == null) 
+                if (m_productInfo == null) 
                 {
-                    m_isConnected = null; // set connection state to null if we cannot get product info
+                    ClearConnectionState(); // set connection state to null if we cannot get product info
                     return false;
                 }
 
@@ -204,12 +192,12 @@ namespace Kepware.Api
                 // If we do not have valid credentials, we assume the connection is not healthy
                 if (m_hasValidCredentials != true)
                 {
-                    m_isConnected = null; // set connection state to null if we cannot connect or credentials are invalid
+                    ClearConnectionState(); // set connection state to null if we cannot connect or credentials are invalid
                     m_logger.LogWarning("Connection to {ClientName}-client at {BaseAddress} failed because credentials are invalid", ClientName, m_httpClient.BaseAddress);
                     return false;
                 }
 
-                m_logger.LogInformation("Successfully connected to {ClientName}-client: {ProductName} {ProductVersion} on {BaseAddress}", ClientName, prodInfo?.ProductName, prodInfo?.ProductVersion, m_httpClient.BaseAddress);
+                m_logger.LogInformation("Successfully connected to {ClientName}-client: {ProductName} {ProductVersion} on {BaseAddress}", ClientName, m_productInfo?.ProductName, m_productInfo?.ProductVersion, m_httpClient.BaseAddress);
 
                 m_isConnected = true; // set connection state to true if we have a valid product info and credentials
                 return m_isConnected.Value; // return true if we have a valid connection
@@ -227,25 +215,29 @@ namespace Kepware.Api
 
         /// <summary>
         /// Gets the product information from the Kepware server which includes product name and version information.
-        /// Uses the /config/v1/about endpoint
         /// Will update the client's product info property, which can be used in other calls to avoid calling the API multiple times for the same information.
+        /// Uses the /config/v1/about endpoint
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the product information. <see cref="Kepware.Api.Model.ProductInfo"/></returns>
         public async Task<ProductInfo?> GetProductInfoAsync(CancellationToken cancellationToken = default)
         {
+            if (m_productInfo != null)
+            {
+                // return cached product info if we have it
+                return m_productInfo; 
+            }
+
             try
             {
                 var response = await m_httpClient.GetAsync(ENDPOINT_ABOUT, cancellationToken).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                    var prodInfo = JsonSerializer.Deserialize(content, KepJsonContext.Default.ProductInfo);
                     
                     // Set Product Info for the client if we have a valid response, so we can use it in other calls without needing to call the API again
-                    m_productInfo = prodInfo;
-
-                    return prodInfo;
+                    m_productInfo = JsonSerializer.Deserialize(content, KepJsonContext.Default.ProductInfo);
+                    return m_productInfo;
                 }
                 else
                 {
@@ -321,14 +313,41 @@ namespace Kepware.Api
         }
         #endregion
 
-        #region internal
+        #region Private / internal helper methods
+        /// <summary>
+        /// Clears all client-level connection state and optionally handler caches.
+        /// Call this whenever the connection should be considered lost or stale.
+        /// </summary>
+        /// <param name="clearCredentials">If true also clears cached credential validation state.</param>
+        private void ClearConnectionState(bool clearCredentials = true)
+        {
+            // Clear derived product info and connection flags
+            m_productInfo = null;
+            m_isConnected = null;
+
+            // Optionally clear credential status so next TestConnection re-evaluates
+            if (clearCredentials)
+                m_hasValidCredentials = null;
+
+            // Invalidate caches on handlers that keep them
+            try
+            {
+                // GenericConfig may implement an InvalidateCaches method (see suggestion below)
+                (GenericConfig as ClientHandler.GenericApiHandler)?.InvalidateCaches();
+            }
+            catch
+            {
+                // swallow - defensive: don't throw from a state-clear helper
+            }
+        }
+
         /// <summary>
         /// Invoked by Handler, when they receice a http request exception
         /// </summary>
         /// <param name="httpEx"></param>
         internal void OnHttpRequestException(HttpRequestException httpEx)
         {
-            m_isConnected = null;
+            ClearConnectionState(false);
         }
         #endregion
     }
