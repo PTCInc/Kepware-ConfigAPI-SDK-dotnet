@@ -159,7 +159,7 @@ namespace Kepware.Api.ClientHandler
                 foreach (var pair in items)
                 {
                     var endpoint = $"{collectionEndpoint}/{Uri.EscapeDataString(pair.oldItem!.Name)}";
-                    var currentEntity = await LoadEntityByEndpointAsync<K>(endpoint, cancellationToken).ConfigureAwait(false);
+                    var currentEntity = await LoadEntityByEndpointAsync<K>(endpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
                     if (currentEntity == null)
                     {
                         m_logger.LogError("Failed to load {TypeName} from {Endpoint}", typeof(K).Name, endpoint);
@@ -478,13 +478,16 @@ namespace Kepware.Api.ClientHandler
         /// </summary>
         /// <typeparam name="T">The type of the entity to load.</typeparam>
         /// <param name="name">The name of the entity to load. If null, loads the default entity.</param>
+        /// <param name="query">Optional query parameters to append to the request URI.</param>
         /// <param name="cancellationToken">A token that can be used to request cancellation of the operation.</param>
         /// <returns>The loaded entity of type <typeparamref name="T"/> or null if not found.</returns>
-        public Task<T?> LoadEntityAsync<T>(string? name = default, CancellationToken cancellationToken = default)
+        public Task<T?> LoadEntityAsync<T>(string? name = default, IEnumerable<KeyValuePair<string, string?>>? query = null, CancellationToken cancellationToken = default)
             where T : BaseEntity, new()
         {
             var endpoint = EndpointResolver.ResolveEndpoint<T>(string.IsNullOrEmpty(name) ? [] : [name]);
-            return LoadEntityByEndpointAsync<T>(endpoint, cancellationToken);
+            endpoint = AppendQueryString(endpoint, query);
+            var serializedRequest = query != null && query.Any(kv => kv.Key.Equals("content", StringComparison.OrdinalIgnoreCase) && kv.Value == "serialize");
+            return LoadEntityByEndpointAsync<T>(endpoint, serialized: serializedRequest, cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -492,13 +495,16 @@ namespace Kepware.Api.ClientHandler
         /// </summary>
         /// <typeparam name="T">The type of the entity to load.</typeparam>
         /// <param name="owner">The owner of the entity.</param>
+        /// <param name="query">Optional query parameters to append to the request URI.</param>
         /// <param name="cancellationToken">A token that can be used to request cancellation of the operation.</param>
         /// <returns>The loaded entity of type <typeparamref name="T"/> or null if not found.</returns>
-        public Task<T?> LoadEntityAsync<T>(IEnumerable<string> owner, CancellationToken cancellationToken = default)
+        public Task<T?> LoadEntityAsync<T>(IEnumerable<string> owner, IEnumerable<KeyValuePair<string, string?>>? query = null, CancellationToken cancellationToken = default)
             where T : BaseEntity, new()
         {
             var endpoint = EndpointResolver.ResolveEndpoint<T>(owner);
-            return LoadEntityByEndpointAsync<T>(endpoint, cancellationToken);
+            endpoint = AppendQueryString(endpoint, query);
+            var serializedRequest = query != null && query.Any(kv => kv.Key.Equals("content", StringComparison.OrdinalIgnoreCase) && kv.Value == "serialize");
+            return LoadEntityByEndpointAsync<T>(endpoint, serialized: serializedRequest, cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -507,14 +513,18 @@ namespace Kepware.Api.ClientHandler
         /// <typeparam name="T">The type of the entity to load.</typeparam>
         /// <param name="name">The name of the entity to load.</param>
         /// <param name="owner">The owner of the entity.</param>
+        /// <param name="query">Optional query parameters to append to the request URI.</param>
         /// <param name="cancellationToken">A token that can be used to request cancellation of the operation.</param>
         /// <returns>The loaded entity of type <typeparamref name="T"/> or null if not found.</returns>
-        public async Task<T?> LoadEntityAsync<T>(string name, NamedEntity owner, CancellationToken cancellationToken = default)
+        public async Task<T?> LoadEntityAsync<T>(string name, NamedEntity owner, IEnumerable<KeyValuePair<string, string?>>? query = null, CancellationToken cancellationToken = default)
             where T : BaseEntity, new()
         {
             var endpoint = EndpointResolver.ResolveEndpoint<T>(owner, name);
+            endpoint = AppendQueryString(endpoint, query);
 
-            var entity = await LoadEntityByEndpointAsync<T>(endpoint, cancellationToken);
+            var serializedRequest = query != null && query.Any(kv => kv.Key.Equals("content", StringComparison.OrdinalIgnoreCase) && kv.Value == "serialize");
+
+            var entity = await LoadEntityByEndpointAsync<T>(endpoint, serialized: serializedRequest, cancellationToken: cancellationToken);
 
             if (entity is IHaveOwner ownable)
             {
@@ -523,7 +533,7 @@ namespace Kepware.Api.ClientHandler
             return entity;
         }
 
-        protected internal async Task<T?> LoadEntityByEndpointAsync<T>(string endpoint, CancellationToken cancellationToken = default)
+        protected internal async Task<T?> LoadEntityByEndpointAsync<T>(string endpoint, bool serialized = false, CancellationToken cancellationToken = default)
             where T : BaseEntity, new()
         {
             try
@@ -536,8 +546,16 @@ namespace Kepware.Api.ClientHandler
                     m_logger.LogWarning("Failed to load {TypeName} from {Endpoint}: {ReasonPhrase}", typeof(T).Name, endpoint, response.ReasonPhrase);
                     return default;
                 }
+                var entity = default(T);
 
-                var entity = await DeserializeJsonAsync<T>(response, cancellationToken).ConfigureAwait(false);
+                if (serialized) 
+                { 
+                    entity = await DeserializeJsonLoadSerializedAsync<T>(response, cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    entity = await DeserializeJsonAsync<T>(response, cancellationToken).ConfigureAwait(false);
+                }
 
                 return entity;
             }
@@ -558,22 +576,24 @@ namespace Kepware.Api.ClientHandler
         /// </summary>
         /// <typeparam name="T">The type of the entity collection to load.</typeparam>
         /// <param name="owner">The owner of the entity collection.</param>
+        /// <param name="query">Optional query parameters to append to the request URI.</param>
         /// <param name="cancellationToken">A token that can be used to request cancellation of the operation.</param>
         /// <returns>The loaded collection of entities of type <typeparamref name="T"/> or null if not found.</returns>
-        public Task<T?> LoadCollectionAsync<T>(string? owner = default, CancellationToken cancellationToken = default)
+        public Task<T?> LoadCollectionAsync<T>(string? owner = default, IEnumerable<KeyValuePair<string, string?>>? query = null, CancellationToken cancellationToken = default)
              where T : EntityCollection<DefaultEntity>, new()
-         => LoadCollectionAsync<T, DefaultEntity>(owner, cancellationToken);
+         => LoadCollectionAsync<T, DefaultEntity>(owner, query, cancellationToken);
 
         /// <summary>
         /// Loads a collection of entities of type <typeparamref name="T"/> asynchronously by its owner from the Kepware server.
         /// </summary>
         /// <typeparam name="T">The type of the entity collection to load.</typeparam>
         /// <param name="owner">The owner of the entity collection.</param>
+        /// <param name="query">Optional query parameters to append to the request URI.</param>
         /// <param name="cancellationToken">A token that can be used to request cancellation of the operation.</param>
         /// <returns>The loaded collection of entities of type <typeparamref name="T"/> or null if not found.</returns>
-        public Task<T?> LoadCollectionAsync<T>(NamedEntity owner, CancellationToken cancellationToken = default)
+        public Task<T?> LoadCollectionAsync<T>(NamedEntity owner, IEnumerable<KeyValuePair<string, string?>>? query = null, CancellationToken cancellationToken = default)
           where T : EntityCollection<DefaultEntity>, new()
-         => LoadCollectionAsync<T, DefaultEntity>(owner, cancellationToken);
+         => LoadCollectionAsync<T, DefaultEntity>(owner, query, cancellationToken);
 
         /// <summary>
         /// Loads a collection of entities of type <typeparamref name="T"/> asynchronously by its owner from the Kepware server.
@@ -581,12 +601,13 @@ namespace Kepware.Api.ClientHandler
         /// <typeparam name="T">The type of the entity collection to load.</typeparam>
         /// <typeparam name="K">The type of the entities in the collection.</typeparam>
         /// <param name="owner">The owner of the entity collection.</param>
+        /// <param name="query">Optional query parameters to append to the request URI.</param>
         /// <param name="cancellationToken">A token that can be used to request cancellation of the operation.</param>
         /// <returns>The loaded collection of entities of type <typeparamref name="T"/> or null if not found.</returns>
-        public Task<T?> LoadCollectionAsync<T, K>(string? owner = default, CancellationToken cancellationToken = default)
+        public Task<T?> LoadCollectionAsync<T, K>(string? owner = default, IEnumerable<KeyValuePair<string, string?>>? query = null, CancellationToken cancellationToken = default)
             where T : EntityCollection<K>, new()
             where K : BaseEntity, new()
-            => LoadCollectionAsync<T, K>(string.IsNullOrEmpty(owner) ? [] : [owner], cancellationToken);
+            => LoadCollectionAsync<T, K>(string.IsNullOrEmpty(owner) ? [] : [owner], query, cancellationToken);
 
         /// <summary>
         /// Loads a collection of entities of type <typeparamref name="T"/> asynchronously by its owner from the Kepware server.
@@ -594,13 +615,14 @@ namespace Kepware.Api.ClientHandler
         /// <typeparam name="T">The type of the entity collection to load.</typeparam>
         /// <typeparam name="K">The type of the entities in the collection.</typeparam>
         /// <param name="owner">The owner of the entity collection.</param>
+        /// <param name="query">Optional query parameters to append to the request URI.</param>
         /// <param name="cancellationToken">A token that can be used to request cancellation of the operation.</param>
         /// <returns>The loaded collection of entities of type <typeparamref name="T"/> or null if not found.</returns>
-        public async Task<T?> LoadCollectionAsync<T, K>(NamedEntity owner, CancellationToken cancellationToken = default)
+        public async Task<T?> LoadCollectionAsync<T, K>(NamedEntity owner, IEnumerable<KeyValuePair<string, string?>>? query = null, CancellationToken cancellationToken = default)
             where T : EntityCollection<K>, new()
             where K : BaseEntity, new()
         {
-            var collection = await LoadCollectionByEndpointAsync<T, K>(EndpointResolver.ResolveEndpoint<T>(owner), cancellationToken);
+            var collection = await LoadCollectionByEndpointAsync<T, K>(AppendQueryString(EndpointResolver.ResolveEndpoint<T>(owner), query), cancellationToken);
             if (collection != null)
             {
                 collection.Owner = owner;
@@ -618,12 +640,13 @@ namespace Kepware.Api.ClientHandler
         /// <typeparam name="T">The type of the entity collection to load.</typeparam>
         /// <typeparam name="K">The type of the entities in the collection.</typeparam>
         /// <param name="owner">The owner of the entity collection.</param>
+        /// <param name="query">Optional query parameters to append to the request URI.</param>
         /// <param name="cancellationToken">A token that can be used to request cancellation of the operation.</param>
         /// <returns>The loaded collection of entities of type <typeparamref name="T"/> or null if not found.</returns>
-        public Task<T?> LoadCollectionAsync<T, K>(IEnumerable<string> owner, CancellationToken cancellationToken = default)
+        public Task<T?> LoadCollectionAsync<T, K>(IEnumerable<string> owner, IEnumerable<KeyValuePair<string, string?>>? query = null, CancellationToken cancellationToken = default)
             where T : EntityCollection<K>, new()
             where K : BaseEntity, new()
-            => LoadCollectionByEndpointAsync<T, K>(EndpointResolver.ResolveEndpoint<T>(owner), cancellationToken);
+            => LoadCollectionByEndpointAsync<T, K>(AppendQueryString(EndpointResolver.ResolveEndpoint<T>(owner), query), cancellationToken);
 
         protected internal async Task<T?> LoadCollectionByEndpointAsync<T, K>(string endpoint, CancellationToken cancellationToken = default)
             where T : EntityCollection<K>, new()
@@ -823,6 +846,57 @@ namespace Kepware.Api.ClientHandler
                 return null;
             }
         }
+
+        /// <summary>
+        /// Special deserialization method for responses from endpoints with `?content=serialize` that wrap the actual object in an additional 
+        /// layer with the object name as the property name, e.g. `{ "Channel": { ... } }`. This is required to properly handle dynamic properties 
+        /// on channels/devices/etc that conform to a different model from JSON type info for the base entity. This would cause  
+        /// deserialization to fail if we tried to deserialize directly to the target type.
+        /// </summary>
+        /// <typeparam name="K"></typeparam>
+        /// <param name="httpResponse"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        protected Task<K?> DeserializeJsonLoadSerializedAsync<K>(HttpResponseMessage httpResponse, CancellationToken cancellationToken = default)
+          where K : BaseEntity, new() => DeserializeJsonLoadSerializedAsync<K>(httpResponse, KepJsonContext.GetJsonTypeInfo<K>(), cancellationToken);
+
+        /// <summary>
+        /// Special deserialization method for responses from endpoints with `?content=serialize` that wrap the actual object in an additional 
+        /// layer with the object name as the property name, e.g. `{ "Channel": { ... } }`. This is required to properly handle dynamic properties 
+        /// on channels/devices/etc that conform to a different model from JSON type info for the base entity. This would cause  
+        /// deserialization to fail if we tried to deserialize directly to the target type.
+        /// </summary>
+        /// <typeparam name="K"></typeparam>
+        /// <param name="httpResponse"></param>
+        /// <param name="jsonTypeInfo"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        protected async Task<K?> DeserializeJsonLoadSerializedAsync<K>(HttpResponseMessage httpResponse, JsonTypeInfo<K> jsonTypeInfo, CancellationToken cancellationToken = default)
+          where K : BaseEntity, new()
+        {
+            try
+            {
+                using var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
+                var wrapper = await JsonSerializer.DeserializeAsync<Dictionary<string, JsonElement>>(
+                        stream, KepJsonContext.Default.DictionaryStringJsonElement, cancellationToken).ConfigureAwait(false)
+                    ?? throw new JsonException("Response was not a JSON object.");
+
+                var first = wrapper.Values.FirstOrDefault();
+                if (first.ValueKind != JsonValueKind.Object)
+                    throw new JsonException("Expected the first property to be a JSON object.");
+
+                return first.Deserialize<K>(jsonTypeInfo: KepJsonContext.GetJsonTypeInfo<K>())
+                       ?? throw new JsonException("Failed to deserialize channel object.");
+                //return await JsonSerializer.DeserializeAsync(stream, jsonTypeInfo, cancellationToken);
+            }
+            catch (JsonException ex)
+            {
+                m_logger.LogError(ex, "JSON Deserialization failed");
+                return default;
+            }
+        }
+
+
         #endregion
 
         /// <summary>
@@ -841,5 +915,36 @@ namespace Kepware.Api.ClientHandler
 
         #endregion
 
+        /// <summary>
+        /// Append query parameters to an endpoint string. Encodes keys and values with Uri.EscapeDataString.
+        /// Null or empty values are skipped. If `endpoint` already contains a query, parameters are appended with &amp;.
+        /// </summary>
+        private static string AppendQueryString(string endpoint, IEnumerable<KeyValuePair<string, string?>>? query)
+        {
+            if (query == null)
+                return endpoint;
+
+            var sb = new StringBuilder();
+            foreach (var kv in query)
+            {
+                if (kv.Key == null)
+                    continue;
+                // Skip parameters with null values to match typical REST filter behavior.
+                if (kv.Value is null)
+                    continue;
+
+                if (sb.Length > 0)
+                    sb.Append('&');
+
+                sb.Append(Uri.EscapeDataString(kv.Key));
+                sb.Append('=');
+                sb.Append(Uri.EscapeDataString(kv.Value));
+            }
+
+            if (sb.Length == 0)
+                return endpoint;
+
+            return endpoint + (endpoint.Contains('?') ? "&" : "?") + sb.ToString();
+        }
     }
 }
