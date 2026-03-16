@@ -25,6 +25,11 @@ namespace Kepware.Api.Model
         public bool IsLoadedByProjectLoadService { get; internal set; } = false;
 
         /// <summary>
+        /// If this is true, it indicates that this is an empty project object that was instantiated without data from the server.
+        /// </summary>
+        public bool IsEmpty => Channels == null && DynamicProperties.Count == 0;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Project"/> class.
         /// </summary>
         public Project()

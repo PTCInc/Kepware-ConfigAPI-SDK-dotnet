@@ -45,6 +45,11 @@ namespace Kepware.Api.Model
             /// </summary>
             public const string DiagnosticsCapture = "servermain.CHANNEL_DIAGNOSTICS_CAPTURE";
 
+            /// <summary>
+            /// Value of the static tag count for the channel.
+            /// </summary>
+            public const string StaticTagCount = "servermain.CHANNEL_STATIC_TAG_COUNT";
+
         }
     }
 }
