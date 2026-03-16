@@ -42,7 +42,7 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-	<None Update="_data/*.*">
+	<None Update="_data/**">
 		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	</None>
   </ItemGroup>
