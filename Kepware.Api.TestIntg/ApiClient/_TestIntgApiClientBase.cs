@@ -153,7 +153,7 @@ namespace Kepware.Api.TestIntg.ApiClient
 
         protected List<Tag> CreateSimulatorTestTags(string name = "Tag", string address = "K000", int count = 2)
         {
-            return Enumerable.Range(0, count-1)
+            return Enumerable.Range(0, count)
                 .Select(i => CreateTestTag(name: $"{name}{i}", address: $"{address}{i}"))
                 .ToList();
         }

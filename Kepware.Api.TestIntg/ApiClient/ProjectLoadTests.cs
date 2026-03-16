@@ -203,6 +203,60 @@ namespace Kepware.Api.TestIntg.ApiClient
             // Clean up
             await DeleteAllChannelsAsync();
         }
+
+
+        [Fact]
+        public async Task LoadProject_Full_OverrideForOptimizedRecursion_ShouldLoadCorrectly_BasedOnProductSupport()
+        {
+            // Arrange
+            var channel = await AddTestChannel();
+            var device = await AddTestDevice(channel);
+            var tags = await AddSimulatorTestTags(device, count: 200);
+            var tagGroup = await AddTestTagGroup(device);
+            var tagGroup2 = await AddTestTagGroup(tagGroup, "TagGroup2");
+            var tagsTagGroup2 = await AddSimulatorTestTags(tagGroup2, count: 10);
+
+            var channel2 = await AddTestChannel("Channel2");
+            var device2 = await AddTestDevice(channel2);
+            var tags2 = await AddSimulatorTestTags(device2);
+            var tagGroup_2 = await AddTestTagGroup(device2);
+            var tagGroup2_2 = await AddTestTagGroup(tagGroup_2, "TagGroup2");
+
+            // Act
+            var project = await _kepwareApiClient.Project.LoadProjectAsync(blnLoadFullProject: true, projectLoadTagLimit: 100);
+
+            // Assert
+            Assert.NotNull(project);
+            Assert.NotNull(project.Channels);
+            Assert.Contains(project.Channels, c => c.Name == channel.Name);
+
+            var foundChannel = project.Channels.Find(c => c.Name == channel.Name);
+            Assert.NotNull(foundChannel);
+            Assert.NotNull(foundChannel.Devices);
+            Assert.Contains(foundChannel.Devices, d => d.Name == device.Name);
+
+            var foundDevice = foundChannel.Devices.Find(d => d.Name == device.Name);
+            Assert.NotNull(foundDevice);
+            Assert.NotNull(foundDevice.Tags);
+            Assert.Equal(tags.Count, foundDevice.Tags.Count);
+            Assert.NotNull(foundDevice.TagGroups);
+            Assert.Contains(foundDevice.TagGroups, tg => tg.Name == tagGroup.Name);
+
+            var foundTagGroup = foundDevice.TagGroups.Find(tg => tg.Name == tagGroup.Name);
+            Assert.NotNull(foundTagGroup);
+            Assert.NotNull(foundTagGroup.TagGroups);
+            Assert.Contains(foundTagGroup.TagGroups, tg => tg.Name == tagGroup2.Name);
+            
+            var foundTagGroup2 = foundTagGroup.TagGroups.Find(tg => tg.Name == tagGroup2.Name);
+            Assert.NotNull(foundTagGroup2);
+            Assert.NotNull(foundTagGroup2.Tags);
+            Assert.Equal(tagsTagGroup2.Count, foundTagGroup2.Tags.Count);
+
+
+            // Clean up
+            await DeleteAllChannelsAsync();
+        }
+
         [Fact]
         public async Task LoadProject_NotFull_ShouldLoadCorrectly_BasedOnProductSupport()
         {

@@ -15,6 +15,7 @@ using Kepware.Api.Serializer;
 using Kepware.Api.Test.ApiClient;
 using Kepware.Api.Util;
 using Shouldly;
+using Xunit.Sdk;
 
 namespace Kepware.Api.Test.ApiClient
 {
@@ -98,9 +99,74 @@ namespace Kepware.Api.Test.ApiClient
                 await ConfigureToServeEndpoints();
             }
 
-            var project = await _kepwareApiClient.Project.LoadProjectAsync(true);
+            var project = await _kepwareApiClient.Project.LoadProjectAsync(blnLoadFullProject: true);
 
             project.IsLoadedByProjectLoadService.ShouldBe(supportsJsonLoad);
+
+            project.ShouldNotBeNull();
+            project.Channels.ShouldNotBeEmpty("Channels list should not be empty.");
+
+            var testProject = await LoadJsonTestDataAsync();
+            var compareResult = EntityCompare.Compare<ChannelCollection, Channel>(testProject?.Project?.Channels, project?.Channels);
+
+            compareResult.ShouldNotBeNull();
+            compareResult.UnchangedItems.ShouldNotBeEmpty("All channels should be unchanged.");
+            compareResult.ChangedItems.ShouldBeEmpty("No channels should be changed.");
+            compareResult.ItemsOnlyInLeft.ShouldBeEmpty("No channels should exist only in the test data.");
+            compareResult.ItemsOnlyInRight.ShouldBeEmpty("No channels should exist only in the loaded project.");
+
+            foreach (var (ExpectedChannel, LoadedChannel) in testProject?.Project?.Channels?.Zip(project?.Channels ?? []) ?? [])
+            {
+                var deviceCompareResult = EntityCompare.Compare<DeviceCollection, Device>(ExpectedChannel.Devices, LoadedChannel.Devices);
+                deviceCompareResult.ShouldNotBeNull();
+                deviceCompareResult.UnchangedItems.ShouldNotBeEmpty($"All devices in channel {ExpectedChannel.Name} should be unchanged.");
+                deviceCompareResult.ChangedItems.ShouldBeEmpty($"No devices in channel {ExpectedChannel.Name} should be changed.");
+                deviceCompareResult.ItemsOnlyInLeft.ShouldBeEmpty($"No devices should exist only in the test data for channel {ExpectedChannel.Name}.");
+                deviceCompareResult.ItemsOnlyInRight.ShouldBeEmpty($"No devices should exist only in the loaded project for channel {ExpectedChannel.Name}.");
+
+                foreach (var (ExpectedDevice, LoadedDevice) in ExpectedChannel.Devices?.Zip(LoadedChannel.Devices ?? []) ?? [])
+                {
+                    if (ExpectedDevice.Tags?.Count > 0 || LoadedDevice.Tags?.Count > 0)
+                    {
+                        var tagCompareResult = EntityCompare.Compare<DeviceTagCollection, Tag>(ExpectedDevice.Tags, LoadedDevice.Tags);
+                        tagCompareResult.ShouldNotBeNull();
+                        tagCompareResult.UnchangedItems.ShouldNotBeEmpty($"All tags in device {ExpectedDevice.Name} should be unchanged.");
+                        tagCompareResult.ChangedItems.ShouldBeEmpty($"No tags in device {ExpectedDevice.Name} should be changed.");
+                        tagCompareResult.ItemsOnlyInLeft.ShouldBeEmpty($"No tags should exist only in the test data for device {ExpectedDevice.Name}.");
+                        tagCompareResult.ItemsOnlyInRight.ShouldBeEmpty($"No tags should exist only in the loaded project for device {ExpectedDevice.Name}.");
+                    }
+
+                    CompareTagGroupsRecursive(ExpectedDevice.TagGroups, LoadedDevice.TagGroups, ExpectedDevice.Name);
+                }
+            }
+        }
+
+        [Theory]
+        [InlineData("KEPServerEX", "12", 6, 17, true)]
+        [InlineData("ThingWorxKepwareServer", "12", 6, 17, true)]
+        [InlineData("ThingWorxKepwareEdge", "13", 1, 10, true)]
+        [InlineData("Kepware Edge", "13", 1, 0, true)]
+        public async Task LoadProject_ShouldLoadCorrectly_Serialize_BasedOnProductSupport(
+            string productName, string productId, int majorVersion, int minorVersion, bool supportsJsonLoad)
+        {
+            ConfigureConnectedClient(productName, productId, majorVersion, minorVersion);
+
+            if (supportsJsonLoad)
+            {
+                await ConfigureToServeEndpoints();
+            }
+            else
+            {
+                // Skip this test case at runtime because it expects the server to serve a full JSON project.
+                throw SkipException.ForSkip($"Product {productName} v{majorVersion}.{minorVersion} (id={productId}) does not support JSON project load. Skipping full-project test case.");
+            }
+
+            var tagLimitOverride = 100; // Set a high tag limit to ensure all tags are loaded for comparison
+
+            var project = await _kepwareApiClient.Project.LoadProjectAsync(blnLoadFullProject: true, projectLoadTagLimit: tagLimitOverride);
+
+            // Optimized recursion is done for this test, which will result in false.
+            project.IsLoadedByProjectLoadService.ShouldBeFalse();
 
             project.ShouldNotBeNull();
             project.Channels.ShouldNotBeEmpty("Channels list should not be empty.");

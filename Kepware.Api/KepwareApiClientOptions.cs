@@ -60,5 +60,16 @@ namespace Kepware.Api
         /// Gets or sets an optional tag object for additional configuration metadata.
         /// </summary>
         public object? Tag { get; init; }
+
+        /// <summary>
+        /// Gets the maximum number of tags that can be loaded in a single action when using ProjectLoad methods.
+        /// This limit is crucial for managing performance and resource utilization when working with large projects, 
+        /// as it helps to prevent excessive memory usage and potential timeouts that may occur when attempting to 
+        /// load an excessively large number of tags at once.
+        /// </summary>
+        /// <remarks>This property is initialized to a default value of 100,000. It is important to
+        /// consider this limit when working with projects that may contain a large number of tags, as exceeding this
+        /// limit may result in performance degradation or incomplete data loading.</remarks>
+        public int ProjectLoadTagLimit { get; init; } = 100000;
     }
 }

@@ -13,7 +13,7 @@
 				"servermain.CHANNEL_WRITE_OPTIMIZATIONS_DUTY_CYCLE": 10,
 				"servermain.CHANNEL_NON_NORMALIZED_FLOATING_POINT_HANDLING": 0,
 				"simulator.CHANNEL_ITEM_PERSISTENCE": false,
-				"simulator.CHANNEL_ITEM_PERSISTENCE_DATA_FILE": "C:\\ProgramData\\Kepware\\KEPServerEX\\V6\\Simulator\\Channel1.dat",
+				"simulator.CHANNEL_ITEM_PERSISTENCE_DATA_FILE": "C:\\ProgramData\\PTC\\Kepware Server\\V7\\Simulator\\Channel1.dat",
 				"devices": [
 					{
 						"common.ALLTYPES_NAME": "Device1",
@@ -63,7 +63,7 @@
 				"servermain.CHANNEL_WRITE_OPTIMIZATIONS_DUTY_CYCLE": 10,
 				"servermain.CHANNEL_NON_NORMALIZED_FLOATING_POINT_HANDLING": 0,
 				"simulator.CHANNEL_ITEM_PERSISTENCE": false,
-				"simulator.CHANNEL_ITEM_PERSISTENCE_DATA_FILE": "C:\\ProgramData\\Kepware\\KEPServerEX\\V6\\Simulator\\Data Type Examples.dat",
+				"simulator.CHANNEL_ITEM_PERSISTENCE_DATA_FILE": "C:\\ProgramData\\PTC\\Kepware Server\\V7\\Simulator\\Data Type Examples.dat",
 				"devices": [
 					{
 						"common.ALLTYPES_NAME": "16 Bit Device",
@@ -2105,7 +2105,7 @@
 				"servermain.CHANNEL_WRITE_OPTIMIZATIONS_DUTY_CYCLE": 10,
 				"servermain.CHANNEL_NON_NORMALIZED_FLOATING_POINT_HANDLING": 0,
 				"simulator.CHANNEL_ITEM_PERSISTENCE": false,
-				"simulator.CHANNEL_ITEM_PERSISTENCE_DATA_FILE": "C:\\ProgramData\\Kepware\\KEPServerEX\\V6\\Simulator\\Simulation Examples.dat",
+				"simulator.CHANNEL_ITEM_PERSISTENCE_DATA_FILE": "C:\\ProgramData\\PTC\\Kepware Server\\V7\\Simulator\\Simulation Examples.dat",
 				"devices": [
 					{
 						"common.ALLTYPES_NAME": "Functions",

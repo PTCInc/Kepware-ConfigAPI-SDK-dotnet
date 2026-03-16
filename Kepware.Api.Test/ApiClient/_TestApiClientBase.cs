@@ -146,7 +146,21 @@ namespace Kepware.Api.Test.ApiClient
         {
             var projectData = await LoadJsonTestDataAsync(filePath);
 
-            var channels = projectData.Project?.Channels?.Select(c => new Channel { Name = c.Name, Description = c.Description, DynamicProperties = c.DynamicProperties }).ToList() ?? [];
+
+            var channels = projectData.Project?.Channels?
+                .Select(c =>
+                {
+                    var ch = new Channel { Name = c.Name, Description = c.Description, DynamicProperties = c.DynamicProperties };
+                    int staticCount = c.Name switch
+                    {
+                        "Channel1" => 2,
+                        "Simulation Examples" => 24,
+                        "Data Type Examples" => 216,
+                        _ => 0
+                    };
+                    ch.SetDynamicProperty(Properties.Channel.StaticTagCount, staticCount);
+                    return ch;
+                }).ToList() ?? new List<Channel>();
 
             // Serve project details
             _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project")
@@ -163,7 +177,21 @@ namespace Kepware.Api.Test.ApiClient
 
                 if (channel.Devices != null)
                 {
-                    var devices = channel.Devices.Select(d => new Device { Name = d.Name, Description = d.Description, DynamicProperties = d.DynamicProperties }).ToList();
+                    var devices = channel.Devices
+                        .Select(d =>
+                        {
+                            var dev = new Device { Name = d.Name, Description = d.Description, DynamicProperties = d.DynamicProperties };
+                            int staticCount = d.Name switch
+                            {
+                                "Device1" => 2,
+                                "Functions" => 24,
+                                "16 Bit Device" => 98,
+                                "8 Bit Device" => 118,
+                                _ => 0
+                            };
+                            dev.SetDynamicProperty(Properties.Device.StaticTagCount, staticCount);
+                            return dev;
+                        }).ToList() ?? new List<Device>();
                     _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + $"/config/v1/project/channels/{channel.Name}/devices")
                                            .ReturnsResponse(JsonSerializer.Serialize(devices), "application/json");
 
@@ -181,6 +209,22 @@ namespace Kepware.Api.Test.ApiClient
                     }
                 }
             }
+
+            // Additional endpoints for content=serialize mocking
+            var projectPropertiesString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/projectProperties.json");
+            var channel1String = await File.ReadAllTextAsync("_data/projectLoadSerializeData/channel1.json");
+            var sixteenBitDeviceString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/dataTypeExamples.16BitDevice.json");
+            var simExamplesChannelString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/simulationExamples.json");
+
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project")
+                                    .ReturnsResponse(projectPropertiesString, "application/json");
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/Channel1?content=serialize")
+                                    .ReturnsResponse(channel1String, "application/json");
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/Data Type Examples/devices/16 Bit Device?content=serialize")
+                                    .ReturnsResponse(sixteenBitDeviceString, "application/json");
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/Simulation Examples?content=serialize")
+                                    .ReturnsResponse(simExamplesChannelString, "application/json");
+
         }
         private void ConfigureToServeEndpointsTagGroupsRecursive(string endpoint, IEnumerable<DeviceTagGroup> tagGroups)
         {
