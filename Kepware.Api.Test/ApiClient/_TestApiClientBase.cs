@@ -28,6 +28,11 @@ namespace Kepware.Api.Test.ApiClient
         protected readonly Mock<ILoggerFactory> _loggerFactoryMock;
         protected readonly KepwareApiClient _kepwareApiClient;
 
+        /// <summary>
+        /// URIs used to optimize recursion endpoints for tests. Populated via <see cref="ConfigureOptimizedRecursionUris(System.Collections.Generic.IEnumerable{string}?)"/>.
+        /// </summary>
+        protected readonly List<string> _optimizedRecursionUris = new List<string>();
+
         protected TestApiClientBase()
         {
             _httpMessageHandlerMock = new Mock<HttpMessageHandler>();
@@ -156,6 +161,7 @@ namespace Kepware.Api.Test.ApiClient
                         "Channel1" => 2,
                         "Simulation Examples" => 24,
                         "Data Type Examples" => 216,
+                        "OptRecursionTest" => 318,
                         _ => 0
                     };
                     ch.SetDynamicProperty(Properties.Channel.StaticTagCount, staticCount);
@@ -187,6 +193,7 @@ namespace Kepware.Api.Test.ApiClient
                                 "Functions" => 24,
                                 "16 Bit Device" => 98,
                                 "8 Bit Device" => 118,
+                                "RecursionTestDevice" => 318,
                                 _ => 0
                             };
                             dev.SetDynamicProperty(Properties.Device.StaticTagCount, staticCount);
@@ -198,6 +205,8 @@ namespace Kepware.Api.Test.ApiClient
                     foreach (var device in channel.Devices)
                     {
                         var deviceEndpoint = TEST_ENDPOINT + $"/config/v1/project/channels/{channel.Name}/devices/{device.Name}";
+
+
                         _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, deviceEndpoint)
                                                .ReturnsResponse(JsonSerializer.Serialize(new Device { Name = device.Name, Description = device.Description, DynamicProperties = device.DynamicProperties }), "application/json");
 
@@ -215,25 +224,114 @@ namespace Kepware.Api.Test.ApiClient
             var channel1String = await File.ReadAllTextAsync("_data/projectLoadSerializeData/channel1.json");
             var sixteenBitDeviceString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/dataTypeExamples.16BitDevice.json");
             var simExamplesChannelString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/simulationExamples.json");
+            var dte8BitBRegTagGroupString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/dte.8bitDevice.Breg.json");
+            var dte8BitKRegTagGroupString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/dte.8bitDevice.Kreg.json");
+            var dte8BitRRegTagGroupString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/dte.8bitDevice.Rreg.json");
+            var dte8BitSRegTagGroupString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/dte.8bitDevice.Sreg.json");
+            var optRecursionDeviceBRegTagGroupString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/opt.recursionDevice.Breg.json");
+            var optRecursionDeviceKRegTagGroupString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/opt.recursionDevice.Kreg.json");
+            var optRecursionDeviceRRegTagGroupString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/opt.recursionDevice.Rreg.json");
+            var optRecursionDeviceSRegTagGroupString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/opt.recursionDevice.Sreg.json");
+            var optRecursionDeviceRecursionTestLevel1String = await File.ReadAllTextAsync("_data/projectLoadSerializeData/opt.recursionDevice.RecursionTest.Level1.json");
+            var optRecursionDeviceRecursionTestLevel2String = await File.ReadAllTextAsync("_data/projectLoadSerializeData/opt.recursionDevice.RecursionTest.Level2.json");
+            var optRecursionDeviceRecursionTestLevel3String = await File.ReadAllTextAsync("_data/projectLoadSerializeData/opt.recursionDevice.RecursionTest.Level3.json");
+            var optRecursionDeviceRecursionTestLevel4String = await File.ReadAllTextAsync("_data/projectLoadSerializeData/opt.recursionDevice.RecursionTest.Level4.json");
 
             _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project")
                                     .ReturnsResponse(projectPropertiesString, "application/json");
+            _optimizedRecursionUris.Add(TEST_ENDPOINT + "/config/v1/project");
+
             _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/Channel1?content=serialize")
                                     .ReturnsResponse(channel1String, "application/json");
+            _optimizedRecursionUris.Add(TEST_ENDPOINT + "/config/v1/project/channels/Channel1?content=serialize");
+
             _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/Data Type Examples/devices/16 Bit Device?content=serialize")
                                     .ReturnsResponse(sixteenBitDeviceString, "application/json");
+            _optimizedRecursionUris.Add(TEST_ENDPOINT + "/config/v1/project/channels/Data Type Examples/devices/16 Bit Device?content=serialize");
+
             _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/Simulation Examples?content=serialize")
                                     .ReturnsResponse(simExamplesChannelString, "application/json");
+            _optimizedRecursionUris.Add(TEST_ENDPOINT + "/config/v1/project/channels/Simulation Examples?content=serialize");
+
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/Data Type Examples/devices/8 Bit Device/tag_groups/B Registers?content=serialize")
+                                    .ReturnsResponse(dte8BitBRegTagGroupString, "application/json");
+            _optimizedRecursionUris.Add(TEST_ENDPOINT + "/config/v1/project/channels/Data Type Examples/devices/8 Bit Device/tag_groups/B Registers?content=serialize");
+
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/Data Type Examples/devices/8 Bit Device/tag_groups/K Registers?content=serialize")
+                                    .ReturnsResponse(dte8BitKRegTagGroupString, "application/json");
+            _optimizedRecursionUris.Add(TEST_ENDPOINT + "/config/v1/project/channels/Data Type Examples/devices/8 Bit Device/tag_groups/K Registers?content=serialize");
+
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/Data Type Examples/devices/8 Bit Device/tag_groups/R Registers?content=serialize")
+                                    .ReturnsResponse(dte8BitRRegTagGroupString, "application/json");
+            _optimizedRecursionUris.Add(TEST_ENDPOINT + "/config/v1/project/channels/Data Type Examples/devices/8 Bit Device/tag_groups/R Registers?content=serialize");
+
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/Data Type Examples/devices/8 Bit Device/tag_groups/S Registers?content=serialize")
+                                    .ReturnsResponse(dte8BitSRegTagGroupString, "application/json");
+            _optimizedRecursionUris.Add(TEST_ENDPOINT + "/config/v1/project/channels/Data Type Examples/devices/8 Bit Device/tag_groups/S Registers?content=serialize");
+
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/OptRecursionTest/devices/RecursionTestDevice/tag_groups/B Registers?content=serialize")
+                                    .ReturnsResponse(optRecursionDeviceBRegTagGroupString, "application/json");
+            _optimizedRecursionUris.Add(TEST_ENDPOINT + "/config/v1/project/channels/OptRecursionTest/devices/RecursionTestDevice/tag_groups/B Registers?content=serialize");
+
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/OptRecursionTest/devices/RecursionTestDevice/tag_groups/K Registers?content=serialize")
+                                    .ReturnsResponse(optRecursionDeviceKRegTagGroupString, "application/json");
+            _optimizedRecursionUris.Add(TEST_ENDPOINT + "/config/v1/project/channels/OptRecursionTest/devices/RecursionTestDevice/tag_groups/K Registers?content=serialize");
+
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/OptRecursionTest/devices/RecursionTestDevice/tag_groups/R Registers?content=serialize")
+                                    .ReturnsResponse(optRecursionDeviceRRegTagGroupString, "application/json");
+            _optimizedRecursionUris.Add(TEST_ENDPOINT + "/config/v1/project/channels/OptRecursionTest/devices/RecursionTestDevice/tag_groups/R Registers?content=serialize");
+
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/OptRecursionTest/devices/RecursionTestDevice/tag_groups/S Registers?content=serialize")
+                                    .ReturnsResponse(optRecursionDeviceSRegTagGroupString, "application/json");
+            _optimizedRecursionUris.Add(TEST_ENDPOINT + "/config/v1/project/channels/OptRecursionTest/devices/RecursionTestDevice/tag_groups/S Registers?content=serialize");
+
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/OptRecursionTest/devices/RecursionTestDevice/tag_groups/RecursionTest/tag_groups/Level1?content=serialize")
+                                    .ReturnsResponse(optRecursionDeviceRecursionTestLevel1String, "application/json");
+            _optimizedRecursionUris.Add(TEST_ENDPOINT + "/config/v1/project/channels/OptRecursionTest/devices/RecursionTestDevice/tag_groups/RecursionTest/tag_groups/Level1?content=serialize");
+
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/OptRecursionTest/devices/RecursionTestDevice/tag_groups/RecursionTest/tag_groups/Level2?content=serialize")
+                                    .ReturnsResponse(optRecursionDeviceRecursionTestLevel2String, "application/json");
+            _optimizedRecursionUris.Add(TEST_ENDPOINT + "/config/v1/project/channels/OptRecursionTest/devices/RecursionTestDevice/tag_groups/RecursionTest/tag_groups/Level2?content=serialize");
+
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/OptRecursionTest/devices/RecursionTestDevice/tag_groups/RecursionTest/tag_groups/Level3?content=serialize")
+                                    .ReturnsResponse(optRecursionDeviceRecursionTestLevel3String, "application/json");
+            _optimizedRecursionUris.Add(TEST_ENDPOINT + "/config/v1/project/channels/OptRecursionTest/devices/RecursionTestDevice/tag_groups/RecursionTest/tag_groups/Level3?content=serialize");
+
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels/OptRecursionTest/devices/RecursionTestDevice/tag_groups/RecursionTest/tag_groups/Level4?content=serialize")
+                                    .ReturnsResponse(optRecursionDeviceRecursionTestLevel4String, "application/json");
+            _optimizedRecursionUris.Add(TEST_ENDPOINT + "/config/v1/project/channels/OptRecursionTest/devices/RecursionTestDevice/tag_groups/RecursionTest/tag_groups/Level4?content=serialize");
 
         }
         private void ConfigureToServeEndpointsTagGroupsRecursive(string endpoint, IEnumerable<DeviceTagGroup> tagGroups)
         {
             var tagGroupEndpoint = endpoint + "/tag_groups";
 
-            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, tagGroupEndpoint)
-                                             .ReturnsResponse(JsonSerializer.Serialize(tagGroups), "application/json");
+            var updatedTagGroups = tagGroups
+                .Select(tg =>
+                {
+                    var tagGrp = tg;
+                    int staticCount = tg.Name switch
+                    {
+                        "B Registers" => 5,
+                        "K Registers" => 54,
+                        "R Registers" => 54,
+                        "S Registers" => 5,
+                        "RecursionTest" => 220,
+                        "Level1" => 88,
+                        "Level2" => 44,
+                        "Level3" => 44,
+                        "Level4" => 44,
+                        "Level1_1" => 44,
+                        _ => 0
+                    };
+                    tagGrp.SetDynamicProperty(Properties.DeviceTagGroup.TotalTagCount, staticCount);
+                    return tagGrp;
+                }).ToList() ?? new List<DeviceTagGroup>();
 
-            foreach (var tagGroup in tagGroups)
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, tagGroupEndpoint)
+                                             .ReturnsResponse(JsonSerializer.Serialize(updatedTagGroups), "application/json");
+
+            foreach (var tagGroup in updatedTagGroups)
             {
                 _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, string.Concat(tagGroupEndpoint, "/", tagGroup.Name, "/tags"))
                                              .ReturnsResponse(JsonSerializer.Serialize(tagGroup.Tags), "application/json");

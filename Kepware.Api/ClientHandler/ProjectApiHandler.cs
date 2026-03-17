@@ -270,8 +270,9 @@ namespace Kepware.Api.ClientHandler
 
             if (productInfo?.SupportsJsonProjectLoadService == true)
             {
-                // Set by <see cref="KepwareApiClientOptions.ProjectLoadTagLimit"/> as the threshold to use content=serialize based loading or full recursive loading. Default
-                // set by class.
+                // Check to see if projectLoadTagLimit parameter is set on call. If not or an invalid value, use value ]
+                // set by <see cref="KepwareApiClientOptions.ProjectLoadTagLimit"/> as the threshold to use content=serialize
+                // based loading or full recursive loading.
                 if (projectLoadTagLimit <= 0)
                     projectLoadTagLimit = m_kepwareApiClient.ClientOptions.ProjectLoadTagLimit;
 
@@ -373,6 +374,10 @@ namespace Kepware.Api.ClientHandler
             project.Channels = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<ChannelCollection, Channel>(cancellationToken: cancellationToken);
             if (project.Channels != null)
             {
+                var query = new[]
+                {
+                    new KeyValuePair<string, string?>("content", "serialize")
+                };
                 int totalChannelCount = project.Channels.Count;
                 int loadedChannelCount = 0;
 
@@ -386,10 +391,6 @@ namespace Kepware.Api.ClientHandler
                     {
                         if (channel.GetDynamicProperty<int>(Properties.Channel.StaticTagCount) < tagLimit)
                         {
-                            var query = new[]
-                            {
-                                new KeyValuePair<string, string?>("content", "serialize")
-                            };
                             var loadedChannel = await m_kepwareApiClient.GenericConfig.LoadEntityAsync<Channel>(channel.Name, query, cancellationToken: cancellationToken).ConfigureAwait(false);
                             if (loadedChannel != null)
                             {
@@ -417,10 +418,6 @@ namespace Kepware.Api.ClientHandler
                                         {
                                             if (device.GetDynamicProperty<int>(Properties.Device.StaticTagCount) < tagLimit)
                                             {
-                                                var query = new[]
-                                                {
-                                                    new KeyValuePair<string, string?>("content", "serialize")
-                                                };
                                                 var loadedDevice = await m_kepwareApiClient.GenericConfig.LoadEntityAsync<Device>(device.Name, channel, query, cancellationToken: cancellationToken).ConfigureAwait(false);
                                                 if (loadedDevice != null)
                                                 {
@@ -440,7 +437,7 @@ namespace Kepware.Api.ClientHandler
 
                                                 if (device.TagGroups != null)
                                                 {
-                                                    await LoadTagGroupsRecursiveAsync(m_kepwareApiClient, device.TagGroups, cancellationToken: cancellationToken).ConfigureAwait(false);
+                                                    await LoadTagGroupsRecursiveAsync(m_kepwareApiClient, device.TagGroups, optimizedRecursion: true, tagLimit: tagLimit, cancellationToken: cancellationToken).ConfigureAwait(false);
                                                 }
                                             }
                                         }));
@@ -596,20 +593,48 @@ namespace Kepware.Api.ClientHandler
         /// </summary>
         /// <param name="apiClient">The API client.</param>
         /// <param name="tagGroups">The tag groups to load.</param>
+        /// <param name="optimizedRecursion">A flag indicating whether to use optimized recursion with content=serialize or basic recursion. 
+        /// This is only applicable for projects loaded with the full project load option and when the JsonProjectLoad service is 
+        /// supported by the server.</param>
+        /// <param name="tagLimit">Tag Limit if overridden by method call.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        internal static async Task LoadTagGroupsRecursiveAsync(KepwareApiClient apiClient, IEnumerable<DeviceTagGroup> tagGroups, CancellationToken cancellationToken = default)
+        internal static async Task LoadTagGroupsRecursiveAsync(KepwareApiClient apiClient, IEnumerable<DeviceTagGroup> tagGroups, bool optimizedRecursion = false, int tagLimit = 0, CancellationToken cancellationToken = default)
         {
+            // Falls back to the value set by <see cref="KepwareApiClientOptions.ProjectLoadTagLimit"/> if tagLimit parameter is not set or an invalid value is provided.
+            if (tagLimit <= 0)
+                tagLimit = apiClient.ClientOptions.ProjectLoadTagLimit;
             foreach (var tagGroup in tagGroups)
             {
                 // Load the Tag Groups and Tags of the current Tag Group
-                tagGroup.TagGroups = await apiClient.GenericConfig.LoadCollectionAsync<DeviceTagGroupCollection, DeviceTagGroup>(tagGroup, cancellationToken: cancellationToken).ConfigureAwait(false);
-                tagGroup.Tags = await apiClient.GenericConfig.LoadCollectionAsync<DeviceTagCollection, Tag>(tagGroup, cancellationToken: cancellationToken).ConfigureAwait(false);
-
-                // Recursively load the Tag Groups and Tags of the child Tag Groups
-                if (tagGroup.TagGroups != null && tagGroup.TagGroups.Count > 0)
+                if (optimizedRecursion && tagGroup.TotalTagCount < tagLimit)
                 {
-                    await LoadTagGroupsRecursiveAsync(apiClient, tagGroup.TagGroups, cancellationToken).ConfigureAwait(false);
+                    var query = new[]
+                    {
+                        new KeyValuePair<string, string?>("content", "serialize")
+                    };
+                    var loadedTagGroup = await apiClient.GenericConfig.LoadEntityAsync<DeviceTagGroup>(tagGroup.Name, tagGroup.Owner!, query, cancellationToken: cancellationToken).ConfigureAwait(false);
+                    if (loadedTagGroup != null)
+                    {
+                        tagGroup.Tags = loadedTagGroup.Tags;
+                        tagGroup.TagGroups = loadedTagGroup.TagGroups;
+                    }
+                    else
+                    {
+                        // Failed to load tag group, log warning and end without loading child tag groups.
+                        apiClient.Logger.LogWarning("Failed to load {TagGroupName} in {OwnerName}", tagGroup.Name, tagGroup.Owner?.Name);
+                        continue;
+                    }
+                }
+                else
+                {
+                    tagGroup.TagGroups = await apiClient.GenericConfig.LoadCollectionAsync<DeviceTagGroupCollection, DeviceTagGroup>(tagGroup, cancellationToken: cancellationToken).ConfigureAwait(false);
+                    tagGroup.Tags = await apiClient.GenericConfig.LoadCollectionAsync<DeviceTagCollection, Tag>(tagGroup, cancellationToken: cancellationToken).ConfigureAwait(false);
+                    // Recursively load the Tag Groups and Tags of the child Tag Groups
+                    if (tagGroup.TagGroups != null && tagGroup.TagGroups.Count > 0)
+                    {
+                        await LoadTagGroupsRecursiveAsync(apiClient, tagGroup.TagGroups, optimizedRecursion, tagLimit, cancellationToken).ConfigureAwait(false);
+                    }
                 }
             }
         }
