@@ -11,14 +11,14 @@ namespace Kepware.Api.Model
         public static class Device
         {
             /// <summary>
-            /// The driver used by this channel.
+            /// The driver used by this device.
             /// </summary>
             public const string DeviceDriver = "servermain.MULTIPLE_TYPES_DEVICE_DRIVER";
 
             /// <summary>
-            /// Value of the static tag count for the channel.
+            /// Constant value for the key of the static tag count for the device.
             /// </summary>
-            public const string StaticTagCount = "servermain.DEVICE_STATIC_TAG_COUNT";
+            public const string StaticTagCount = Properties.NonSerialized.DeviceStaticTagCount;
 
         }
     }

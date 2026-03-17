@@ -48,7 +48,7 @@ namespace Kepware.Api.Model
             /// <summary>
             /// Value of the static tag count for the channel.
             /// </summary>
-            public const string StaticTagCount = "servermain.CHANNEL_STATIC_TAG_COUNT";
+            public const string StaticTagCount = Properties.NonSerialized.ChannelStaticTagCount;
 
         }
     }
