@@ -26,6 +26,17 @@
     },
     "Container (Dockerfile)": {
       "commandName": "Docker"
+    },
+    // For WSL2, ensure that the distribution name is set to your WSL distribution (e.g., "Ubuntu-20.04") if you 
+    // want to specify the specific distribution to run the project in. If left empty, it will use the default WSL distribution.
+    // You can find the distribution names and defaults by running `wsl -l -v` in a command prompt.
+    "WSL": {
+      "commandName": "WSL2",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "MODBUS_HOST": "HostByEnv"
+      },
+      "distributionName": ""
     }
   },
   "$schema": "https://json.schemastore.org/launchsettings.json"

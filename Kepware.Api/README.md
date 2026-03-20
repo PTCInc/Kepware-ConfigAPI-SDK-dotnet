@@ -1,13 +1,14 @@
 # Kepware.Api
 
-[![Build Status](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions/workflows/nuget-test-and-build.yml/badge.svg)](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions)
 [![NuGet](https://img.shields.io/nuget/v/Kepware.Api.svg)](https://www.nuget.org/packages/Kepware.Api/)
+![Dynamic XML Badge](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fraw.githubusercontent.com%2FPTCInc%2FKepware-ConfigAPI-SDK-dotnet%2Frefs%2Fheads%2Fmain%2FKepware.Api%2FKepware.Api.csproj&query=%2F%2FTargetFrameworks&logo=.net&label=versions)
+[![Build Status](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions/workflows/nuget-test-and-build.yml/badge.svg)](https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet/actions)
+![NuGet Downloads](https://img.shields.io/nuget/dt/Kepware.Api?label=nuget%20downloads)
 
 ## Overview
 The `Kepware.Api` library provides a robust client implementation to interact with the Kepware Configuration API. It supports managing channels, devices, tags, and other configurations programmatically while ensuring secure and efficient communication.
 
-This package is designed to work with all versions of Kepware that support the Configuration API including Kepware Server (KS), and Kepware Edge (KE). For reference, Kepware Server in this documentation will also imply Thingworx Kepware Server and KEPServerEX versions prior to v7.0 when v6.x is referenced.
-
+This package is designed to work with all versions of Kepware that support the Configuration API including Kepware Server (KS), Kepware Edge (KE), Thingworx Kepware Server (TKS), and KEPServerEX (KEP). For reference, when Kepware Server v6.x is referenced in this documentation, this implies Thingworx Kepware Server and KEPServerEX branded products.
 ## Features
 
 1. Connect to Kepware Configuration APIs securely with HTTPS and optional certificate validation.
@@ -19,14 +20,15 @@ This package is designed to work with all versions of Kepware that support the C
 | **Connectivity** <br /> *(Channel, Devices, Tags, Tag Groups)* | Y | Y |
 | **Administration** <br /> *(User Groups, Users, UA Endpoints, Local License Server)* | Y[^1] | Y |
 | **Product Info and Health Status** | Y[^4] | Y |
-| **Export Project** | Y[^2] | Y |
+| **Export Project** | Y | Y |
 | **Import Project (via JsonProjectLoad Service)** | N[^2] | N |
 | **Import Project (via CompareAndApply)[^3]** | Y | Y |
 
-[^1]: UA Endpoints and Local License Server supported for Kepware Edge only
-[^2]: JsonProjectLoad was added to Kepware Server v6.17 and later builds, the SDK detects the server version and uses the appropriate service or loads the project by multiple requests if using KepwareApiClient.LoadProject.
-[^3]: CompareAndApply is handled by the SDK, it compares the source project with the server project and applies the changes. The JsonProjectLoad service is a direct call to the server to load a project.
+[^2]: JsonProjectLoad was added to Kepware Server v6.17 and later builds.
+[^3]: [CompareAndApply](/Kepware.Api/ClientHandler/ProjectApiHandler.cs) is handled by the SDK. It compares the source project with another server project and applies the changes.
 [^4]: Added to Kepware Server v6.13 and later builds
+
+**NOTE:** Exporting a project from a Kepware server is done using the KepwareApiClient.LoadProjectAsync method. This detects the server version and uses the appropriate method to either export/load the whole project or loads the project by multiple requests. This ensures that large projects can be exported/loaded from the Kepware instance as optimally as possible based on the current API design. See [LoadProjectAsync](/Kepware.Api/ClientHandler/ProjectApiHandler.cs) for more details.
 
 3. Configuration API *Services* implemented:
 
@@ -35,11 +37,10 @@ This package is designed to work with all versions of Kepware that support the C
 | **TagGeneration** <br /> *(for supported drivers)* | Y | Y |
 | **ReinitializeRuntime** | Y* | Y |
 | **ProjectLoad and ProjectSave** | N | N |
-| **JsonProjectLoad\*\*** <br /> *(used for import project feature)* | Y | Y |
+| **JsonProjectLoad\*\*** <br /> *(used for import project feature)* | N | N |
 
-4.  Synchronize configurations between your application and Kepware server.
-5.  Supports advanced operations like project comparison, entity synchronization, and driver property queries.
-6.  Built-in support for Dependency Injection to simplify integration.
+4.  Supports advanced operations like project comparison, entity synchronization, and driver property queries.
+5.  Built-in support for Dependency Injection to simplify integration.
 
 ## Installation
 
@@ -51,16 +52,36 @@ Kepware.Api NuGet package is available from NuGet repository.
    ```
 
 2. Register the `KepwareApiClient` in your application using Dependency Injection:
+
    ```csharp
    services.AddKepwareApiClient(
        name: "default",
        baseUrl: "https://localhost:57512",
        apiUserName: "Administrator",
        apiPassword: "StrongAdminPassword2025!",
-       disableCertificateValidation: true
+       disableCertificateValidation: false
    );
    ```
 
+    or
+
+   ```csharp
+   var clientOptions = new KepwareClientOptions
+   {
+        HostUri = new Uri("https://localhost:57512"),
+        Username = "Administrator",
+        Password = "StrongAdminPassword2025!",
+        Timeout = TimeSpan.FromSeconds(60),
+        DisableCertifcateValidation = false,
+        ProjectLoadTagLimit = 100000
+   };
+   
+   services.AddKepwareApiClient(
+       name: "default",
+       options: clientOptions
+   );
+   ```
+   
 ## Key Methods
 
 ### Connection and Status
@@ -77,9 +98,9 @@ Kepware.Api NuGet package is available from NuGet repository.
   Retrieves product information about the Kepware server.
 
 ### Project Management
-- **Load Project:**
+- **Export / Load Project:**
   ```csharp
-  var project = await api.LoadProject(blnLoadFullProject:true);
+  var project = await api.LoadProjectAsync(blnLoadFullProject:true);
   ```
   Loads the current project from the Kepware server.
 

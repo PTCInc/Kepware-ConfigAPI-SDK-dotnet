@@ -1,0 +1,53 @@
+{
+  "tag_groups": {
+    "common.ALLTYPES_NAME": "B Registers",
+    "common.ALLTYPES_DESCRIPTION": "Boolean registers",
+    "tags": [
+      {
+        "common.ALLTYPES_NAME": "Boolean1",
+        "common.ALLTYPES_DESCRIPTION": "Boolean register",
+        "servermain.TAG_ADDRESS": "B0001",
+        "servermain.TAG_DATA_TYPE": 1,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Boolean2",
+        "common.ALLTYPES_DESCRIPTION": "Boolean register",
+        "servermain.TAG_ADDRESS": "B0002",
+        "servermain.TAG_DATA_TYPE": 1,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Boolean3",
+        "common.ALLTYPES_DESCRIPTION": "Boolean register",
+        "servermain.TAG_ADDRESS": "B0003",
+        "servermain.TAG_DATA_TYPE": 1,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Boolean4",
+        "common.ALLTYPES_DESCRIPTION": "Boolean register",
+        "servermain.TAG_ADDRESS": "B0004",
+        "servermain.TAG_DATA_TYPE": 1,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "BooleanArray",
+        "common.ALLTYPES_DESCRIPTION": "Array of 4 Boolean Registers",
+        "servermain.TAG_ADDRESS": "B0010 [4]",
+        "servermain.TAG_DATA_TYPE": 21,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      }
+    ]
+  }
+}

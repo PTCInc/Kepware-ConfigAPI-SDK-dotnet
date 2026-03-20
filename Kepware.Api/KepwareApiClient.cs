@@ -44,6 +44,14 @@ namespace Kepware.Api
         private ProductInfo? m_productInfo = null;
 
         /// <summary>
+        /// Gets the logger instance used for logging operations.
+        /// </summary>
+        /// <remarks>This property provides access to the logger, which can be used to log messages at
+        /// various levels. Ensure that the logger is properly initialized before use.</remarks>
+        public ILogger Logger => m_logger;
+
+
+        /// <summary>
         /// Gets the name of the client instance.
         /// </summary>
         public string ClientName { get; }

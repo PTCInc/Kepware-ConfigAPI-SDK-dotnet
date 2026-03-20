@@ -379,7 +379,7 @@ namespace Kepware.Api.Test.ApiClient
 
         #endregion
 
-        #region LoadEntityAsync - Single Tag mit DynamicProperties
+        #region LoadEntityAsync - Single Tag with DynamicProperties
 
         [Fact]
         public async Task LoadEntityAsync_ShouldReturnTag_WithCorrectDynamicProperties()

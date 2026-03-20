@@ -1,0 +1,53 @@
+{
+  "tag_groups": {
+    "common.ALLTYPES_NAME": "S Registers",
+    "common.ALLTYPES_DESCRIPTION": "String Registers",
+    "tags": [
+      {
+        "common.ALLTYPES_NAME": "String1",
+        "common.ALLTYPES_DESCRIPTION": "Null terminated Unicode string",
+        "servermain.TAG_ADDRESS": "S0001",
+        "servermain.TAG_DATA_TYPE": 0,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "String2",
+        "common.ALLTYPES_DESCRIPTION": "Null terminated Unicode string",
+        "servermain.TAG_ADDRESS": "S0002",
+        "servermain.TAG_DATA_TYPE": 0,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "String3",
+        "common.ALLTYPES_DESCRIPTION": "Null terminated Unicode string",
+        "servermain.TAG_ADDRESS": "S0003",
+        "servermain.TAG_DATA_TYPE": 0,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "String4",
+        "common.ALLTYPES_DESCRIPTION": "Null terminated Unicode string",
+        "servermain.TAG_ADDRESS": "S0004",
+        "servermain.TAG_DATA_TYPE": 0,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "StringArray[4]",
+        "common.ALLTYPES_DESCRIPTION": "Null terminated Unicode string array",
+        "servermain.TAG_ADDRESS": "S0010 [4]",
+        "servermain.TAG_DATA_TYPE": 20,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      }
+    ]
+  }
+}

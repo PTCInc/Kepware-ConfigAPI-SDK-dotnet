@@ -1,0 +1,250 @@
+{
+  "channels": {
+    "common.ALLTYPES_NAME": "Simulation Examples",
+    "common.ALLTYPES_DESCRIPTION": "Example Simulator Channel",
+    "servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator",
+    "servermain.CHANNEL_DIAGNOSTICS_CAPTURE": false,
+    "servermain.CHANNEL_UNIQUE_ID": 2691320731,
+    "servermain.CHANNEL_WRITE_OPTIMIZATIONS_METHOD": 2,
+    "servermain.CHANNEL_WRITE_OPTIMIZATIONS_DUTY_CYCLE": 10,
+    "servermain.CHANNEL_NON_NORMALIZED_FLOATING_POINT_HANDLING": 0,
+    "simulator.CHANNEL_ITEM_PERSISTENCE": false,
+    "simulator.CHANNEL_ITEM_PERSISTENCE_DATA_FILE": "C:\\ProgramData\\PTC\\Kepware Server\\V7\\Simulator\\Simulation Examples.dat",
+    "devices": [
+      {
+        "common.ALLTYPES_NAME": "Functions",
+        "common.ALLTYPES_DESCRIPTION": "Example Simulator Device",
+        "servermain.MULTIPLE_TYPES_DEVICE_DRIVER": "Simulator",
+        "servermain.DEVICE_MODEL": 0,
+        "servermain.DEVICE_UNIQUE_ID": 2266623120,
+        "servermain.DEVICE_ID_FORMAT": 1,
+        "servermain.DEVICE_ID_STRING": "4",
+        "servermain.DEVICE_ID_HEXADECIMAL": 4,
+        "servermain.DEVICE_ID_DECIMAL": 4,
+        "servermain.DEVICE_ID_OCTAL": 4,
+        "servermain.DEVICE_DATA_COLLECTION": true,
+        "servermain.DEVICE_SCAN_MODE": 0,
+        "servermain.DEVICE_SCAN_MODE_RATE_MS": 1000,
+        "servermain.DEVICE_SCAN_MODE_PROVIDE_INITIAL_UPDATES_FROM_CACHE": false,
+        "tags": [
+          {
+            "common.ALLTYPES_NAME": "Ramp1",
+            "common.ALLTYPES_DESCRIPTION": "Value increments by 4 from 35 to 100 every 120  ms",
+            "servermain.TAG_ADDRESS": "RAMP (120, 35, 100, 4)",
+            "servermain.TAG_DATA_TYPE": 6,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Ramp2",
+            "common.ALLTYPES_DESCRIPTION": "Value decrements by 0.25 from 200.50 to 150.75 every 300 ms",
+            "servermain.TAG_ADDRESS": "RAMP (300, 150.750000, 200.500000, -0.250000)",
+            "servermain.TAG_DATA_TYPE": 8,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Ramp3",
+            "common.ALLTYPES_DESCRIPTION": "Value increments by 1 from 0 to 1000 every 250  ms",
+            "servermain.TAG_ADDRESS": "RAMP (250, 0, 1000, 1)",
+            "servermain.TAG_DATA_TYPE": 5,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Ramp4",
+            "common.ALLTYPES_DESCRIPTION": "Value decrements by 5 from 1000 to -1000 every 2000  ms",
+            "servermain.TAG_ADDRESS": "RAMP (2000, -1000, 1000, -5)",
+            "servermain.TAG_DATA_TYPE": 6,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Ramp5",
+            "common.ALLTYPES_DESCRIPTION": "Value decrements by 500 from 1000000 to -1000000 every 250  ms",
+            "servermain.TAG_ADDRESS": "RAMP (250, -1000000, 1000000, -500)",
+            "servermain.TAG_DATA_TYPE": 13,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Ramp6",
+            "common.ALLTYPES_DESCRIPTION": "Value increments by 1250 from 0 to 1 billion every 1000  ms",
+            "servermain.TAG_ADDRESS": "RAMP (1000, 0, 1000000000, 1250)",
+            "servermain.TAG_DATA_TYPE": 14,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Ramp7",
+            "common.ALLTYPES_DESCRIPTION": "Value decrements by 1 billion to -1 billion every 1000  ms",
+            "servermain.TAG_ADDRESS": "RAMP (1000, -1000000000, 1000000000, -5555)",
+            "servermain.TAG_DATA_TYPE": 13,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Ramp8",
+            "common.ALLTYPES_DESCRIPTION": "Value decrements by 0.25 from 200.50 to 150.75 every 300 ms",
+            "servermain.TAG_ADDRESS": "RAMP (1000, 150.750000, 200.500000, -0.250000)",
+            "servermain.TAG_DATA_TYPE": 9,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Random1",
+            "common.ALLTYPES_DESCRIPTION": "Random values from -20 to 75 that change every 30 ms",
+            "servermain.TAG_ADDRESS": "RANDOM (30, -20, 75)",
+            "servermain.TAG_DATA_TYPE": 4,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Random2",
+            "common.ALLTYPES_DESCRIPTION": "Random values from 0 to 1000 that change every 100 ms",
+            "servermain.TAG_ADDRESS": "RANDOM (100, 0, 1000)",
+            "servermain.TAG_DATA_TYPE": 5,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Random3",
+            "common.ALLTYPES_DESCRIPTION": "Random values from -1000 to 0 that change every 100 ms",
+            "servermain.TAG_ADDRESS": "RANDOM (100, -1000, 0)",
+            "servermain.TAG_DATA_TYPE": 6,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Random4",
+            "common.ALLTYPES_DESCRIPTION": "Random values from -999 to 999 that change every 1000 ms",
+            "servermain.TAG_ADDRESS": "RANDOM (1000, -999, 999)",
+            "servermain.TAG_DATA_TYPE": 6,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Random5",
+            "common.ALLTYPES_DESCRIPTION": "Random values from -1000000000 to 1000000000 that change every 100 ms",
+            "servermain.TAG_ADDRESS": "RANDOM (100, -1000000000, 1000000000)",
+            "servermain.TAG_DATA_TYPE": 6,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Random6",
+            "common.ALLTYPES_DESCRIPTION": "Random values from -1000000 to 1000000 that change every 1000 ms",
+            "servermain.TAG_ADDRESS": "RANDOM (1000, -1000000, 1000000)",
+            "servermain.TAG_DATA_TYPE": 13,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Random7",
+            "common.ALLTYPES_DESCRIPTION": "Random values from 0 to 1000000000 that change every 1000 ms",
+            "servermain.TAG_ADDRESS": "RANDOM (1000, 0, 1000000000)",
+            "servermain.TAG_DATA_TYPE": 14,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Random8",
+            "common.ALLTYPES_DESCRIPTION": "Random values from 0 to 1000000 that change every 100 ms",
+            "servermain.TAG_ADDRESS": "RANDOM (100, 0, 1000000)",
+            "servermain.TAG_DATA_TYPE": 14,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Sine1",
+            "common.ALLTYPES_DESCRIPTION": "Sine values between -40 and 40 at 0.05 Hz with 0 phase shift",
+            "servermain.TAG_ADDRESS": "SINE (10, -40.000000, 40.000000, 0.050000, 0)",
+            "servermain.TAG_DATA_TYPE": 8,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Sine2",
+            "common.ALLTYPES_DESCRIPTION": "Sine values between -40 and 40 at 0.05 Hz with 180 phase shift",
+            "servermain.TAG_ADDRESS": "SINE (10, -40.000000, 40.000000, 0.050000, 180)",
+            "servermain.TAG_DATA_TYPE": 8,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Sine3",
+            "common.ALLTYPES_DESCRIPTION": "Sine values between -40 and 40 at 0.1 Hz with 0 phase shift",
+            "servermain.TAG_ADDRESS": "SINE (10, -40.000000, 40.000000, 0.100000, 0)",
+            "servermain.TAG_DATA_TYPE": 8,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "Sine4",
+            "common.ALLTYPES_DESCRIPTION": "Sine values between -40 and 40 at 0.1 Hz with 360 phase shift",
+            "servermain.TAG_ADDRESS": "SINE (10, -40.000000, 40.000000, 0.100000, 360)",
+            "servermain.TAG_DATA_TYPE": 8,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "User1",
+            "common.ALLTYPES_DESCRIPTION": "Sequential string values that change every 1000 ms",
+            "servermain.TAG_ADDRESS": "USER (1000,Hello,world!,This,is,a,test.)",
+            "servermain.TAG_DATA_TYPE": 0,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "User2",
+            "common.ALLTYPES_DESCRIPTION": "Sequential float values that change every 250 ms",
+            "servermain.TAG_ADDRESS": "USER (250,15.16,23.42,4.8)",
+            "servermain.TAG_DATA_TYPE": 8,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "User3",
+            "common.ALLTYPES_DESCRIPTION": "Sequential Boolean values that change every 200 ms",
+            "servermain.TAG_ADDRESS": "USER (200,1,0,0,1,0,0,1,0,0,0,1,0,1,0,1,0,0,0,1,0,1,0,1,0,0,0)",
+            "servermain.TAG_DATA_TYPE": 1,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          },
+          {
+            "common.ALLTYPES_NAME": "User4",
+            "common.ALLTYPES_DESCRIPTION": "A comma is a delimiter unless it is preceded with a backslash",
+            "servermain.TAG_ADDRESS": "USER (1500,To display a comma\\, place,a backslash in front of it.)",
+            "servermain.TAG_DATA_TYPE": 0,
+            "servermain.TAG_READ_WRITE_ACCESS": 0,
+            "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+            "servermain.TAG_SCALING_TYPE": 0
+          }
+        ]
+      }
+    ]
+  }
+}

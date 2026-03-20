@@ -61,7 +61,7 @@ namespace Kepware.Api.ClientHandler
         /// <returns>A task that represents the asynchronous operation. The task result contains a tuple with the counts of inserts, updates, and deletes.</returns>
         public async Task<(int inserts, int updates, int deletes)> CompareAndApply(Project sourceProject, CancellationToken cancellationToken = default)
         {
-            var projectFromApi = await LoadProject(blnLoadFullProject: true, cancellationToken: cancellationToken);
+            var projectFromApi = await LoadProjectAsync(blnLoadFullProject: true, cancellationToken: cancellationToken);
             await projectFromApi.Cleanup(m_kepwareApiClient, true, cancellationToken).ConfigureAwait(false);
             return await CompareAndApply(sourceProject, projectFromApi, cancellationToken).ConfigureAwait(false);
         }
@@ -217,16 +217,35 @@ namespace Kepware.Api.ClientHandler
         #endregion
 
         #region LoadProject
+
+        /// <summary>
+        /// Does the same as <see cref="LoadProjectAsync(bool, int, CancellationToken)"/> but is marked as obsolete.
+        /// </summary>
+        /// <param name="blnLoadFullProject">Indicates whether to load the full project.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the loaded <see cref="Project"/>.</returns>
+        /// <remarks>Deprecated in v1.1.0; will be removed in future release</remarks>
+        [Obsolete("Use LoadProjectAsync() instead. This will be removed in future release", false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public async Task<Project> LoadProject(bool blnLoadFullProject = false, CancellationToken cancellationToken = default)
+        {
+            return await LoadProjectAsync(blnLoadFullProject, m_kepwareApiClient.ClientOptions.ProjectLoadTagLimit ,cancellationToken).ConfigureAwait(false);
+        }
+
         /// <summary>
         /// Loads the project from the Kepware server. If <paramref name="blnLoadFullProject"/> is true, it loads the full project, otherwise only
         /// the project properties will be returned. 
         /// </summary>
         /// <param name="blnLoadFullProject">Indicates whether to load the full project.</param>
+        /// <param name="projectLoadTagLimit">The tag count threshold to determine whether to use optimized content=serialize 
+        /// loading or basic recursive loading when loading the full project. This is only applicable for projects loaded with 
+        /// the full project load option and when the JsonProjectLoad service is supported by the server.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the loaded <see cref="Project"/>.</returns>
-        /// <remarks>NOTE: When loading a full project, the project will be loaded via the JsonProjectLoad service if supported by the server. (Kepware Server 6.17+
-        /// and Thingworx Kepware Server 1.10+) Otherwise, the project will be loaded by recursively loading all objects in the project.</remarks>
-        public async Task<Project> LoadProject(bool blnLoadFullProject = false, CancellationToken cancellationToken = default)
+        /// <remarks>NOTE: When loading a full project, the project will be loaded either via the JsonProjectLoad service,  an "optimized"
+        /// recursion that uses the content=serialize query or a basic recurion through project tree. Putting a value for <paramref name="projectLoadTagLimit"/>
+        /// will override the value set in <see cref="KepwareApiClientOptions.ProjectLoadTagLimit"/> during initial client creation.</remarks>
+        public async Task<Project> LoadProjectAsync(bool blnLoadFullProject = false, int projectLoadTagLimit = 0,  CancellationToken cancellationToken = default)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -249,41 +268,63 @@ namespace Kepware.Api.ClientHandler
 
             var productInfo = await m_kepwareApiClient.GetProductInfoAsync(cancellationToken).ConfigureAwait(false);
 
-            if (blnLoadFullProject && productInfo?.SupportsJsonProjectLoadService == true)
+            if (productInfo?.SupportsJsonProjectLoadService == true)
             {
+                // Check to see if projectLoadTagLimit parameter is set on call. If not or an invalid value, use value ]
+                // set by <see cref="KepwareApiClientOptions.ProjectLoadTagLimit"/> as the threshold to use content=serialize
+                // based loading or full recursive loading.
+                if (projectLoadTagLimit <= 0)
+                    projectLoadTagLimit = m_kepwareApiClient.ClientOptions.ProjectLoadTagLimit;
+
                 try
                 {
-                    var response = await m_kepwareApiClient.HttpClient.GetAsync(ENDPONT_FULL_PROJECT, cancellationToken).ConfigureAwait(false);
-                    if (response.IsSuccessStatusCode)
+
+                    // Optimized recursive loading approach that uses the content=serialize query parameter.
+                    // This approach significantly reduces the number of API calls when loading projects with a large number of tags and prevents 
+                    // timeout errors with large projects.
+                    
+                    if (int.TryParse(project.GetDynamicProperty<string>(Properties.ProjectSettings.TagsDefined), out int count) && count > projectLoadTagLimit)
                     {
-                        var prjRoot = await JsonSerializer.DeserializeAsync(
-                            await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false),
-                            KepJsonContext.Default.JsonProjectRoot, cancellationToken).ConfigureAwait(false);
+                        m_logger.LogInformation("Project has greater than {TagLimit} tags defined. Loading project via optimized recursion...", projectLoadTagLimit);
+                        
+                        project = await LoadProjectOptimizedRecurisveAsync(project, projectLoadTagLimit, cancellationToken).ConfigureAwait(false);
 
-                        if (prjRoot?.Project != null)
+                        if (!project.IsEmpty)
                         {
-                            prjRoot.Project.IsLoadedByProjectLoadService = true;
-
-                            if (prjRoot.Project.Channels != null)
-                                foreach (var channel in prjRoot.Project.Channels)
-                                {
-                                    if (channel.Devices != null)
-                                        foreach (var device in channel.Devices)
-                                        {
-                                            device.Owner = channel;
-
-                                            if (device.Tags != null)
-                                                foreach (var tag in device.Tags)
-                                                    tag.Owner = device;
-
-                                            if (device.TagGroups != null)
-                                                SetOwnerRecursive(device.TagGroups, device);
-                                        }
-                                }
-
-                            m_logger.LogInformation("Loaded project via JsonProjectLoad Service in {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
-                            return prjRoot.Project;
+                            SetOwnersFullProject(project);
+                            m_logger.LogInformation("Loaded project via optimized recursion in {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
                         }
+                        return project;
+                    }
+
+                    // If project has less than tagLimit number of tags, load full project via JsonProjectLoad service.
+                    else
+                    {
+                        m_logger.LogInformation("Project has less than {TagLimit} tags defined. Loading project via JsonProjectLoad Service...", projectLoadTagLimit);
+                        var response = await m_kepwareApiClient.HttpClient.GetAsync(ENDPONT_FULL_PROJECT, cancellationToken).ConfigureAwait(false);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var prjRoot = await JsonSerializer.DeserializeAsync(
+                                await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false),
+                                KepJsonContext.Default.JsonProjectRoot, cancellationToken).ConfigureAwait(false);
+
+                            // Set the Owner property for all loaded entities.
+                            if (prjRoot?.Project != null)
+                            {
+                                prjRoot.Project.IsLoadedByProjectLoadService = true;
+
+                                SetOwnersFullProject(prjRoot.Project);
+
+                                m_logger.LogInformation("Loaded project via JsonProjectLoad Service in {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
+                                project = prjRoot.Project;
+                            }
+                            else
+                            {
+                                m_logger.LogWarning("Failed to deserialize project loaded via JsonProjectLoad Service");
+                                project = new Project();
+                            }
+                        }
+                        return project;
                     }
                 }
                 catch (HttpRequestException httpEx)
@@ -297,57 +338,187 @@ namespace Kepware.Api.ClientHandler
             }
             else
             {
-                project = await m_kepwareApiClient.GenericConfig.LoadEntityAsync<Project>(cancellationToken: cancellationToken).ConfigureAwait(false);
+                project = await LoadProjectRecursiveAsync(project, cancellationToken).ConfigureAwait(false);
 
-                if (project == null)
+                if (!project.IsEmpty)
                 {
-                    m_logger.LogWarning("Failed to load project");
-                    project = new Project();
-                }
-                else if (blnLoadFullProject)
-                {
-                    project.Channels = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<ChannelCollection, Channel>(cancellationToken: cancellationToken).ConfigureAwait(false);
-
-                    if (project.Channels != null)
-                    {
-                        int totalChannelCount = project.Channels.Count;
-                        int loadedChannelCount = 0;
-                        await Task.WhenAll(project.Channels.Select(async channel =>
-                        {
-                            channel.Devices = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceCollection, Device>(channel, cancellationToken).ConfigureAwait(false);
-
-                            if (channel.Devices != null)
-                            {
-                                await Task.WhenAll(channel.Devices.Select(async device =>
-                                {
-                                    device.Tags = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagCollection, Tag>(device, cancellationToken: cancellationToken).ConfigureAwait(false);
-                                    device.TagGroups = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagGroupCollection, DeviceTagGroup>(device, cancellationToken: cancellationToken).ConfigureAwait(false);
-
-                                    if (device.TagGroups != null)
-                                    {
-                                        await LoadTagGroupsRecursiveAsync(m_kepwareApiClient, device.TagGroups, cancellationToken: cancellationToken).ConfigureAwait(false);
-                                    }
-                                }));
-                            }
-                            // Log information, loaded channel <Name> x of y
-                            loadedChannelCount++;
-                            if (totalChannelCount == 1)
-                            {
-                                m_logger.LogInformation("Loaded channel {ChannelName}", channel.Name);
-                            }
-                            else
-                            {
-                                m_logger.LogInformation("Loaded channel {ChannelName} {LoadedChannelCount} of {TotalChannelCount}", channel.Name, loadedChannelCount, totalChannelCount);
-                            }
-
-                        }));
-                    }
-
-                    m_logger.LogInformation("Loaded project in {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
+                    m_logger.LogInformation("Loaded project in via non-optimized recursion {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
                 }
 
                 return project;
             }
+        }
+
+        private static void SetOwnersFullProject(Project project)
+        {
+            if (project.Channels != null)
+                foreach (var channel in project.Channels)
+                {
+                    if (channel.Devices != null)
+                        foreach (var device in channel.Devices)
+                        {
+                            device.Owner = channel;
+
+                            if (device.Tags != null)
+                                foreach (var tag in device.Tags)
+                                    tag.Owner = device;
+
+                            if (device.TagGroups != null)
+                                SetOwnerRecursive(device.TagGroups, device);
+                        }
+                }
+        }
+
+        private async Task<Project> LoadProjectOptimizedRecurisveAsync(Project project, int tagLimit, CancellationToken cancellationToken = default)
+        {
+            project.Channels = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<ChannelCollection, Channel>(cancellationToken: cancellationToken);
+            if (project.Channels != null)
+            {
+                var query = new[]
+                {
+                    new KeyValuePair<string, string?>("content", "serialize")
+                };
+                int totalChannelCount = project.Channels.Count;
+                int loadedChannelCount = 0;
+
+                // Create a list of tasks by iterating indices to avoid modifying the collection while it's being enumerated.
+                var channelTasks = new List<Task>();
+                for (int c_index = 0; c_index < project.Channels.Count; c_index++)
+                {
+                    int channelIndex = c_index;
+                    var channel = project.Channels[channelIndex];
+                    channelTasks.Add(Task.Run(async () =>
+                    {
+                        if (channel.GetDynamicProperty<int>(Properties.Channel.StaticTagCount) < tagLimit)
+                        {
+                            var loadedChannel = await m_kepwareApiClient.GenericConfig.LoadEntityAsync<Channel>(channel.Name, query, cancellationToken: cancellationToken).ConfigureAwait(false);
+                            if (loadedChannel != null)
+                            {
+                                project.Channels[channelIndex] = loadedChannel;
+                            }
+                            else
+                            {
+                                // Failed to load channel, log warning and end without incrementing completion.
+                                m_logger.LogWarning("Failed to load {ChannelName}", channel.Name);
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            channel.Devices = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceCollection, Device>(channel, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                                if (channel.Devices != null)
+                                {
+                                    var deviceTasks = new List<Task>();
+                                    for (int d_index = 0; d_index < channel.Devices.Count; d_index++)
+                                    {
+                                        int deviceIndex = d_index;
+                                        var device = channel.Devices[deviceIndex];
+                                        deviceTasks.Add(Task.Run(async () =>
+                                        {
+                                            if (device.GetDynamicProperty<int>(Properties.Device.StaticTagCount) < tagLimit)
+                                            {
+                                                var loadedDevice = await m_kepwareApiClient.GenericConfig.LoadEntityAsync<Device>(device.Name, channel, query, cancellationToken: cancellationToken).ConfigureAwait(false);
+                                                if (loadedDevice != null)
+                                                {
+                                                    project.Channels[channelIndex].Devices![deviceIndex] = loadedDevice;
+                                                }
+                                                else
+                                                {
+                                                    // Failed to load device, log warning and end without incrementing completion.
+                                                    m_logger.LogWarning("Failed to load {DeviceName} in channel {ChannelName}", device.Name, channel.Name);
+                                                    return;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                device.Tags = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagCollection, Tag>(device, cancellationToken: cancellationToken).ConfigureAwait(false);
+                                                device.TagGroups = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagGroupCollection, DeviceTagGroup>(device, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                                                if (device.TagGroups != null)
+                                                {
+                                                    await LoadTagGroupsRecursiveAsync(m_kepwareApiClient, device.TagGroups, optimizedRecursion: true, tagLimit: tagLimit, cancellationToken: cancellationToken).ConfigureAwait(false);
+                                                }
+                                            }
+                                        }));
+                                    }
+                                    await Task.WhenAll(deviceTasks).ConfigureAwait(false);
+                                }
+                        }
+
+                        // Log information, loaded channel <Name> x of y
+                        System.Threading.Interlocked.Increment(ref loadedChannelCount);
+                        if (totalChannelCount == 1)
+                        {
+                            m_logger.LogInformation("Loaded channel {ChannelName}", channel.Name);
+                        }
+                        else
+                        {
+                            m_logger.LogInformation("Loaded channel {ChannelName} {LoadedChannelCount} of {TotalChannelCount}", channel.Name, loadedChannelCount, totalChannelCount);
+                        }
+                    }));
+                }
+
+                await Task.WhenAll(channelTasks).ConfigureAwait(false);
+
+                // If loaded channel count doesn't match total channel count, log warning that some channels may have failed to load.
+                // Return empty project to avoid returning a partially loaded project which may cause issues for consumers of the API.
+                if (loadedChannelCount != totalChannelCount)
+                {
+                    m_logger.LogWarning("Only loaded {LoadedChannelCount} of {TotalChannelCount} channels. Some channels may have fail to load.", loadedChannelCount, totalChannelCount);
+                    project = new Project();
+                }
+            }
+
+            return project;
+        }
+
+        private async Task<Project> LoadProjectRecursiveAsync(Project project, CancellationToken cancellationToken = default)
+        {
+            project.Channels = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<ChannelCollection, Channel>(cancellationToken: cancellationToken).ConfigureAwait(false);
+
+            if (project.Channels != null)
+            {
+                int totalChannelCount = project.Channels.Count;
+                int loadedChannelCount = 0;
+                await Task.WhenAll(project.Channels.Select(async channel =>
+                {
+                    channel.Devices = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceCollection, Device>(channel, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                    if (channel.Devices != null)
+                    {
+                        await Task.WhenAll(channel.Devices.Select(async device =>
+                        {
+                            device.Tags = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagCollection, Tag>(device, cancellationToken: cancellationToken).ConfigureAwait(false);
+                            device.TagGroups = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<DeviceTagGroupCollection, DeviceTagGroup>(device, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                            if (device.TagGroups != null)
+                            {
+                                await LoadTagGroupsRecursiveAsync(m_kepwareApiClient, device.TagGroups, cancellationToken: cancellationToken).ConfigureAwait(false);
+                            }
+                        }));
+                    }
+                    // Log information, loaded channel <Name> x of y
+                    loadedChannelCount++;
+                    if (totalChannelCount == 1)
+                    {
+                        m_logger.LogInformation("Loaded channel {ChannelName}", channel.Name);
+                    }
+                    else
+                    {
+                        m_logger.LogInformation("Loaded channel {ChannelName} {LoadedChannelCount} of {TotalChannelCount}", channel.Name, loadedChannelCount, totalChannelCount);
+                    }
+
+                }));
+                // If loaded channel count doesn't match total channel count, log warning that some channels may have failed to load.
+                // Return empty project to avoid returning a partially loaded project which may cause issues for consumers of the API.
+                if (loadedChannelCount != totalChannelCount)
+                {
+                    m_logger.LogWarning("Only loaded {LoadedChannelCount} of {TotalChannelCount} channels. Some channels may have fail to load.", loadedChannelCount, totalChannelCount);
+                    project = new Project();
+                }
+            }
+            return project;
         }
         #endregion
 
@@ -422,20 +593,48 @@ namespace Kepware.Api.ClientHandler
         /// </summary>
         /// <param name="apiClient">The API client.</param>
         /// <param name="tagGroups">The tag groups to load.</param>
+        /// <param name="optimizedRecursion">A flag indicating whether to use optimized recursion with content=serialize or basic recursion. 
+        /// This is only applicable for projects loaded with the full project load option and when the JsonProjectLoad service is 
+        /// supported by the server.</param>
+        /// <param name="tagLimit">Tag Limit if overridden by method call.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        internal static async Task LoadTagGroupsRecursiveAsync(KepwareApiClient apiClient, IEnumerable<DeviceTagGroup> tagGroups, CancellationToken cancellationToken = default)
+        internal static async Task LoadTagGroupsRecursiveAsync(KepwareApiClient apiClient, IEnumerable<DeviceTagGroup> tagGroups, bool optimizedRecursion = false, int tagLimit = 0, CancellationToken cancellationToken = default)
         {
+            // Falls back to the value set by <see cref="KepwareApiClientOptions.ProjectLoadTagLimit"/> if tagLimit parameter is not set or an invalid value is provided.
+            if (tagLimit <= 0)
+                tagLimit = apiClient.ClientOptions.ProjectLoadTagLimit;
             foreach (var tagGroup in tagGroups)
             {
                 // Load the Tag Groups and Tags of the current Tag Group
-                tagGroup.TagGroups = await apiClient.GenericConfig.LoadCollectionAsync<DeviceTagGroupCollection, DeviceTagGroup>(tagGroup, cancellationToken).ConfigureAwait(false);
-                tagGroup.Tags = await apiClient.GenericConfig.LoadCollectionAsync<DeviceTagCollection, Tag>(tagGroup, cancellationToken).ConfigureAwait(false);
-
-                // Recursively load the Tag Groups and Tags of the child Tag Groups
-                if (tagGroup.TagGroups != null && tagGroup.TagGroups.Count > 0)
+                if (optimizedRecursion && tagGroup.TotalTagCount < tagLimit)
                 {
-                    await LoadTagGroupsRecursiveAsync(apiClient, tagGroup.TagGroups, cancellationToken).ConfigureAwait(false);
+                    var query = new[]
+                    {
+                        new KeyValuePair<string, string?>("content", "serialize")
+                    };
+                    var loadedTagGroup = await apiClient.GenericConfig.LoadEntityAsync<DeviceTagGroup>(tagGroup.Name, tagGroup.Owner!, query, cancellationToken: cancellationToken).ConfigureAwait(false);
+                    if (loadedTagGroup != null)
+                    {
+                        tagGroup.Tags = loadedTagGroup.Tags;
+                        tagGroup.TagGroups = loadedTagGroup.TagGroups;
+                    }
+                    else
+                    {
+                        // Failed to load tag group, log warning and end without loading child tag groups.
+                        apiClient.Logger.LogWarning("Failed to load {TagGroupName} in {OwnerName}", tagGroup.Name, tagGroup.Owner?.Name);
+                        continue;
+                    }
+                }
+                else
+                {
+                    tagGroup.TagGroups = await apiClient.GenericConfig.LoadCollectionAsync<DeviceTagGroupCollection, DeviceTagGroup>(tagGroup, cancellationToken: cancellationToken).ConfigureAwait(false);
+                    tagGroup.Tags = await apiClient.GenericConfig.LoadCollectionAsync<DeviceTagCollection, Tag>(tagGroup, cancellationToken: cancellationToken).ConfigureAwait(false);
+                    // Recursively load the Tag Groups and Tags of the child Tag Groups
+                    if (tagGroup.TagGroups != null && tagGroup.TagGroups.Count > 0)
+                    {
+                        await LoadTagGroupsRecursiveAsync(apiClient, tagGroup.TagGroups, optimizedRecursion, tagLimit, cancellationToken).ConfigureAwait(false);
+                    }
                 }
             }
         }

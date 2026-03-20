@@ -153,25 +153,25 @@ namespace Kepware.Api.TestIntg.ApiClient
 
         protected List<Tag> CreateSimulatorTestTags(string name = "Tag", string address = "K000", int count = 2)
         {
-            return Enumerable.Range(1, count)
+            return Enumerable.Range(0, count)
                 .Select(i => CreateTestTag(name: $"{name}{i}", address: $"{address}{i}"))
                 .ToList();
         }
 
         protected async Task<List<Tag>> AddSimulatorTestTags(Device owner, string name = "Tag", string address = "K000", int count = 2)
         {
-            var tagsList = CreateSimulatorTestTags(name, address);
+            var tagsList = CreateSimulatorTestTags(name, address, count);
             foreach (var tag in tagsList)
             {
                 tag.Owner = owner;
             }
-            await _kepwareApiClient.GenericConfig.InsertItemsAsync<DeviceTagCollection, Tag>(tagsList, owner: owner);
+            await _kepwareApiClient.GenericConfig.InsertItemsAsync<DeviceTagCollection, Tag>(tagsList, pageSize: count ,owner: owner);
             return tagsList;
         }
 
         protected async Task<List<Tag>> AddSimulatorTestTags(DeviceTagGroup owner, string name = "Tag1", string address = "K000", int count = 2)
         {
-            var tagsList = CreateSimulatorTestTags(name, address);
+            var tagsList = CreateSimulatorTestTags(name, address, count);
             foreach (var tag in tagsList)
             {
                 tag.Owner = owner;

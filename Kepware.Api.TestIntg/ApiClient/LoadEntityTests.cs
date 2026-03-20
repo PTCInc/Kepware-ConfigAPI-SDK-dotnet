@@ -276,7 +276,7 @@ namespace Kepware.Api.TestIntg.ApiClient
         [Fact]
         public async Task LoadEntityAsync_ShouldReturnTagGroupCollectionInTagGroup_WhenApiRespondsSuccessfully()
         {
-            // TODO: Currently this test fails due to issue in EndpointResolver.
+            // TODO: Clean up test. Fix was made and test is successful.
             // Arrange
             try
             {
@@ -330,6 +330,47 @@ namespace Kepware.Api.TestIntg.ApiClient
             {
                 Assert.Fail($"Currently this test fails due to issue in EndpointResolver. Test failed with exception: \n {ex}");
             }
+
+            // Cleanup
+            await DeleteAllChannelsAsync();
+        }
+        #endregion
+
+        #region LoadEntityAsync - Return Channel Collection with all children - Serialize query
+        [SkippableFact]
+        public async Task LoadEntityAsync_ShouldReturnChannelAndChildren_WhenApiRespondsSuccessfully()
+        {
+            // Skip the test if the serialize feature is not supported by server version.
+            Skip.If(!_productInfo.SupportsJsonProjectLoadService, "Test only applicable for versions that support JsonProjectLoad");
+
+            // Arrange
+            var channel = await AddTestChannel();
+            var device = await AddTestDevice(channel);
+            var tagGroup = await AddTestTagGroup(device);
+            var tagGroup2 = await AddTestTagGroup(tagGroup, "TagGroup2");
+
+            var query = new[]
+            {
+                new KeyValuePair<string, string?>("content", "serialize"),
+            };
+
+            // Act
+            var result = await _kepwareApiClient.GenericConfig.LoadEntityAsync<Channel>(channel.Name, query);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.NotNull(result.Devices);
+            Assert.Contains(result.Devices, g => g.Name == device.Name);
+                
+            var foundDevice = result.Devices.Find(d => d.Name == device.Name);
+            Assert.NotNull(foundDevice);
+            Assert.NotNull(foundDevice.TagGroups);
+            Assert.Contains(foundDevice.TagGroups, tg => tg.Name == tagGroup.Name);
+                
+            var foundTagGroup = foundDevice.TagGroups.Find(tg => tg.Name == tagGroup.Name);
+            Assert.NotNull(foundTagGroup);
+            Assert.NotNull(foundTagGroup.TagGroups);
+            Assert.Contains(foundTagGroup.TagGroups, tg => tg.Name == tagGroup2.Name);
 
             // Cleanup
             await DeleteAllChannelsAsync();
