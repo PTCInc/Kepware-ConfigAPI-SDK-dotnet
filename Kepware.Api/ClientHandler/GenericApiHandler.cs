@@ -50,11 +50,11 @@ namespace Kepware.Api.ClientHandler
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the comparison result as <see cref="EntityCompare.CollectionResultBucket{K}"/>.</returns>
 
-        public async Task<EntityCompare.CollectionResultBucket<K>> CompareAndApply<T, K>(T? sourceCollection, T? targetCollection, NamedEntity? owner = null, CancellationToken cancellationToken = default)
+        public async Task<EntityCompare.CollectionResultBucket<K>> CompareAndApplyAsync<T, K>(T? sourceCollection, T? targetCollection, NamedEntity? owner = null, CancellationToken cancellationToken = default)
           where T : EntityCollection<K>
           where K : NamedEntity, new()
         {
-            var result = await CompareAndApplyDetailed<T, K>(sourceCollection, targetCollection, owner, cancellationToken).ConfigureAwait(false);
+            var result = await CompareAndApplyDetailedAsync<T, K>(sourceCollection, targetCollection, owner, cancellationToken).ConfigureAwait(false);
             return result.CompareResult;
         }
 
@@ -69,7 +69,7 @@ namespace Kepware.Api.ClientHandler
         /// <param name="owner">The owner of the entities.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A detailed apply result including successful counts and failed item details.</returns>
-        public async Task<CollectionApplyResult<K>> CompareAndApplyDetailed<T, K>(T? sourceCollection, T? targetCollection, NamedEntity? owner = null, CancellationToken cancellationToken = default)
+        public async Task<CollectionApplyResult<K>> CompareAndApplyDetailedAsync<T, K>(T? sourceCollection, T? targetCollection, NamedEntity? owner = null, CancellationToken cancellationToken = default)
           where T : EntityCollection<K>
           where K : NamedEntity, new()
         {

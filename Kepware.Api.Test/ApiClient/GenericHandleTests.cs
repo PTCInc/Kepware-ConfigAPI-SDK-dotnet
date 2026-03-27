@@ -18,7 +18,7 @@ namespace Kepware.Api.Test.ApiClient
     public class GenericHandler : TestApiClientBase
     {
                 [Fact]
-                public async Task CompareAndApplyDetailed_ShouldCountUpdateAsFailed_When200ContainsNotApplied()
+                public async Task CompareAndApplyDetailedAsync_ShouldCountUpdateAsFailed_When200ContainsNotApplied()
                 {
                         // Arrange
                         var channel = new Channel { Name = "Channel1" };
@@ -48,7 +48,7 @@ namespace Kepware.Api.Test.ApiClient
                                         "application/json");
 
                         // Act
-                        var result = await _kepwareApiClient.GenericConfig.CompareAndApplyDetailed<DeviceCollection, Device>(sourceCollection, targetCollection, channel);
+                        var result = await _kepwareApiClient.GenericConfig.CompareAndApplyDetailedAsync<DeviceCollection, Device>(sourceCollection, targetCollection, channel);
 
                         // Assert
                         result.Updates.ShouldBe(0);
@@ -62,7 +62,7 @@ namespace Kepware.Api.Test.ApiClient
                 }
 
                 [Fact]
-                public async Task CompareAndApplyDetailed_ShouldMap207InsertFeedbackToItems()
+                public async Task CompareAndApplyDetailedAsync_ShouldMap207InsertFeedbackToItems()
                 {
                         // Arrange
                         var channel = new Channel { Name = "Channel1" };
@@ -94,7 +94,7 @@ namespace Kepware.Api.Test.ApiClient
                                         "application/json");
 
                         // Act
-                        var result = await _kepwareApiClient.GenericConfig.CompareAndApplyDetailed<DeviceTagCollection, Tag>(sourceTags, null, ownerDevice);
+                        var result = await _kepwareApiClient.GenericConfig.CompareAndApplyDetailedAsync<DeviceTagCollection, Tag>(sourceTags, null, ownerDevice);
 
                         // Assert
                         result.Inserts.ShouldBe(1);

@@ -285,7 +285,7 @@ namespace Kepware.SyncService
 
             if (await kepServerClient.TestConnectionAsync(cancellationToken).ConfigureAwait(false))
             {
-                var (inserts, updates, deletes) = await kepServerClient.Project.CompareAndApply(project, cancellationToken).ConfigureAwait(false);
+                var (inserts, updates, deletes) = await kepServerClient.Project.CompareAndApplyAsync(project, cancellationToken).ConfigureAwait(false);
 
                 if (updates > 0 || deletes > 0 || inserts > 0)
                 {
