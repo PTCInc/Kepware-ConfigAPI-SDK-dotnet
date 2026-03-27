@@ -285,12 +285,12 @@ namespace Kepware.SyncService
 
             if (await kepServerClient.TestConnectionAsync(cancellationToken).ConfigureAwait(false))
             {
-                var (inserts, updates, deletes) = await kepServerClient.Project.CompareAndApplyAsync(project, cancellationToken).ConfigureAwait(false);
+                var compareAndApplyResults = await kepServerClient.Project.CompareAndApplyDetailedAsync(project, cancellationToken).ConfigureAwait(false);
 
-                if (updates > 0 || deletes > 0 || inserts > 0)
+                if (compareAndApplyResults.Updates > 0 || compareAndApplyResults.Deletes > 0 || compareAndApplyResults.Inserts > 0 || compareAndApplyResults.Failures > 0)
                 {
-                    m_logger.LogInformation("Completed synchronisation from {ProjectSource} to {ClientName}-kepserver ({ClientHostName}): {NumUpdates} updates, {NumInserts} inserts, {NumDeletes} deletes",
-                     projectSource, clientName, kepServerClient.ClientHostName, updates, inserts, deletes);
+                    m_logger.LogInformation("Completed synchronisation from {ProjectSource} to {ClientName}-kepserver ({ClientHostName}): {NumUpdates} updates, {NumInserts} inserts, {NumDeletes} deletes, {NumFailures} failures",
+                     projectSource, clientName, kepServerClient.ClientHostName, compareAndApplyResults.Updates, compareAndApplyResults.Inserts, compareAndApplyResults.Deletes, compareAndApplyResults.Failures);
                     onSyncedWithChanges?.Invoke();
                 }
                 else
