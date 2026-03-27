@@ -113,12 +113,12 @@ namespace Kepware.Api.Model
         /// <summary>
         /// Gets the number of failed operations.
         /// </summary>
-        public int Failed => m_failures.Count;
+        public int Failures => m_failures.Count;
 
         /// <summary>
         /// Gets the failed operation details.
         /// </summary>
-        public ReadOnlyCollection<ApplyFailure> Failures => m_failures.AsReadOnly();
+        public ReadOnlyCollection<ApplyFailure> FailureList => m_failures.AsReadOnly();
 
         internal void AddInsertSuccess() => Inserts += 1;
 
@@ -154,27 +154,27 @@ namespace Kepware.Api.Model
         /// <summary>
         /// Gets the number of failed operations.
         /// </summary>
-        public int Failed => m_failures.Count;
+        public int Failures => m_failures.Count;
 
         /// <summary>
         /// Gets the failed operation details.
         /// </summary>
-        public ReadOnlyCollection<ApplyFailure> Failures => m_failures.AsReadOnly();
+        public ReadOnlyCollection<ApplyFailure> FailureList => m_failures.AsReadOnly();
 
         internal void Add(CollectionApplyResult<Channel> result)
-            => Add(result.Inserts, result.Updates, result.Deletes, result.Failures);
+            => Add(result.Inserts, result.Updates, result.Deletes, result.FailureList);
 
         internal void Add(CollectionApplyResult<Device> result)
-            => Add(result.Inserts, result.Updates, result.Deletes, result.Failures);
+            => Add(result.Inserts, result.Updates, result.Deletes, result.FailureList);
 
         internal void Add(CollectionApplyResult<Tag> result)
-            => Add(result.Inserts, result.Updates, result.Deletes, result.Failures);
+            => Add(result.Inserts, result.Updates, result.Deletes, result.FailureList);
 
         internal void Add(CollectionApplyResult<DeviceTagGroup> result)
-            => Add(result.Inserts, result.Updates, result.Deletes, result.Failures);
+            => Add(result.Inserts, result.Updates, result.Deletes, result.FailureList);
 
         internal void Add(ProjectCompareAndApplyResult result)
-            => Add(result.Inserts, result.Updates, result.Deletes, result.Failures);
+            => Add(result.Inserts, result.Updates, result.Deletes, result.FailureList);
 
         internal void AddInsertSuccess() => Inserts += 1;
 

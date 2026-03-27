@@ -52,13 +52,13 @@ namespace Kepware.Api.Test.ApiClient
 
                         // Assert
                         result.Updates.ShouldBe(0);
-                        result.Failed.ShouldBe(1);
-                        result.Failures.Count.ShouldBe(1);
-                        result.Failures[0].Operation.ShouldBe(ApplyOperation.Update);
-                        (result.Failures[0].AttemptedItem as Device)?.Name.ShouldBe("Device1");
-                        result.Failures[0].NotAppliedProperties.ShouldNotBeNull();
-                        result.Failures[0].NotAppliedProperties!.ShouldContain("servermain.DEVICE_ID_OCTAL");
-                        result.Failures[0].NotAppliedProperties!.ShouldContain("servermain.DEVICE_MODEL");
+                        result.Failures.ShouldBe(1);
+                        result.FailureList.Count.ShouldBe(1);
+                        result.FailureList[0].Operation.ShouldBe(ApplyOperation.Update);
+                        (result.FailureList[0].AttemptedItem as Device)?.Name.ShouldBe("Device1");
+                        result.FailureList[0].NotAppliedProperties.ShouldNotBeNull();
+                        result.FailureList[0].NotAppliedProperties!.ShouldContain("servermain.DEVICE_ID_OCTAL");
+                        result.FailureList[0].NotAppliedProperties!.ShouldContain("servermain.DEVICE_MODEL");
                 }
 
                 [Fact]
@@ -98,14 +98,14 @@ namespace Kepware.Api.Test.ApiClient
 
                         // Assert
                         result.Inserts.ShouldBe(1);
-                        result.Failed.ShouldBe(1);
-                        result.Failures.Count.ShouldBe(1);
-                        result.Failures[0].Operation.ShouldBe(ApplyOperation.Insert);
-                        (result.Failures[0].AttemptedItem as Tag)?.Name.ShouldBe("Tag1");
-                        result.Failures[0].ResponseCode.ShouldBe(400);
-                        result.Failures[0].Property.ShouldBe("common.ALLTYPES_NAME");
-                        result.Failures[0].Description.ShouldBe("The name 'Tag1' is already used.");
-                        result.Failures[0].ErrorLine.ShouldBe(3);
+                        result.Failures.ShouldBe(1);
+                        result.FailureList.Count.ShouldBe(1);
+                        result.FailureList[0].Operation.ShouldBe(ApplyOperation.Insert);
+                        (result.FailureList[0].AttemptedItem as Tag)?.Name.ShouldBe("Tag1");
+                        result.FailureList[0].ResponseCode.ShouldBe(400);
+                        result.FailureList[0].Property.ShouldBe("common.ALLTYPES_NAME");
+                        result.FailureList[0].Description.ShouldBe("The name 'Tag1' is already used.");
+                        result.FailureList[0].ErrorLine.ShouldBe(3);
                 }
 
         [Fact]
