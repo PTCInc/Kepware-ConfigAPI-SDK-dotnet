@@ -420,11 +420,11 @@ namespace Kepware.Api.ClientHandler
         /// <param name="item"></param>
         /// <param name="owner"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public Task<bool> DeleteItemAsync<T, K>(K item, NamedEntity? owner = null, CancellationToken cancellationToken = default)
+        /// <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating whether the delete was successful.</returns>
+        public async Task<bool> DeleteItemAsync<T, K>(K item, NamedEntity? owner = null, CancellationToken cancellationToken = default)
             where T : EntityCollection<K>
             where K : NamedEntity, new()
-            => DeleteItemsAsync<T, K>([item], owner, cancellationToken);
+            => (await DeleteItemsAsync<T, K>([item], owner, cancellationToken).ConfigureAwait(false)).FirstOrDefault();
 
         /// <summary>
         /// Deletes a list of items from the Kepware server.
@@ -434,14 +434,16 @@ namespace Kepware.Api.ClientHandler
         /// <param name="items"></param>
         /// <param name="owner"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        // TODO: determine return options for mixed results (e.g. some deletes succeed and some fail) - currently returns false if any delete fails, but could also return a list of results for each item
-        public async Task<bool> DeleteItemsAsync<T, K>(List<K> items, NamedEntity? owner = null, CancellationToken cancellationToken = default)
+        /// <returns>A task that represents the asynchronous operation. The task result contains an array of booleans indicating whether each delete was successful.</returns>
+        public async Task<bool[]> DeleteItemsAsync<T, K>(List<K> items, NamedEntity? owner = null, CancellationToken cancellationToken = default)
             where T : EntityCollection<K>
             where K : NamedEntity, new()
         {
             if (items.Count == 0)
-                return true;
+                return [];
+
+            List<bool> result = [];
+
             try
             {
                 var collectionEndpoint = EndpointResolver.ResolveEndpoint<T>(owner).TrimEnd('/');
@@ -456,17 +458,24 @@ namespace Kepware.Api.ClientHandler
                     {
                         var message = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                         m_logger.LogError("Failed to delete {TypeName} from {Endpoint}: {ReasonPhrase}\n{Message}", typeof(T).Name, endpoint, response.ReasonPhrase, message);
-                        return false;
+                        result.Add(false);
+                    }
+                    else
+                    {
+                        result.Add(true);
                     }
                 }
-                return true;
             }
             catch (HttpRequestException httpEx)
             {
                 m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_httpClient.BaseAddress);
                 m_kepwareApiClient.OnHttpRequestException(httpEx);
+
+                if (items.Count > result.Count)
+                    result.AddRange(Enumerable.Repeat(false, items.Count - result.Count));
             }
-            return false;
+
+            return [.. result];
         }
         #endregion
 
