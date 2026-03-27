@@ -7,6 +7,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
@@ -53,21 +54,93 @@ namespace Kepware.Api.ClientHandler
           where T : EntityCollection<K>
           where K : NamedEntity, new()
         {
+            var result = await CompareAndApplyDetailed<T, K>(sourceCollection, targetCollection, owner, cancellationToken).ConfigureAwait(false);
+            return result.CompareResult;
+        }
+
+        /// <summary>
+        /// Compares two collections and applies changes while returning detailed success and failure information.
+        /// Left should represent the source collection and Right should represent the target collection in the Kepware server.
+        /// </summary>
+        /// <typeparam name="T">The type of the entity collection.</typeparam>
+        /// <typeparam name="K">The type of the entity.</typeparam>
+        /// <param name="sourceCollection">The source collection.</param>
+        /// <param name="targetCollection">The collection representing the current state of the API.</param>
+        /// <param name="owner">The owner of the entities.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A detailed apply result including successful counts and failed item details.</returns>
+        public async Task<CollectionApplyResult<K>> CompareAndApplyDetailed<T, K>(T? sourceCollection, T? targetCollection, NamedEntity? owner = null, CancellationToken cancellationToken = default)
+          where T : EntityCollection<K>
+          where K : NamedEntity, new()
+        {
             var compareResult = EntityCompare.Compare<T, K>(sourceCollection, targetCollection);
+            var result = new CollectionApplyResult<K>(compareResult);
 
-            // This are the items that are in the API but not in the source
-            // --> we need to delete them
-            await DeleteItemsAsync<T, K>(compareResult.ItemsOnlyInRight.Select(i => i.Right!).ToList(), owner, cancellationToken: cancellationToken).ConfigureAwait(false);
+            var deleteItems = compareResult.ItemsOnlyInRight.Select(i => i.Right!).ToList();
+            var deleteResult = await DeleteItemsAsync<T, K>(deleteItems, owner, cancellationToken: cancellationToken).ConfigureAwait(false);
+            for (int i = 0; i < deleteItems.Count; i++)
+            {
+                if (i < deleteResult.Length && deleteResult[i])
+                {
+                    result.AddDeleteSuccess();
+                }
+                else
+                {
+                    result.AddFailure(new ApplyFailure
+                    {
+                        Operation = ApplyOperation.Delete,
+                        AttemptedItem = deleteItems[i],
+                    });
+                }
+            }
 
-            // This are the items both in the API and the source
-            // --> we need to update them
-            await UpdateItemsAsync<T, K>(compareResult.ChangedItems.Select(i => (i.Left!, i.Right)).ToList(), owner, cancellationToken: cancellationToken).ConfigureAwait(false);
+            var updatePairs = compareResult.ChangedItems.Select(i => (i.Left!, i.Right)).ToList();
+            var updateResult = await UpdateItemsDetailedAsync<T, K>(updatePairs, owner, cancellationToken).ConfigureAwait(false);
+            for (int i = 0; i < updatePairs.Count; i++)
+            {
+                if (i < updateResult.Count && updateResult[i].IsSuccess)
+                {
+                    result.AddUpdateSuccess();
+                }
+                else
+                {
+                    var updateOutcome = i < updateResult.Count ? updateResult[i] : new UpdateItemOutcome(false);
+                    result.AddFailure(new ApplyFailure
+                    {
+                        Operation = ApplyOperation.Update,
+                        AttemptedItem = updatePairs[i].Item1,
+                        ResponseCode = updateOutcome.ResponseCode,
+                        ResponseMessage = updateOutcome.ResponseMessage,
+                        NotAppliedProperties = updateOutcome.NotAppliedProperties,
+                    });
+                }
+            }
 
-            // This are the items that are in the source but not in the API
-            // --> we need to insert them
-            await InsertItemsAsync<T, K>(compareResult.ItemsOnlyInLeft.Select(i => i.Left!).ToList(), owner: owner, cancellationToken: cancellationToken).ConfigureAwait(false);
+            var insertItems = compareResult.ItemsOnlyInLeft.Select(i => i.Left!).ToList();
+            var insertResult = await InsertItemsDetailedAsync<T, K>(insertItems, owner: owner, cancellationToken: cancellationToken).ConfigureAwait(false);
+            for (int i = 0; i < insertItems.Count; i++)
+            {
+                if (i < insertResult.Count && insertResult[i].IsSuccess)
+                {
+                    result.AddInsertSuccess();
+                }
+                else
+                {
+                    var insertOutcome = i < insertResult.Count ? insertResult[i] : new InsertItemOutcome(false);
+                    result.AddFailure(new ApplyFailure
+                    {
+                        Operation = ApplyOperation.Insert,
+                        AttemptedItem = insertItems[i],
+                        ResponseCode = insertOutcome.ResponseCode,
+                        ResponseMessage = insertOutcome.ResponseMessage,
+                        Property = insertOutcome.Property,
+                        Description = insertOutcome.Description,
+                        ErrorLine = insertOutcome.ErrorLine,
+                    });
+                }
+            }
 
-            return compareResult;
+            return result;
         }
         #endregion
 
@@ -110,6 +183,14 @@ namespace Kepware.Api.ClientHandler
                 }
                 else
                 {
+                    var updateMessage = await TryDeserializeUpdateMessageAsync(response, cancellationToken).ConfigureAwait(false);
+                    if (updateMessage?.NotApplied != null && updateMessage.NotApplied.Count > 0)
+                    {
+                        m_logger.LogError("Partial update detected for {TypeName} on {Endpoint}. Not applied properties: {NotApplied}",
+                            typeof(T).Name, endpoint, updateMessage.NotApplied.Keys);
+                        return false;
+                    }
+
                     return true;
                 }
             }
@@ -148,11 +229,16 @@ namespace Kepware.Api.ClientHandler
         public async Task<bool[]> UpdateItemsAsync<T, K>(List<(K item, K? oldItem)> items, NamedEntity? owner = null, CancellationToken cancellationToken = default)
           where T : EntityCollection<K>
           where K : NamedEntity, new()
+            => (await UpdateItemsDetailedAsync<T, K>(items, owner, cancellationToken).ConfigureAwait(false)).Select(i => i.IsSuccess).ToArray();
+
+        private async Task<List<UpdateItemOutcome>> UpdateItemsDetailedAsync<T, K>(List<(K item, K? oldItem)> items, NamedEntity? owner = null, CancellationToken cancellationToken = default)
+          where T : EntityCollection<K>
+          where K : NamedEntity, new()
         {
             if (items.Count == 0)
                 return [];
 
-            List<bool> result = new List<bool>();
+            List<UpdateItemOutcome> result = [];
             try
             {
                 var collectionEndpoint = EndpointResolver.ResolveEndpoint<T>(owner).TrimEnd('/');
@@ -163,7 +249,7 @@ namespace Kepware.Api.ClientHandler
                     if (currentEntity == null)
                     {
                         m_logger.LogError("Failed to load {TypeName} from {Endpoint}", typeof(K).Name, endpoint);
-                        result.Add(false);
+                        result.Add(new UpdateItemOutcome(false));
                     }
                     else
                     {
@@ -179,11 +265,21 @@ namespace Kepware.Api.ClientHandler
                         {
                             var message = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                             m_logger.LogError("Failed to update {TypeName} from {Endpoint}: {ReasonPhrase}\n{Message}", typeof(T).Name, endpoint, response.ReasonPhrase, message);
-                            result.Add(false);
+                            result.Add(new UpdateItemOutcome(false, (int)response.StatusCode, message));
                         }
                         else
                         {
-                            result.Add(true);
+                            var updateMessage = await TryDeserializeUpdateMessageAsync(response, cancellationToken).ConfigureAwait(false);
+                            if (updateMessage?.NotApplied != null && updateMessage.NotApplied.Count > 0)
+                            {
+                                var notApplied = updateMessage.NotApplied.Keys.ToList();
+                                m_logger.LogError("Partial update detected for {TypeName} on {Endpoint}. Not applied properties: {NotApplied}", typeof(T).Name, endpoint, notApplied);
+                                result.Add(new UpdateItemOutcome(false, updateMessage.ResponseStatusCode, updateMessage.Message, notApplied));
+                            }
+                            else
+                            {
+                                result.Add(new UpdateItemOutcome(true, (int)response.StatusCode, updateMessage?.Message));
+                            }
                         }
                     }
                 }
@@ -195,9 +291,9 @@ namespace Kepware.Api.ClientHandler
             }
 
             if (result.Count < items.Count)
-                result.AddRange(Enumerable.Repeat(false, items.Count - result.Count));
+                result.AddRange(Enumerable.Repeat(new UpdateItemOutcome(false), items.Count - result.Count));
 
-            return [..result];
+            return result;
         }
         #endregion
 
@@ -269,15 +365,24 @@ namespace Kepware.Api.ClientHandler
         public async Task<bool[]> InsertItemsAsync<T, K>(List<K> items, int pageSize = 10, NamedEntity? owner = null, CancellationToken cancellationToken = default)
          where T : EntityCollection<K>
          where K : NamedEntity, new()
+            => (await InsertItemsDetailedAsync<T, K>(items, pageSize, owner, cancellationToken).ConfigureAwait(false)).Select(i => i.IsSuccess).ToArray();
+
+        private async Task<List<InsertItemOutcome>> InsertItemsDetailedAsync<T, K>(List<K> items, int pageSize = 10, NamedEntity? owner = null, CancellationToken cancellationToken = default)
+         where T : EntityCollection<K>
+         where K : NamedEntity, new()
         {
             if (items.Count == 0)
                 return [];
 
-            List<bool> result = new List<bool>();
+            var result = new InsertItemOutcome?[items.Count];
 
             try
             {
                 var endpoint = EndpointResolver.ResolveEndpoint<T>(owner);
+
+                var supportedItems = new List<(int index, K item)>();
+                var unsupportedItems = new List<K>();
+                var unsupportedMessage = "Unsupported driver detected for insert.";
 
 
                 if (typeof(K) == typeof(Channel) || typeof(K) == typeof(Device))
@@ -290,26 +395,41 @@ namespace Kepware.Api.ClientHandler
                         m_cachedSupportedDrivers = await GetSupportedDriversAsync(cancellationToken).ConfigureAwait(false);
                     }
 
-                    var groupedItems = items
-                      .GroupBy(i =>
-                      {
-                          var driver = i.GetDynamicProperty<string>(Properties.Channel.DeviceDriver);
-                          return !string.IsNullOrEmpty(driver) && m_cachedSupportedDrivers.ContainsKey(driver);
-                      });
+                    for (int i = 0; i < items.Count; i++)
+                    {
+                        var item = items[i];
+                        var driver = item.GetDynamicProperty<string>(Properties.Channel.DeviceDriver);
+                        var isSupported = !string.IsNullOrEmpty(driver) && m_cachedSupportedDrivers.ContainsKey(driver);
+                        if (isSupported)
+                        {
+                            supportedItems.Add((i, item));
+                        }
+                        else
+                        {
+                            unsupportedItems.Add(item);
+                            result[i] = new InsertItemOutcome(false, (int)HttpStatusCode.BadRequest, unsupportedMessage);
+                        }
+                    }
 
-                    var unsupportedItems = groupedItems.FirstOrDefault(g => !g.Key)?.ToList() ?? [];
                     if (unsupportedItems.Count > 0)
                     {
-                        items = groupedItems.FirstOrDefault(g => g.Key)?.ToList() ?? [];
                         m_logger.LogWarning("The following {NumItems} {TypeName} have unsupported drivers ({ListOfUsedUnsupportedDrivers}) and will not be inserted: {ItemsNames}",
                             unsupportedItems.Count, typeof(K).Name, unsupportedItems.Select(i => i.GetDynamicProperty<string>(Properties.Channel.DeviceDriver)).Distinct(), unsupportedItems.Select(i => i.Name));
                     }
                 }
+                else
+                {
+                    for (int i = 0; i < items.Count; i++)
+                    {
+                        supportedItems.Add((i, items[i]));
+                    }
+                }
 
-                var totalPageCount = (int)Math.Ceiling((double)items.Count / pageSize);
+                var totalPageCount = (int)Math.Ceiling((double)supportedItems.Count / pageSize);
                 for (int i = 0; i < totalPageCount; i++)
                 {
-                    var pageItems = items.Skip(i * pageSize).Take(pageSize).ToList();
+                    var pageItemMapping = supportedItems.Skip(i * pageSize).Take(pageSize).ToList();
+                    var pageItems = pageItemMapping.Select(p => p.item).ToList();
                     m_logger.LogInformation("Inserting {NumItems} {TypeName}(s) on {Endpoint} in batch {BatchNr} of {TotalBatches} ...", pageItems.Count, typeof(K).Name, endpoint, i + 1, totalPageCount);
 
                     var jsonContent = JsonSerializer.Serialize(pageItems, KepJsonContext.GetJsonListTypeInfo<K>());
@@ -319,7 +439,10 @@ namespace Kepware.Api.ClientHandler
                     {
                         var message = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                         m_logger.LogError("Failed to insert {TypeName} from {Endpoint}: {ReasonPhrase}\n{Message}", typeof(T).Name, endpoint, response.ReasonPhrase, message);
-                        result.AddRange(Enumerable.Repeat(false, pageItems.Count));
+                        foreach (var pageItem in pageItemMapping)
+                        {
+                            result[pageItem.index] = new InsertItemOutcome(false, (int)response.StatusCode, message);
+                        }
                     }
                     else if (response.StatusCode == System.Net.HttpStatusCode.MultiStatus)
                     {
@@ -330,7 +453,26 @@ namespace Kepware.Api.ClientHandler
                             await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false),
                             KepJsonContext.Default.ListApiResult, cancellationToken).ConfigureAwait(false) ?? [];
 
-                        result.AddRange(results.Select(r => r.IsSuccessStatusCode));
+                        for (int entryIndex = 0; entryIndex < pageItemMapping.Count; entryIndex++)
+                        {
+                            var mappedItem = pageItemMapping[entryIndex];
+                            if (entryIndex < results.Count)
+                            {
+                                var itemResult = results[entryIndex];
+                                result[mappedItem.index] = new InsertItemOutcome(
+                                    itemResult.IsSuccessStatusCode,
+                                    itemResult.Code,
+                                    itemResult.Message,
+                                    itemResult.Property,
+                                    itemResult.Description,
+                                    itemResult.ErrorLine);
+                            }
+                            else
+                            {
+                                result[mappedItem.index] = new InsertItemOutcome(false, (int)HttpStatusCode.InternalServerError,
+                                    "Multi-status response did not contain an entry for this item.");
+                            }
+                        }
 
                         var failedEntries = results?.Where(r => !r.IsSuccessStatusCode)?.ToList() ?? [];
                         m_logger.LogError("{NumSuccessFull} were successfull, failed to insert {NumFailed} {TypeName} from {Endpoint}: {ReasonPhrase}\nFailed:\n{Message}",
@@ -338,7 +480,10 @@ namespace Kepware.Api.ClientHandler
                     }
                     else
                     {
-                        result.AddRange(Enumerable.Repeat(true, pageItems.Count));
+                        foreach (var pageItem in pageItemMapping)
+                        {
+                            result[pageItem.index] = new InsertItemOutcome(true, (int)response.StatusCode, response.ReasonPhrase);
+                        }
                     }
                 }
             }
@@ -346,14 +491,44 @@ namespace Kepware.Api.ClientHandler
             {
                 m_logger.LogWarning(httpEx, "Failed to connect to {BaseAddress}", m_httpClient.BaseAddress);
                 m_kepwareApiClient.OnHttpRequestException(httpEx);
-
-                if (items.Count > result.Count)
-                    result.AddRange(Enumerable.Repeat(false, items.Count - result.Count));
             }
 
-            return [.. result];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] ??= new InsertItemOutcome(false);
+            }
+
+            return result.Select(r => r!).ToList();
         }
         #endregion
+
+        private async Task<UpdateApiResponseMessage?> TryDeserializeUpdateMessageAsync(HttpResponseMessage response, CancellationToken cancellationToken)
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            if (string.IsNullOrWhiteSpace(body))
+            {
+                return null;
+            }
+
+            try
+            {
+                return JsonSerializer.Deserialize(body, KepJsonContext.Default.UpdateApiResponseMessage);
+            }
+            catch (JsonException)
+            {
+                return null;
+            }
+        }
+
+        private sealed record UpdateItemOutcome(bool IsSuccess, int? ResponseCode = null, string? ResponseMessage = null, IReadOnlyList<string>? NotAppliedProperties = null);
+
+        private sealed record InsertItemOutcome(
+            bool IsSuccess,
+            int? ResponseCode = null,
+            string? ResponseMessage = null,
+            string? Property = null,
+            string? Description = null,
+            int? ErrorLine = null);
 
         #region Delete
         /// <summary>

@@ -84,7 +84,7 @@ public class InsertTests : TestIntgApiClientBase
     }
 
     [Fact]
-    public async Task Insert_MultipleItems_WithUnsupportedDriver_ShouldSkipItems()
+    public async Task Insert_MultipleItems_WithUnsupportedDriver_ShouldItems()
     {
         // Arrange
         var channel1 = CreateTestChannel("Channel1", "UnsupportedDriver");
@@ -95,8 +95,9 @@ public class InsertTests : TestIntgApiClientBase
         var results = await _kepwareApiClient.GenericConfig.InsertItemsAsync<ChannelCollection, Channel>(channels);
 
         // Assert
-        results.Length.ShouldBe(1); // Only the Simulator channel should be inserted  
-        results[0].ShouldBeTrue();
+        results.Length.ShouldBe(2); // Both channels have results  
+        results[0].ShouldBeFalse(); // UnsupportedDriver should fail
+        results[1].ShouldBeTrue();  // Simulator should succeed
 
         // Clean up
         await DeleteAllChannelsAsync();

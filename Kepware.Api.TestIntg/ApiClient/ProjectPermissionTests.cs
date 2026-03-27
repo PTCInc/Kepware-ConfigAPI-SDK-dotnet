@@ -55,13 +55,12 @@ namespace Kepware.Api.TestIntg.ApiClient
 
             await _kepwareApiClient.Admin.CreateOrUpdateServerUserGroupAsync(serverUserGroup);
 
-            var projectPermission = new ProjectPermission
+            var projectPermission = await _kepwareApiClient.Admin.GetProjectPermissionAsync(serverUserGroup, ProjectPermissionName.ServermainAlias);
+            if (projectPermission == null)
             {
-                Name = ProjectPermissionName.ServermainAlias,
-                AddObject = true,
-                EditObject = true,
-                DeleteObject = false
-            };
+                Assert.Fail("Precondition failed: ProjectPermission should exist for the test user group.");
+            }
+            projectPermission.DeleteObject = false; // Change a property to trigger an update
 
             // Act
             var result = await _kepwareApiClient.Admin.UpdateProjectPermissionAsync(serverUserGroup, projectPermission);
@@ -97,9 +96,6 @@ namespace Kepware.Api.TestIntg.ApiClient
         [Fact]
         public async Task UpdateProjectPermissionAsync_ShouldReturnFalse_WhenUpdateFails()
         {
-            // TODO: Currently fails. Unsure of expected behavior from Kepware when an update fails. As of v6.18
-            // Kepware returns a 200 OK with content that indicates a "not applied" key in the payload ,
-            // which is not consistent with other endpoints.
             
             // Arrange
             var serverUserGroup = new ServerUserGroup { Name = "Administrators" };
@@ -115,7 +111,7 @@ namespace Kepware.Api.TestIntg.ApiClient
             var result = await _kepwareApiClient.Admin.UpdateProjectPermissionAsync(serverUserGroup, projectPermission);
 
             // Assert
-            result.ShouldBeFalse("Currently fails. Unsure of expected behavior from Kepware when an update fails. See comments in test.");
+            result.ShouldBeFalse();
         }
     }
 }
