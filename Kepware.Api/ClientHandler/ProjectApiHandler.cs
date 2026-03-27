@@ -316,9 +316,7 @@ namespace Kepware.Api.ClientHandler
             // If not loading full project, return with just project properties.
             if (!blnLoadFullProject)
             {
-                m_logger.LogInformation("Loaded project properties in {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
                 return project;
-
             }
 
 
