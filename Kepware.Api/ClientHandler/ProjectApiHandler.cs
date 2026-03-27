@@ -83,7 +83,7 @@ namespace Kepware.Api.ClientHandler
         /// </summary>
         /// <param name="sourceProject">The source project to compare.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A detailed project apply result including counts and failed items.</returns>
+        /// <returns>A <see cref="ProjectCompareAndApplyResult"/> including counts and failed items.</returns>
         public async Task<ProjectCompareAndApplyResult> CompareAndApplyDetailedAsync(Project sourceProject, CancellationToken cancellationToken = default)
         {
             var projectFromApi = await LoadProjectAsync(blnLoadFullProject: true, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -97,7 +97,7 @@ namespace Kepware.Api.ClientHandler
         /// <param name="sourceProject">The source project to compare.</param>
         /// <param name="projectFromApi">The project loaded from the API.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A detailed project apply result including counts and failed items.</returns>
+        /// <returns>A <see cref="ProjectCompareAndApplyResult"/> including counts and failed items.</returns>
         public async Task<ProjectCompareAndApplyResult> CompareAndApplyDetailedAsync(Project sourceProject, Project projectFromApi, CancellationToken cancellationToken = default)
         {
             var result = new ProjectCompareAndApplyResult();
