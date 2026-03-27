@@ -231,7 +231,7 @@ namespace Kepware.Api.ClientHandler
           where K : NamedEntity, new()
             => (await UpdateItemsDetailedAsync<T, K>(items, owner, cancellationToken).ConfigureAwait(false)).Select(i => i.IsSuccess).ToArray();
 
-        private async Task<List<UpdateItemOutcome>> UpdateItemsDetailedAsync<T, K>(List<(K item, K? oldItem)> items, NamedEntity? owner = null, CancellationToken cancellationToken = default)
+        protected internal async Task<List<UpdateItemOutcome>> UpdateItemsDetailedAsync<T, K>(List<(K item, K? oldItem)> items, NamedEntity? owner = null, CancellationToken cancellationToken = default)
           where T : EntityCollection<K>
           where K : NamedEntity, new()
         {
@@ -295,6 +295,10 @@ namespace Kepware.Api.ClientHandler
 
             return result;
         }
+
+
+        protected internal sealed record UpdateItemOutcome(bool IsSuccess, int? ResponseCode = null, string? ResponseMessage = null, IReadOnlyList<string>? NotAppliedProperties = null);
+
         #endregion
 
         #region Insert
@@ -367,7 +371,7 @@ namespace Kepware.Api.ClientHandler
          where K : NamedEntity, new()
             => (await InsertItemsDetailedAsync<T, K>(items, pageSize, owner, cancellationToken).ConfigureAwait(false)).Select(i => i.IsSuccess).ToArray();
 
-        private async Task<List<InsertItemOutcome>> InsertItemsDetailedAsync<T, K>(List<K> items, int pageSize = 10, NamedEntity? owner = null, CancellationToken cancellationToken = default)
+        protected internal async Task<List<InsertItemOutcome>> InsertItemsDetailedAsync<T, K>(List<K> items, int pageSize = 10, NamedEntity? owner = null, CancellationToken cancellationToken = default)
          where T : EntityCollection<K>
          where K : NamedEntity, new()
         {
@@ -520,9 +524,8 @@ namespace Kepware.Api.ClientHandler
             }
         }
 
-        private sealed record UpdateItemOutcome(bool IsSuccess, int? ResponseCode = null, string? ResponseMessage = null, IReadOnlyList<string>? NotAppliedProperties = null);
 
-        private sealed record InsertItemOutcome(
+        protected internal sealed record InsertItemOutcome(
             bool IsSuccess,
             int? ResponseCode = null,
             string? ResponseMessage = null,
