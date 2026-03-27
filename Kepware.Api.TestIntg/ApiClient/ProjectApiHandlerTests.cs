@@ -312,7 +312,7 @@ namespace Kepware.Api.TestIntg.ApiClient
             newProject.SetDynamicProperty("uaserverinterface.PROJECT_OPC_UA_ANONYMOUS_LOGIN", !existingProperties?.ProjectProperties.OpcUaAllowAnonymousLogin);
 
             // Act
-            var result = await _kepwareApiClient.Project.CompareAndApply(newProject);
+            var result = await _kepwareApiClient.Project.CompareAndApplyAsync(newProject);
 
             // Assert
             Assert.Equal(2, result.inserts);  // 2 new channels added

@@ -205,7 +205,7 @@ namespace Kepware.Api.ClientHandler
 
                 if (updateTagsAndTagGroups)
                 {
-                    await m_kepwareApiClient.GenericConfig.CompareAndApply<DeviceTagCollection, Tag>(device.Tags, currentDevice.Tags, device, cancellationToken: cancellationToken);
+                    await m_kepwareApiClient.GenericConfig.CompareAndApplyAsync<DeviceTagCollection, Tag>(device.Tags, currentDevice.Tags, device, cancellationToken: cancellationToken);
 
                     if (device.TagGroups != null)
                         await ProjectApiHandler.RecusivlyCompareTagGroup(m_kepwareApiClient, device.TagGroups, currentDevice.TagGroups, device, cancellationToken);

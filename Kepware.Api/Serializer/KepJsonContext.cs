@@ -23,6 +23,7 @@ namespace Kepware.Api.Serializer
     [JsonSerializable(typeof(ServerUser))]
     [JsonSerializable(typeof(ProjectPermission))]
     [JsonSerializable(typeof(ApiResponseMessage))]
+    [JsonSerializable(typeof(UpdateApiResponseMessage))]
     [JsonSerializable(typeof(JobResponseMessage))]
     [JsonSerializable(typeof(JobStatusMessage))]
     [JsonSerializable(typeof(ServiceInvocationRequest))]

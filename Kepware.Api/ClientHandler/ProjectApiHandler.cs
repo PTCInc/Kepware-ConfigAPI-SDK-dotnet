@@ -59,11 +59,10 @@ namespace Kepware.Api.ClientHandler
         /// <param name="sourceProject">The source project to compare.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains a tuple with the counts of inserts, updates, and deletes.</returns>
-        public async Task<(int inserts, int updates, int deletes)> CompareAndApply(Project sourceProject, CancellationToken cancellationToken = default)
+        public async Task<(int inserts, int updates, int deletes)> CompareAndApplyAsync(Project sourceProject, CancellationToken cancellationToken = default)
         {
-            var projectFromApi = await LoadProjectAsync(blnLoadFullProject: true, cancellationToken: cancellationToken);
-            await projectFromApi.Cleanup(m_kepwareApiClient, true, cancellationToken).ConfigureAwait(false);
-            return await CompareAndApply(sourceProject, projectFromApi, cancellationToken).ConfigureAwait(false);
+            var result = await CompareAndApplyDetailedAsync(sourceProject, cancellationToken).ConfigureAwait(false);
+            return (result.Inserts, result.Updates, result.Deletes);
         }
 
         /// <summary>
@@ -73,76 +72,84 @@ namespace Kepware.Api.ClientHandler
         /// <param name="projectFromApi">The project loaded from the API.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains a tuple with the counts of inserts, updates, and deletes.</returns>
-        public async Task<(int inserts, int updates, int deletes)> CompareAndApply(Project sourceProject, Project projectFromApi, CancellationToken cancellationToken = default)
+        public async Task<(int inserts, int updates, int deletes)> CompareAndApplyAsync(Project sourceProject, Project projectFromApi, CancellationToken cancellationToken = default)
         {
-            int inserts = 0, updates = 0, deletes = 0;
+            var result = await CompareAndApplyDetailedAsync(sourceProject, projectFromApi, cancellationToken).ConfigureAwait(false);
+            return (result.Inserts, result.Updates, result.Deletes);
+        }
+
+        /// <summary>
+        /// Compares the source project with the project from the API and applies changes while returning detailed success and failure information.
+        /// </summary>
+        /// <param name="sourceProject">The source project to compare.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A <see cref="ProjectCompareAndApplyResult"/> including counts and failed items.</returns>
+        public async Task<ProjectCompareAndApplyResult> CompareAndApplyDetailedAsync(Project sourceProject, CancellationToken cancellationToken = default)
+        {
+            var projectFromApi = await LoadProjectAsync(blnLoadFullProject: true, cancellationToken: cancellationToken).ConfigureAwait(false);
+            await projectFromApi.Cleanup(m_kepwareApiClient, true, cancellationToken).ConfigureAwait(false);
+            return await CompareAndApplyDetailedAsync(sourceProject, projectFromApi, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Compares the source project with the project from the API and applies changes while returning detailed success and failure information.
+        /// </summary>
+        /// <param name="sourceProject">The source project to compare.</param>
+        /// <param name="projectFromApi">The project loaded from the API.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A <see cref="ProjectCompareAndApplyResult"/> including counts and failed items.</returns>
+        public async Task<ProjectCompareAndApplyResult> CompareAndApplyDetailedAsync(Project sourceProject, Project projectFromApi, CancellationToken cancellationToken = default)
+        {
+            var result = new ProjectCompareAndApplyResult();
 
             if (sourceProject.Hash != projectFromApi.Hash)
             {
                 m_logger.LogInformation("Project properties has changed. Updating project properties...");
-                var result = await SetProjectPropertiesAsync(sourceProject, cancellationToken: cancellationToken).ConfigureAwait(false);
-                if (result)
+                var projectPropertyFailure = await SetProjectPropertiesDetailedAsync(sourceProject, cancellationToken: cancellationToken).ConfigureAwait(false);
+                if (projectPropertyFailure == null)
                 {
-                    updates += 1;
+                    result.AddUpdateSuccess();
                 }
                 else
                 {
                     m_logger.LogError("Failed to update project properties...");
+                    result.AddFailure(projectPropertyFailure);
                 }
             }
-            
 
-            var channelCompare = await m_kepwareApiClient.GenericConfig.CompareAndApply<ChannelCollection, Channel>(sourceProject.Channels, projectFromApi.Channels,
+            var channelCompare = await m_kepwareApiClient.GenericConfig.CompareAndApplyDetailedAsync<ChannelCollection, Channel>(sourceProject.Channels, projectFromApi.Channels,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
+            result.Add(channelCompare);
 
-            updates += channelCompare.ChangedItems.Count;
-            inserts += channelCompare.ItemsOnlyInLeft.Count;
-            deletes += channelCompare.ItemsOnlyInRight.Count;
-
-            foreach (var channel in channelCompare.UnchangedItems.Concat(channelCompare.ChangedItems))
+            foreach (var channel in channelCompare.CompareResult.UnchangedItems.Concat(channelCompare.CompareResult.ChangedItems))
             {
-                var deviceCompare = await m_kepwareApiClient.GenericConfig.CompareAndApply<DeviceCollection, Device>(channel.Left!.Devices, channel.Right!.Devices, channel.Right,
+                var deviceCompare = await m_kepwareApiClient.GenericConfig.CompareAndApplyDetailedAsync<DeviceCollection, Device>(channel.Left!.Devices, channel.Right!.Devices, channel.Right,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
+                result.Add(deviceCompare);
 
-                updates += deviceCompare.ChangedItems.Count;
-                inserts += deviceCompare.ItemsOnlyInLeft.Count;
-                deletes += deviceCompare.ItemsOnlyInRight.Count;
-
-                foreach (var device in deviceCompare.UnchangedItems.Concat(deviceCompare.ChangedItems))
+                foreach (var device in deviceCompare.CompareResult.UnchangedItems.Concat(deviceCompare.CompareResult.ChangedItems))
                 {
-                    var tagCompare = await m_kepwareApiClient.GenericConfig.CompareAndApply<DeviceTagCollection, Tag>(device.Left!.Tags, device.Right!.Tags, device.Right, cancellationToken).ConfigureAwait(false);
+                    var tagCompare = await m_kepwareApiClient.GenericConfig.CompareAndApplyDetailedAsync<DeviceTagCollection, Tag>(device.Left!.Tags, device.Right!.Tags, device.Right, cancellationToken).ConfigureAwait(false);
+                    result.Add(tagCompare);
 
-                    updates += tagCompare.ChangedItems.Count;
-                    inserts += tagCompare.ItemsOnlyInLeft.Count;
-                    deletes += tagCompare.ItemsOnlyInRight.Count;
+                    var tagGroupCompare = await m_kepwareApiClient.GenericConfig.CompareAndApplyDetailedAsync<DeviceTagGroupCollection, DeviceTagGroup>(device.Left!.TagGroups, device.Right!.TagGroups, device.Right, cancellationToken).ConfigureAwait(false);
+                    result.Add(tagGroupCompare);
 
-                    var tagGroupCompare = await m_kepwareApiClient.GenericConfig.CompareAndApply<DeviceTagGroupCollection, DeviceTagGroup>(device.Left!.TagGroups, device.Right!.TagGroups, device.Right, cancellationToken).ConfigureAwait(false);
-
-                    updates += tagGroupCompare.ChangedItems.Count;
-                    inserts += tagGroupCompare.ItemsOnlyInLeft.Count;
-                    deletes += tagGroupCompare.ItemsOnlyInRight.Count;
-
-
-                    foreach (var tagGroup in tagGroupCompare.UnchangedItems.Concat(tagGroupCompare.ChangedItems))
+                    foreach (var tagGroup in tagGroupCompare.CompareResult.UnchangedItems.Concat(tagGroupCompare.CompareResult.ChangedItems))
                     {
-                        var tagGroupTagCompare = await m_kepwareApiClient.GenericConfig.CompareAndApply<DeviceTagCollection, Tag>(tagGroup.Left!.Tags, tagGroup.Right!.Tags, tagGroup.Right, cancellationToken).ConfigureAwait(false);
-
-                        updates += tagGroupTagCompare.ChangedItems.Count;
-                        inserts += tagGroupTagCompare.ItemsOnlyInLeft.Count;
-                        deletes += tagGroupTagCompare.ItemsOnlyInRight.Count;
+                        var tagGroupTagCompare = await m_kepwareApiClient.GenericConfig.CompareAndApplyDetailedAsync<DeviceTagCollection, Tag>(tagGroup.Left!.Tags, tagGroup.Right!.Tags, tagGroup.Right, cancellationToken).ConfigureAwait(false);
+                        result.Add(tagGroupTagCompare);
 
                         if (tagGroup.Left?.TagGroups != null)
                         {
-                            var result = await RecusivlyCompareTagGroup(tagGroup.Left!.TagGroups, tagGroup.Right!.TagGroups, tagGroup.Right, cancellationToken).ConfigureAwait(false);
-                            updates += result.updates;
-                            inserts += result.inserts;
-                            deletes += result.deletes;
+                            var recursiveResult = await RecusivlyCompareTagGroupDetailed(tagGroup.Left!.TagGroups, tagGroup.Right!.TagGroups, tagGroup.Right, cancellationToken).ConfigureAwait(false);
+                            result.Add(recursiveResult);
                         }
                     }
                 }
             }
 
-            return (inserts, updates, deletes);
+            return result;
         }
         #endregion
 
@@ -169,6 +176,11 @@ namespace Kepware.Api.ClientHandler
         /// <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating whether the update was successful.</returns>
         /// <exception cref="InvalidOperationException"></exception>
         public async Task<bool> SetProjectPropertiesAsync(Project project, CancellationToken cancellationToken = default)
+        {
+            return await SetProjectPropertiesDetailedAsync(project, cancellationToken).ConfigureAwait(false) == null;
+        }
+
+        private async Task<ApplyFailure?> SetProjectPropertiesDetailedAsync(Project project, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -199,10 +211,32 @@ namespace Kepware.Api.ClientHandler
                 {
                     var message = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                     m_logger.LogError("Failed to update Project Property Settings from {Endpoint}: {ReasonPhrase}\n{Message}", endpoint, response.ReasonPhrase, message);
+                    return new ApplyFailure
+                    {
+                        Operation = ApplyOperation.Update,
+                        AttemptedItem = project,
+                        ResponseCode = (int)response.StatusCode,
+                        ResponseMessage = message,
+                    };
                 }
                 else
                 {
-                    return true;
+                    var updateMessage = await TryDeserializeUpdateMessageAsync(response, cancellationToken).ConfigureAwait(false);
+                    if (updateMessage?.NotApplied != null && updateMessage.NotApplied.Count > 0)
+                    {
+                        var notApplied = updateMessage.NotApplied.Keys.ToList();
+                        m_logger.LogError("Partial update detected for project properties on {Endpoint}. Not applied properties: {NotApplied}", endpoint, notApplied);
+                        return new ApplyFailure
+                        {
+                            Operation = ApplyOperation.Update,
+                            AttemptedItem = project,
+                            ResponseCode = updateMessage.ResponseStatusCode,
+                            ResponseMessage = updateMessage.Message,
+                            NotAppliedProperties = notApplied,
+                        };
+                    }
+
+                    return null;
                 }
             }
             catch (HttpRequestException httpEx)
@@ -211,7 +245,29 @@ namespace Kepware.Api.ClientHandler
                 m_kepwareApiClient.OnHttpRequestException(httpEx);
             }
 
-            return false;
+            return new ApplyFailure
+            {
+                Operation = ApplyOperation.Update,
+                AttemptedItem = project,
+            };
+        }
+
+        private static async Task<UpdateApiResponseMessage?> TryDeserializeUpdateMessageAsync(HttpResponseMessage response, CancellationToken cancellationToken)
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            if (string.IsNullOrWhiteSpace(body))
+            {
+                return null;
+            }
+
+            try
+            {
+                return JsonSerializer.Deserialize(body, KepJsonContext.Default.UpdateApiResponseMessage);
+            }
+            catch (JsonException)
+            {
+                return null;
+            }
         }
 
         #endregion
@@ -260,9 +316,7 @@ namespace Kepware.Api.ClientHandler
             // If not loading full project, return with just project properties.
             if (!blnLoadFullProject)
             {
-                m_logger.LogInformation("Loaded project properties in {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
                 return project;
-
             }
 
 
@@ -560,28 +614,29 @@ namespace Kepware.Api.ClientHandler
         /// <returns>A task that represents the asynchronous operation. The task result contains a tuple with the counts of inserts, updates, and deletes.</returns>
         internal static async Task<(int inserts, int updates, int deletes)> RecusivlyCompareTagGroup(KepwareApiClient apiClient, DeviceTagGroupCollection left, DeviceTagGroupCollection? right, NamedEntity owner, CancellationToken cancellationToken)
         {
-            (int inserts, int updates, int deletes) ret = (0, 0, 0);
+            var result = await RecusivlyCompareTagGroupDetailed(apiClient, left, right, owner, cancellationToken).ConfigureAwait(false);
+            return (result.Inserts, result.Updates, result.Deletes);
+        }
 
-            var tagGroupCompare = await apiClient.GenericConfig.CompareAndApply<DeviceTagGroupCollection, DeviceTagGroup>(left, right, owner, cancellationToken: cancellationToken).ConfigureAwait(false);
+        private Task<ProjectCompareAndApplyResult> RecusivlyCompareTagGroupDetailed(DeviceTagGroupCollection left, DeviceTagGroupCollection? right, NamedEntity owner, CancellationToken cancellationToken)
+         => RecusivlyCompareTagGroupDetailed(m_kepwareApiClient, left, right, owner, cancellationToken);
 
-            ret.inserts = tagGroupCompare.ItemsOnlyInLeft.Count;
-            ret.updates = tagGroupCompare.ChangedItems.Count;
-            ret.deletes = tagGroupCompare.ItemsOnlyInRight.Count;
+        internal static async Task<ProjectCompareAndApplyResult> RecusivlyCompareTagGroupDetailed(KepwareApiClient apiClient, DeviceTagGroupCollection left, DeviceTagGroupCollection? right, NamedEntity owner, CancellationToken cancellationToken)
+        {
+            var ret = new ProjectCompareAndApplyResult();
 
-            foreach (var tagGroup in tagGroupCompare.UnchangedItems.Concat(tagGroupCompare.ChangedItems))
+            var tagGroupCompare = await apiClient.GenericConfig.CompareAndApplyDetailedAsync<DeviceTagGroupCollection, DeviceTagGroup>(left, right, owner, cancellationToken: cancellationToken).ConfigureAwait(false);
+            ret.Add(tagGroupCompare);
+
+            foreach (var tagGroup in tagGroupCompare.CompareResult.UnchangedItems.Concat(tagGroupCompare.CompareResult.ChangedItems))
             {
-                var tagGroupTagCompare = await apiClient.GenericConfig.CompareAndApply<DeviceTagCollection, Tag>(tagGroup.Left!.Tags, tagGroup.Right!.Tags, tagGroup.Right, cancellationToken: cancellationToken).ConfigureAwait(false);
-
-                ret.inserts = tagGroupTagCompare.ItemsOnlyInLeft.Count;
-                ret.updates = tagGroupTagCompare.ChangedItems.Count;
-                ret.deletes = tagGroupTagCompare.ItemsOnlyInRight.Count;
+                var tagGroupTagCompare = await apiClient.GenericConfig.CompareAndApplyDetailedAsync<DeviceTagCollection, Tag>(tagGroup.Left!.Tags, tagGroup.Right!.Tags, tagGroup.Right, cancellationToken: cancellationToken).ConfigureAwait(false);
+                ret.Add(tagGroupTagCompare);
 
                 if (tagGroup.Left!.TagGroups != null)
                 {
-                    var result = await RecusivlyCompareTagGroup(apiClient, tagGroup.Left!.TagGroups, tagGroup.Right!.TagGroups, tagGroup.Right, cancellationToken: cancellationToken).ConfigureAwait(false);
-                    ret.updates += result.updates;
-                    ret.deletes += result.deletes;
-                    ret.inserts += result.inserts;
+                    var result = await RecusivlyCompareTagGroupDetailed(apiClient, tagGroup.Left!.TagGroups, tagGroup.Right!.TagGroups, tagGroup.Right, cancellationToken: cancellationToken).ConfigureAwait(false);
+                    ret.Add(result);
                 }
             }
 
