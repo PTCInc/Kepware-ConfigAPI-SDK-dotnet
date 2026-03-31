@@ -98,6 +98,12 @@ namespace Kepware.Api
         /// <remarks> See <see cref="Kepware.Api.ClientHandler.ServicesApiHandler"/> for method references.</remarks>
         public ServicesApiHandler ApiServices { get; init; }
 
+        /// <summary>
+        /// Gets the IoT Gateway handlers.
+        /// </summary>
+        /// <remarks> See <see cref="Kepware.Api.ClientHandler.IotGatewayApiHandler"/> for method references.</remarks>
+        public IotGatewayApiHandler IotGateway { get; init; }
+
         internal HttpClient HttpClient { get { return m_httpClient; } }
 
         #region Constructors
@@ -131,6 +137,7 @@ namespace Kepware.Api
             Project = new ProjectApiHandler(this, channelsApiHandler, devicesApiHandler, loggerFactory.CreateLogger<ProjectApiHandler>());
             Admin = new AdminApiHandler(this, loggerFactory.CreateLogger<AdminApiHandler>());
             ApiServices = new ServicesApiHandler(this, loggerFactory.CreateLogger<ServicesApiHandler>());
+            IotGateway = new IotGatewayApiHandler(this, loggerFactory.CreateLogger<IotGatewayApiHandler>());
         }
         #endregion
 
