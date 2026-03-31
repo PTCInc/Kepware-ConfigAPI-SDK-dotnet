@@ -27,7 +27,11 @@ namespace Kepware.Api.Serializer
     [JsonSerializable(typeof(JobResponseMessage))]
     [JsonSerializable(typeof(JobStatusMessage))]
     [JsonSerializable(typeof(ServiceInvocationRequest))]
-    
+    [JsonSerializable(typeof(MqttClientAgent))]
+    [JsonSerializable(typeof(RestClientAgent))]
+    [JsonSerializable(typeof(RestServerAgent))]
+    [JsonSerializable(typeof(IotItem))]
+
     [JsonSerializable(typeof(List<ApiStatus>))]
     [JsonSerializable(typeof(List<UaEndpoint>))]
     [JsonSerializable(typeof(List<ServerUserGroup>))]
@@ -37,6 +41,10 @@ namespace Kepware.Api.Serializer
     [JsonSerializable(typeof(List<Tag>))]
     [JsonSerializable(typeof(List<DeviceTagGroup>))]
     [JsonSerializable(typeof(List<DefaultEntity>))]
+    [JsonSerializable(typeof(List<MqttClientAgent>))]
+    [JsonSerializable(typeof(List<RestClientAgent>))]
+    [JsonSerializable(typeof(List<RestServerAgent>))]
+    [JsonSerializable(typeof(List<IotItem>))]
     [JsonSerializable(typeof(List<object?>))]
     [JsonSerializable(typeof(List<ApiResult>))]
     [JsonSerializable(typeof(List<ProjectPermission>))]
@@ -96,6 +104,22 @@ namespace Kepware.Api.Serializer
             {
                 return (JsonTypeInfo<T>)(object)Default.DefaultEntity;
             }
+            else if (typeof(T) == typeof(MqttClientAgent))
+            {
+                return (JsonTypeInfo<T>)(object)Default.MqttClientAgent;
+            }
+            else if (typeof(T) == typeof(RestClientAgent))
+            {
+                return (JsonTypeInfo<T>)(object)Default.RestClientAgent;
+            }
+            else if (typeof(T) == typeof(RestServerAgent))
+            {
+                return (JsonTypeInfo<T>)(object)Default.RestServerAgent;
+            }
+            else if (typeof(T) == typeof(IotItem))
+            {
+                return (JsonTypeInfo<T>)(object)Default.IotItem;
+            }
             else
             {
                 throw new NotSupportedException();
@@ -140,6 +164,22 @@ namespace Kepware.Api.Serializer
             else if (typeof(T) == typeof(DefaultEntity))
             {
                 return (JsonTypeInfo<List<T>>)(object)Default.ListDefaultEntity;
+            }
+            else if (typeof(T) == typeof(MqttClientAgent))
+            {
+                return (JsonTypeInfo<List<T>>)(object)Default.ListMqttClientAgent;
+            }
+            else if (typeof(T) == typeof(RestClientAgent))
+            {
+                return (JsonTypeInfo<List<T>>)(object)Default.ListRestClientAgent;
+            }
+            else if (typeof(T) == typeof(RestServerAgent))
+            {
+                return (JsonTypeInfo<List<T>>)(object)Default.ListRestServerAgent;
+            }
+            else if (typeof(T) == typeof(IotItem))
+            {
+                return (JsonTypeInfo<List<T>>)(object)Default.ListIotItem;
             }
             else
             {
