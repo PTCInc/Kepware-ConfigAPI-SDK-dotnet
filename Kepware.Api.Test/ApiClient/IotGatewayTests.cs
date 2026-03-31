@@ -45,7 +45,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.GetOrCreateMqttClientAgentAsync("TestAgent");
+        var result = await _kepwareApiClient.Project.IotGateway.GetOrCreateMqttClientAgentAsync("TestAgent");
 
         // Assert
         result.ShouldNotBeNull();
@@ -70,7 +70,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK, agentJson, "application/json");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.GetOrCreateMqttClientAgentAsync("TestAgent");
+        var result = await _kepwareApiClient.Project.IotGateway.GetOrCreateMqttClientAgentAsync("TestAgent");
 
         // Assert
         result.ShouldNotBeNull();
@@ -95,14 +95,14 @@ public class IotGatewayTests : TestApiClientBase
 
         // Act & Assert
         await Should.ThrowAsync<InvalidOperationException>(async () =>
-            await _kepwareApiClient.IotGateway.GetOrCreateMqttClientAgentAsync("TestAgent"));
+            await _kepwareApiClient.Project.IotGateway.GetOrCreateMqttClientAgentAsync("TestAgent"));
     }
 
     [Fact]
     public async Task GetOrCreateMqttClientAgent_WithEmptyName_ShouldThrowArgumentException()
     {
         await Should.ThrowAsync<ArgumentException>(async () =>
-            await _kepwareApiClient.IotGateway.GetOrCreateMqttClientAgentAsync(""));
+            await _kepwareApiClient.Project.IotGateway.GetOrCreateMqttClientAgentAsync(""));
     }
 
 
@@ -116,7 +116,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.CreateMqttClientAgentAsync("TestAgent");
+        var result = await _kepwareApiClient.Project.IotGateway.CreateMqttClientAgentAsync("TestAgent");
 
         // Assert
         result.ShouldNotBeNull();
@@ -140,7 +140,7 @@ public class IotGatewayTests : TestApiClientBase
         };
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.CreateMqttClientAgentAsync("TestAgent", properties);
+        var result = await _kepwareApiClient.Project.IotGateway.CreateMqttClientAgentAsync("TestAgent", properties);
 
         // Assert
         result.ShouldNotBeNull();
@@ -158,7 +158,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.InternalServerError, "Server Error");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.CreateMqttClientAgentAsync("TestAgent");
+        var result = await _kepwareApiClient.Project.IotGateway.CreateMqttClientAgentAsync("TestAgent");
 
         // Assert
         result.ShouldBeNull();
@@ -176,7 +176,7 @@ public class IotGatewayTests : TestApiClientBase
     public async Task CreateMqttClientAgent_WithEmptyName_ShouldThrowArgumentException()
     {
         await Should.ThrowAsync<ArgumentException>(async () =>
-            await _kepwareApiClient.IotGateway.CreateMqttClientAgentAsync(""));
+            await _kepwareApiClient.Project.IotGateway.CreateMqttClientAgentAsync(""));
     }
 
     [Fact]
@@ -196,7 +196,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK, agentJson, "application/json");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.GetMqttClientAgentAsync("TestAgent");
+        var result = await _kepwareApiClient.Project.IotGateway.GetMqttClientAgentAsync("TestAgent");
 
         // Assert
         result.ShouldNotBeNull();
@@ -215,7 +215,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.NotFound, "Not Found");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.GetMqttClientAgentAsync("NonExistent");
+        var result = await _kepwareApiClient.Project.IotGateway.GetMqttClientAgentAsync("NonExistent");
 
         // Assert
         result.ShouldBeNull();
@@ -232,7 +232,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.DeleteMqttClientAgentAsync(agent);
+        var result = await _kepwareApiClient.Project.IotGateway.DeleteMqttClientAgentAsync(agent);
 
         // Assert
         result.ShouldBeTrue();
@@ -249,7 +249,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.DeleteMqttClientAgentAsync("TestAgent");
+        var result = await _kepwareApiClient.Project.IotGateway.DeleteMqttClientAgentAsync("TestAgent");
 
         // Assert
         result.ShouldBeTrue();
@@ -266,7 +266,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.InternalServerError, "Server Error");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.DeleteMqttClientAgentAsync("TestAgent");
+        var result = await _kepwareApiClient.Project.IotGateway.DeleteMqttClientAgentAsync("TestAgent");
 
         // Assert
         result.ShouldBeFalse();
@@ -282,7 +282,7 @@ public class IotGatewayTests : TestApiClientBase
             .Throws(new HttpRequestException("Connection error"));
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.DeleteMqttClientAgentAsync("TestAgent");
+        var result = await _kepwareApiClient.Project.IotGateway.DeleteMqttClientAgentAsync("TestAgent");
 
         // Assert
         result.ShouldBeFalse();
@@ -306,7 +306,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.GetOrCreateRestClientAgentAsync("TestRestClient");
+        var result = await _kepwareApiClient.Project.IotGateway.GetOrCreateRestClientAgentAsync("TestRestClient");
 
         // Assert
         result.ShouldNotBeNull();
@@ -330,7 +330,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK, agentJson, "application/json");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.GetOrCreateRestClientAgentAsync("TestRestClient");
+        var result = await _kepwareApiClient.Project.IotGateway.GetOrCreateRestClientAgentAsync("TestRestClient");
 
         // Assert
         result.ShouldNotBeNull();
@@ -353,14 +353,14 @@ public class IotGatewayTests : TestApiClientBase
 
         // Act & Assert
         await Should.ThrowAsync<InvalidOperationException>(async () =>
-            await _kepwareApiClient.IotGateway.GetOrCreateRestClientAgentAsync("TestRestClient"));
+            await _kepwareApiClient.Project.IotGateway.GetOrCreateRestClientAgentAsync("TestRestClient"));
     }
 
     [Fact]
     public async Task GetOrCreateRestClientAgent_WithEmptyName_ShouldThrowArgumentException()
     {
         await Should.ThrowAsync<ArgumentException>(async () =>
-            await _kepwareApiClient.IotGateway.GetOrCreateRestClientAgentAsync(""));
+            await _kepwareApiClient.Project.IotGateway.GetOrCreateRestClientAgentAsync(""));
     }
 
     [Fact]
@@ -373,7 +373,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.CreateRestClientAgentAsync("TestRestClient");
+        var result = await _kepwareApiClient.Project.IotGateway.CreateRestClientAgentAsync("TestRestClient");
 
         // Assert
         result.ShouldNotBeNull();
@@ -395,7 +395,7 @@ public class IotGatewayTests : TestApiClientBase
         };
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.CreateRestClientAgentAsync("TestRestClient", properties);
+        var result = await _kepwareApiClient.Project.IotGateway.CreateRestClientAgentAsync("TestRestClient", properties);
 
         // Assert
         result.ShouldNotBeNull();
@@ -412,7 +412,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.InternalServerError, "Server Error");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.CreateRestClientAgentAsync("TestRestClient");
+        var result = await _kepwareApiClient.Project.IotGateway.CreateRestClientAgentAsync("TestRestClient");
 
         // Assert
         result.ShouldBeNull();
@@ -422,7 +422,7 @@ public class IotGatewayTests : TestApiClientBase
     public async Task CreateRestClientAgent_WithEmptyName_ShouldThrowArgumentException()
     {
         await Should.ThrowAsync<ArgumentException>(async () =>
-            await _kepwareApiClient.IotGateway.CreateRestClientAgentAsync(""));
+            await _kepwareApiClient.Project.IotGateway.CreateRestClientAgentAsync(""));
     }
 
     [Fact]
@@ -442,7 +442,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK, agentJson, "application/json");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.GetRestClientAgentAsync("TestRestClient");
+        var result = await _kepwareApiClient.Project.IotGateway.GetRestClientAgentAsync("TestRestClient");
 
         // Assert
         result.ShouldNotBeNull();
@@ -460,7 +460,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.NotFound, "Not Found");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.GetRestClientAgentAsync("NonExistent");
+        var result = await _kepwareApiClient.Project.IotGateway.GetRestClientAgentAsync("NonExistent");
 
         // Assert
         result.ShouldBeNull();
@@ -477,7 +477,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.DeleteRestClientAgentAsync(agent);
+        var result = await _kepwareApiClient.Project.IotGateway.DeleteRestClientAgentAsync(agent);
 
         // Assert
         result.ShouldBeTrue();
@@ -494,7 +494,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.DeleteRestClientAgentAsync("TestRestClient");
+        var result = await _kepwareApiClient.Project.IotGateway.DeleteRestClientAgentAsync("TestRestClient");
 
         // Assert
         result.ShouldBeTrue();
@@ -510,7 +510,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.InternalServerError, "Server Error");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.DeleteRestClientAgentAsync("TestRestClient");
+        var result = await _kepwareApiClient.Project.IotGateway.DeleteRestClientAgentAsync("TestRestClient");
 
         // Assert
         result.ShouldBeFalse();
@@ -534,7 +534,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.GetOrCreateRestServerAgentAsync("TestRestServer");
+        var result = await _kepwareApiClient.Project.IotGateway.GetOrCreateRestServerAgentAsync("TestRestServer");
 
         // Assert
         result.ShouldNotBeNull();
@@ -558,7 +558,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK, agentJson, "application/json");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.GetOrCreateRestServerAgentAsync("TestRestServer");
+        var result = await _kepwareApiClient.Project.IotGateway.GetOrCreateRestServerAgentAsync("TestRestServer");
 
         // Assert
         result.ShouldNotBeNull();
@@ -581,14 +581,14 @@ public class IotGatewayTests : TestApiClientBase
 
         // Act & Assert
         await Should.ThrowAsync<InvalidOperationException>(async () =>
-            await _kepwareApiClient.IotGateway.GetOrCreateRestServerAgentAsync("TestRestServer"));
+            await _kepwareApiClient.Project.IotGateway.GetOrCreateRestServerAgentAsync("TestRestServer"));
     }
 
     [Fact]
     public async Task GetOrCreateRestServerAgent_WithEmptyName_ShouldThrowArgumentException()
     {
         await Should.ThrowAsync<ArgumentException>(async () =>
-            await _kepwareApiClient.IotGateway.GetOrCreateRestServerAgentAsync(""));
+            await _kepwareApiClient.Project.IotGateway.GetOrCreateRestServerAgentAsync(""));
     }
 
     [Fact]
@@ -601,7 +601,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.CreateRestServerAgentAsync("TestRestServer");
+        var result = await _kepwareApiClient.Project.IotGateway.CreateRestServerAgentAsync("TestRestServer");
 
         // Assert
         result.ShouldNotBeNull();
@@ -623,7 +623,7 @@ public class IotGatewayTests : TestApiClientBase
         };
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.CreateRestServerAgentAsync("TestRestServer", properties);
+        var result = await _kepwareApiClient.Project.IotGateway.CreateRestServerAgentAsync("TestRestServer", properties);
 
         // Assert
         result.ShouldNotBeNull();
@@ -640,7 +640,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.InternalServerError, "Server Error");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.CreateRestServerAgentAsync("TestRestServer");
+        var result = await _kepwareApiClient.Project.IotGateway.CreateRestServerAgentAsync("TestRestServer");
 
         // Assert
         result.ShouldBeNull();
@@ -650,7 +650,7 @@ public class IotGatewayTests : TestApiClientBase
     public async Task CreateRestServerAgent_WithEmptyName_ShouldThrowArgumentException()
     {
         await Should.ThrowAsync<ArgumentException>(async () =>
-            await _kepwareApiClient.IotGateway.CreateRestServerAgentAsync(""));
+            await _kepwareApiClient.Project.IotGateway.CreateRestServerAgentAsync(""));
     }
 
     [Fact]
@@ -670,7 +670,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK, agentJson, "application/json");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.GetRestServerAgentAsync("TestRestServer");
+        var result = await _kepwareApiClient.Project.IotGateway.GetRestServerAgentAsync("TestRestServer");
 
         // Assert
         result.ShouldNotBeNull();
@@ -688,7 +688,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.NotFound, "Not Found");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.GetRestServerAgentAsync("NonExistent");
+        var result = await _kepwareApiClient.Project.IotGateway.GetRestServerAgentAsync("NonExistent");
 
         // Assert
         result.ShouldBeNull();
@@ -705,7 +705,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.DeleteRestServerAgentAsync(agent);
+        var result = await _kepwareApiClient.Project.IotGateway.DeleteRestServerAgentAsync(agent);
 
         // Assert
         result.ShouldBeTrue();
@@ -722,7 +722,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.DeleteRestServerAgentAsync("TestRestServer");
+        var result = await _kepwareApiClient.Project.IotGateway.DeleteRestServerAgentAsync("TestRestServer");
 
         // Assert
         result.ShouldBeTrue();
@@ -738,7 +738,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.InternalServerError, "Server Error");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.DeleteRestServerAgentAsync("TestRestServer");
+        var result = await _kepwareApiClient.Project.IotGateway.DeleteRestServerAgentAsync("TestRestServer");
 
         // Assert
         result.ShouldBeFalse();
@@ -763,7 +763,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.GetOrCreateIotItemAsync("Channel1.Device1.Tag1", parentAgent);
+        var result = await _kepwareApiClient.Project.IotGateway.GetOrCreateIotItemAsync("Channel1.Device1.Tag1", parentAgent);
 
         // Assert
         result.ShouldNotBeNull();
@@ -789,7 +789,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK, itemJson, "application/json");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.GetOrCreateIotItemAsync("Channel1.Device1.Tag1", parentAgent);
+        var result = await _kepwareApiClient.Project.IotGateway.GetOrCreateIotItemAsync("Channel1.Device1.Tag1", parentAgent);
 
         // Assert
         result.ShouldNotBeNull();
@@ -814,7 +814,7 @@ public class IotGatewayTests : TestApiClientBase
 
         // Act & Assert
         await Should.ThrowAsync<InvalidOperationException>(async () =>
-            await _kepwareApiClient.IotGateway.GetOrCreateIotItemAsync("Channel1.Device1.Tag1", parentAgent));
+            await _kepwareApiClient.Project.IotGateway.GetOrCreateIotItemAsync("Channel1.Device1.Tag1", parentAgent));
     }
 
     [Fact]
@@ -828,7 +828,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.CreateIotItemAsync("Channel1.Device1.Tag1", parentAgent);
+        var result = await _kepwareApiClient.Project.IotGateway.CreateIotItemAsync("Channel1.Device1.Tag1", parentAgent);
 
         // Assert
         result.ShouldNotBeNull();
@@ -847,7 +847,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.CreateIotItemAsync("_System._Time", parentAgent);
+        var result = await _kepwareApiClient.Project.IotGateway.CreateIotItemAsync("_System._Time", parentAgent);
 
         // Assert
         result.ShouldNotBeNull();
@@ -866,7 +866,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.InternalServerError, "Server Error");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.CreateIotItemAsync("Channel1.Device1.Tag1", parentAgent);
+        var result = await _kepwareApiClient.Project.IotGateway.CreateIotItemAsync("Channel1.Device1.Tag1", parentAgent);
 
         // Assert
         result.ShouldBeNull();
@@ -878,14 +878,14 @@ public class IotGatewayTests : TestApiClientBase
         var parentAgent = new MqttClientAgent("ParentAgent");
 
         await Should.ThrowAsync<ArgumentException>(async () =>
-            await _kepwareApiClient.IotGateway.CreateIotItemAsync("", parentAgent));
+            await _kepwareApiClient.Project.IotGateway.CreateIotItemAsync("", parentAgent));
     }
 
     [Fact]
     public async Task CreateIotItem_WithNullParent_ShouldThrowArgumentNullException()
     {
         await Should.ThrowAsync<ArgumentNullException>(async () =>
-            await _kepwareApiClient.IotGateway.CreateIotItemAsync("Channel1.Device1.Tag1", null!));
+            await _kepwareApiClient.Project.IotGateway.CreateIotItemAsync("Channel1.Device1.Tag1", null!));
     }
 
     [Fact]
@@ -906,7 +906,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK, itemJson, "application/json");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.GetIotItemAsync("Channel1.Device1.Tag1", parentAgent);
+        var result = await _kepwareApiClient.Project.IotGateway.GetIotItemAsync("Channel1.Device1.Tag1", parentAgent);
 
         // Assert
         result.ShouldNotBeNull();
@@ -927,7 +927,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.DeleteIotItemAsync(item);
+        var result = await _kepwareApiClient.Project.IotGateway.DeleteIotItemAsync(item);
 
         // Assert
         result.ShouldBeTrue();
@@ -945,7 +945,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.OK);
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.DeleteIotItemAsync("Channel1.Device1.Tag1", parentAgent);
+        var result = await _kepwareApiClient.Project.IotGateway.DeleteIotItemAsync("Channel1.Device1.Tag1", parentAgent);
 
         // Assert
         result.ShouldBeTrue();
@@ -964,7 +964,7 @@ public class IotGatewayTests : TestApiClientBase
             .ReturnsResponse(HttpStatusCode.InternalServerError, "Server Error");
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.DeleteIotItemAsync(item);
+        var result = await _kepwareApiClient.Project.IotGateway.DeleteIotItemAsync(item);
 
         // Assert
         result.ShouldBeFalse();
@@ -982,7 +982,7 @@ public class IotGatewayTests : TestApiClientBase
             .Throws(new HttpRequestException("Connection error"));
 
         // Act
-        var result = await _kepwareApiClient.IotGateway.DeleteIotItemAsync(item);
+        var result = await _kepwareApiClient.Project.IotGateway.DeleteIotItemAsync(item);
 
         // Assert
         result.ShouldBeFalse();
@@ -996,42 +996,42 @@ public class IotGatewayTests : TestApiClientBase
     public async Task GetMqttClientAgent_WithEmptyName_ShouldThrowArgumentException()
     {
         await Should.ThrowAsync<ArgumentException>(async () =>
-            await _kepwareApiClient.IotGateway.GetMqttClientAgentAsync(""));
+            await _kepwareApiClient.Project.IotGateway.GetMqttClientAgentAsync(""));
     }
 
     [Fact]
     public async Task GetRestClientAgent_WithEmptyName_ShouldThrowArgumentException()
     {
         await Should.ThrowAsync<ArgumentException>(async () =>
-            await _kepwareApiClient.IotGateway.GetRestClientAgentAsync(""));
+            await _kepwareApiClient.Project.IotGateway.GetRestClientAgentAsync(""));
     }
 
     [Fact]
     public async Task GetRestServerAgent_WithEmptyName_ShouldThrowArgumentException()
     {
         await Should.ThrowAsync<ArgumentException>(async () =>
-            await _kepwareApiClient.IotGateway.GetRestServerAgentAsync(""));
+            await _kepwareApiClient.Project.IotGateway.GetRestServerAgentAsync(""));
     }
 
     [Fact]
     public async Task DeleteMqttClientAgent_WithNullEntity_ShouldThrowArgumentNullException()
     {
         await Should.ThrowAsync<ArgumentNullException>(async () =>
-            await _kepwareApiClient.IotGateway.DeleteMqttClientAgentAsync((MqttClientAgent)null!));
+            await _kepwareApiClient.Project.IotGateway.DeleteMqttClientAgentAsync((MqttClientAgent)null!));
     }
 
     [Fact]
     public async Task DeleteRestClientAgent_WithNullEntity_ShouldThrowArgumentNullException()
     {
         await Should.ThrowAsync<ArgumentNullException>(async () =>
-            await _kepwareApiClient.IotGateway.DeleteRestClientAgentAsync((RestClientAgent)null!));
+            await _kepwareApiClient.Project.IotGateway.DeleteRestClientAgentAsync((RestClientAgent)null!));
     }
 
     [Fact]
     public async Task DeleteRestServerAgent_WithNullEntity_ShouldThrowArgumentNullException()
     {
         await Should.ThrowAsync<ArgumentNullException>(async () =>
-            await _kepwareApiClient.IotGateway.DeleteRestServerAgentAsync((RestServerAgent)null!));
+            await _kepwareApiClient.Project.IotGateway.DeleteRestServerAgentAsync((RestServerAgent)null!));
     }
 
     [Fact]
@@ -1040,21 +1040,21 @@ public class IotGatewayTests : TestApiClientBase
         var parentAgent = new MqttClientAgent("ParentAgent");
 
         await Should.ThrowAsync<ArgumentException>(async () =>
-            await _kepwareApiClient.IotGateway.GetIotItemAsync("", parentAgent));
+            await _kepwareApiClient.Project.IotGateway.GetIotItemAsync("", parentAgent));
     }
 
     [Fact]
     public async Task GetIotItem_WithNullParent_ShouldThrowArgumentNullException()
     {
         await Should.ThrowAsync<ArgumentNullException>(async () =>
-            await _kepwareApiClient.IotGateway.GetIotItemAsync("Channel1.Device1.Tag1", null!));
+            await _kepwareApiClient.Project.IotGateway.GetIotItemAsync("Channel1.Device1.Tag1", null!));
     }
 
     [Fact]
     public async Task DeleteIotItem_WithNullEntity_ShouldThrowArgumentNullException()
     {
         await Should.ThrowAsync<ArgumentNullException>(async () =>
-            await _kepwareApiClient.IotGateway.DeleteIotItemAsync((IotItem)null!));
+            await _kepwareApiClient.Project.IotGateway.DeleteIotItemAsync((IotItem)null!));
     }
 
     [Fact]
@@ -1063,14 +1063,14 @@ public class IotGatewayTests : TestApiClientBase
         var parentAgent = new MqttClientAgent("ParentAgent");
 
         await Should.ThrowAsync<ArgumentException>(async () =>
-            await _kepwareApiClient.IotGateway.GetOrCreateIotItemAsync("", parentAgent));
+            await _kepwareApiClient.Project.IotGateway.GetOrCreateIotItemAsync("", parentAgent));
     }
 
     [Fact]
     public async Task GetOrCreateIotItem_WithNullParent_ShouldThrowArgumentNullException()
     {
         await Should.ThrowAsync<ArgumentNullException>(async () =>
-            await _kepwareApiClient.IotGateway.GetOrCreateIotItemAsync("Channel1.Device1.Tag1", null!));
+            await _kepwareApiClient.Project.IotGateway.GetOrCreateIotItemAsync("Channel1.Device1.Tag1", null!));
     }
 
     [Fact]
@@ -1079,14 +1079,14 @@ public class IotGatewayTests : TestApiClientBase
         var parentAgent = new MqttClientAgent("ParentAgent");
 
         await Should.ThrowAsync<ArgumentException>(async () =>
-            await _kepwareApiClient.IotGateway.DeleteIotItemAsync("", parentAgent));
+            await _kepwareApiClient.Project.IotGateway.DeleteIotItemAsync("", parentAgent));
     }
 
     [Fact]
     public async Task DeleteIotItem_ByServerTag_WithNullParent_ShouldThrowArgumentNullException()
     {
         await Should.ThrowAsync<ArgumentNullException>(async () =>
-            await _kepwareApiClient.IotGateway.DeleteIotItemAsync("Channel1.Device1.Tag1", null!));
+            await _kepwareApiClient.Project.IotGateway.DeleteIotItemAsync("Channel1.Device1.Tag1", null!));
     }
 
     #endregion
