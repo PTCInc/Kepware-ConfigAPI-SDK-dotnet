@@ -157,6 +157,9 @@ namespace Kepware.Api.ClientHandler
                 }
             }
 
+            // Compare and apply IoT Gateway agents and their IoT Items
+            await CompareAndApplyIotGatewayDetailedAsync(sourceProject.IotGateway, projectFromApi.IotGateway, result, cancellationToken).ConfigureAwait(false);
+
             return result;
         }
         #endregion
@@ -429,6 +432,18 @@ namespace Kepware.Api.ClientHandler
                                 SetOwnerRecursive(device.TagGroups, device);
                         }
                 }
+
+            if (project.IotGateway != null)
+            {
+                foreach (var agent in (project.IotGateway.MqttClientAgents ?? []).Cast<IotAgent>()
+                    .Concat(project.IotGateway.RestClientAgents ?? [])
+                    .Concat(project.IotGateway.RestServerAgents ?? []))
+                {
+                    if (agent.IotItems != null)
+                        foreach (var item in agent.IotItems)
+                            item.Owner = agent;
+                }
+            }
         }
 
         private async Task<Project> LoadProjectOptimizedRecurisveAsync(Project project, int tagLimit, CancellationToken cancellationToken = default)
@@ -532,6 +547,9 @@ namespace Kepware.Api.ClientHandler
                 }
             }
 
+            // Load IoT Gateway agents and their IoT Items
+            await LoadIotGatewayRecursiveAsync(project, cancellationToken).ConfigureAwait(false);
+
             return project;
         }
 
@@ -580,11 +598,102 @@ namespace Kepware.Api.ClientHandler
                     project = new Project();
                 }
             }
+
+            // Load IoT Gateway agents and their IoT Items
+            await LoadIotGatewayRecursiveAsync(project, cancellationToken).ConfigureAwait(false);
+
             return project;
+        }
+
+        private async Task LoadIotGatewayRecursiveAsync(Project project, CancellationToken cancellationToken)
+        {
+            MqttClientAgentCollection? mqttClients;
+            RestClientAgentCollection? restClients;
+            RestServerAgentCollection? restServers;
+
+            try
+            {
+                mqttClients = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<MqttClientAgentCollection, MqttClientAgent>(cancellationToken: cancellationToken).ConfigureAwait(false);
+                restClients = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<RestClientAgentCollection, RestClientAgent>(cancellationToken: cancellationToken).ConfigureAwait(false);
+                restServers = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<RestServerAgentCollection, RestServerAgent>(cancellationToken: cancellationToken).ConfigureAwait(false);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // IoT Gateway plug-in may not be installed on the server
+                m_logger.LogDebug(ex, "IoT Gateway plug-in not available, skipping IoT Gateway loading");
+                return;
+            }
+
+            if ((mqttClients != null && mqttClients.Count > 0) ||
+                (restClients != null && restClients.Count > 0) ||
+                (restServers != null && restServers.Count > 0))
+            {
+                project.IotGateway = new IotGatewayContainer
+                {
+                    MqttClientAgents = mqttClients,
+                    RestClientAgents = restClients,
+                    RestServerAgents = restServers
+                };
+
+                // Load IoT Items for each agent
+                var agentTasks = new List<Task>();
+                foreach (var agent in (mqttClients ?? []).Cast<IotAgent>()
+                    .Concat(restClients ?? [])
+                    .Concat(restServers ?? []))
+                {
+                    agentTasks.Add(Task.Run(async () =>
+                    {
+                        agent.IotItems = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<IotItemCollection, IotItem>(agent, cancellationToken: cancellationToken).ConfigureAwait(false);
+                    }));
+                }
+                await Task.WhenAll(agentTasks).ConfigureAwait(false);
+            }
         }
         #endregion
 
         #region recursive methods
+
+        private async Task CompareAndApplyIotGatewayDetailedAsync(
+            IotGatewayContainer? source, IotGatewayContainer? current,
+            ProjectCompareAndApplyResult result, CancellationToken cancellationToken)
+        {
+            // Compare MQTT Client agents
+            var mqttCompare = await m_kepwareApiClient.GenericConfig.CompareAndApplyDetailedAsync<MqttClientAgentCollection, MqttClientAgent>(
+                source?.MqttClientAgents, current?.MqttClientAgents, cancellationToken: cancellationToken).ConfigureAwait(false);
+            result.Add(mqttCompare);
+
+            foreach (var agent in mqttCompare.CompareResult.UnchangedItems.Concat(mqttCompare.CompareResult.ChangedItems))
+            {
+                var itemCompare = await m_kepwareApiClient.GenericConfig.CompareAndApplyDetailedAsync<IotItemCollection, IotItem>(
+                    agent.Left!.IotItems, agent.Right!.IotItems, agent.Right, cancellationToken).ConfigureAwait(false);
+                result.Add(itemCompare);
+            }
+
+            // Compare REST Client agents
+            var restClientCompare = await m_kepwareApiClient.GenericConfig.CompareAndApplyDetailedAsync<RestClientAgentCollection, RestClientAgent>(
+                source?.RestClientAgents, current?.RestClientAgents, cancellationToken: cancellationToken).ConfigureAwait(false);
+            result.Add(restClientCompare);
+
+            foreach (var agent in restClientCompare.CompareResult.UnchangedItems.Concat(restClientCompare.CompareResult.ChangedItems))
+            {
+                var itemCompare = await m_kepwareApiClient.GenericConfig.CompareAndApplyDetailedAsync<IotItemCollection, IotItem>(
+                    agent.Left!.IotItems, agent.Right!.IotItems, agent.Right, cancellationToken).ConfigureAwait(false);
+                result.Add(itemCompare);
+            }
+
+            // Compare REST Server agents
+            var restServerCompare = await m_kepwareApiClient.GenericConfig.CompareAndApplyDetailedAsync<RestServerAgentCollection, RestServerAgent>(
+                source?.RestServerAgents, current?.RestServerAgents, cancellationToken: cancellationToken).ConfigureAwait(false);
+            result.Add(restServerCompare);
+
+            foreach (var agent in restServerCompare.CompareResult.UnchangedItems.Concat(restServerCompare.CompareResult.ChangedItems))
+            {
+                var itemCompare = await m_kepwareApiClient.GenericConfig.CompareAndApplyDetailedAsync<IotItemCollection, IotItem>(
+                    agent.Left!.IotItems, agent.Right!.IotItems, agent.Right, cancellationToken).ConfigureAwait(false);
+                result.Add(itemCompare);
+            }
+        }
+
         private static void SetOwnerRecursive(IEnumerable<DeviceTagGroup> tagGroups, NamedEntity owner)
         {
             foreach (var tagGroup in tagGroups)

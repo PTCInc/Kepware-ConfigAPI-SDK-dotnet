@@ -31,6 +31,7 @@ namespace Kepware.Api.Serializer
     [JsonSerializable(typeof(RestClientAgent))]
     [JsonSerializable(typeof(RestServerAgent))]
     [JsonSerializable(typeof(IotItem))]
+    [JsonSerializable(typeof(IotGatewayContainer))]
 
     [JsonSerializable(typeof(List<ApiStatus>))]
     [JsonSerializable(typeof(List<UaEndpoint>))]
