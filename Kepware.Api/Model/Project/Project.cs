@@ -27,7 +27,7 @@ namespace Kepware.Api.Model
         /// <summary>
         /// If this is true, it indicates that this is an empty project object that was instantiated without data from the server.
         /// </summary>
-        public bool IsEmpty => Channels == null && DynamicProperties.Count == 0;
+        public bool IsEmpty => Channels == null && (IotGateway == null || IotGateway.IsEmpty) && DynamicProperties.Count == 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Project"/> class.
@@ -59,6 +59,15 @@ namespace Kepware.Api.Model
         public ChannelCollection? Channels { get; set; }
 
         /// <summary>
+        /// Gets or sets the IoT Gateway container holding MQTT Client, REST Client, and REST Server agent collections.
+        /// </summary>
+        [YamlIgnore]
+        [JsonPropertyName("_iot_gateway")]
+        [JsonPropertyOrder(101)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public IotGatewayContainer? IotGateway { get; set; }
+
+        /// <summary>
         /// Recursively cleans up the project and all its children
         /// </summary>
         /// <param name="defaultValueProvider"></param>
@@ -75,6 +84,16 @@ namespace Kepware.Api.Model
                 foreach (var channel in Channels)
                 {
                     await channel.Cleanup(defaultValueProvider, blnRemoveProjectId, cancellationToken).ConfigureAwait(false);
+                }
+            }
+
+            if (IotGateway != null)
+            {
+                foreach (var agent in (IotGateway.MqttClientAgents ?? []).Cast<IotAgent>()
+                    .Concat(IotGateway.RestClientAgents ?? [])
+                    .Concat(IotGateway.RestServerAgents ?? []))
+                {
+                    await agent.Cleanup(defaultValueProvider, blnRemoveProjectId, cancellationToken).ConfigureAwait(false);
                 }
             }
         }

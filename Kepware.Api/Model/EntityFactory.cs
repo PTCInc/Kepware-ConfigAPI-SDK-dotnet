@@ -19,6 +19,10 @@ namespace Kepware.Api.Model
             Factories[typeof(Tag)] = () => new Tag();
             Factories[typeof(DefaultEntity)] = () => new DefaultEntity();
             Factories[typeof(NamedEntity)] = () => new NamedEntity();
+            Factories[typeof(MqttClientAgent)] = () => new MqttClientAgent();
+            Factories[typeof(RestClientAgent)] = () => new RestClientAgent();
+            Factories[typeof(RestServerAgent)] = () => new RestServerAgent();
+            Factories[typeof(IotItem)] = () => new IotItem();
         }
 
         public static BaseEntity CreateInstance(Type type)

@@ -173,6 +173,18 @@ namespace Kepware.Api.Model
         internal void Add(CollectionApplyResult<DeviceTagGroup> result)
             => Add(result.Inserts, result.Updates, result.Deletes, result.FailureList);
 
+        internal void Add(CollectionApplyResult<MqttClientAgent> result)
+            => Add(result.Inserts, result.Updates, result.Deletes, result.FailureList);
+
+        internal void Add(CollectionApplyResult<RestClientAgent> result)
+            => Add(result.Inserts, result.Updates, result.Deletes, result.FailureList);
+
+        internal void Add(CollectionApplyResult<RestServerAgent> result)
+            => Add(result.Inserts, result.Updates, result.Deletes, result.FailureList);
+
+        internal void Add(CollectionApplyResult<IotItem> result)
+            => Add(result.Inserts, result.Updates, result.Deletes, result.FailureList);
+
         internal void Add(ProjectCompareAndApplyResult result)
             => Add(result.Inserts, result.Updates, result.Deletes, result.FailureList);
 

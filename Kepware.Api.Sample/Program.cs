@@ -57,6 +57,47 @@ namespace Kepware.Api.Sample
 
                 await api.Project.Devices.UpdateDeviceAsync(device, true);
 
+                // --- IoT Gateway: MQTT Client Agent ---
+                var mqttAgent = await api.Project.IotGateway.GetOrCreateMqttClientAgentAsync("MQTT Agent by Api");
+                mqttAgent.Url = "tcp://broker.example.com:1883";
+                mqttAgent.Topic = "kepware/data";
+                await api.Project.IotGateway.UpdateMqttClientAgentAsync(mqttAgent);
+
+                // Add an IoT Item referencing a tag on the device created above
+                var mqttItem = await api.Project.IotGateway.GetOrCreateIotItemAsync(
+                    $"{channel1.Name}.{device.Name}.BooleanByApi", mqttAgent);
+                mqttItem.ScanRateMs = 500;
+                await api.Project.IotGateway.UpdateIotItemAsync(mqttItem);
+
+                // Clean up MQTT IoT Item and agent
+                await api.Project.IotGateway.DeleteIotItemAsync(mqttItem);
+                await api.Project.IotGateway.DeleteMqttClientAgentAsync(mqttAgent);
+
+                // --- IoT Gateway: REST Client Agent ---
+                var restClientAgent = await api.Project.IotGateway.GetOrCreateRestClientAgentAsync("REST Client by Api");
+                restClientAgent.Url = "https://api.example.com/data";
+                restClientAgent.HttpMethod = RestClientHttpMethod.Post;
+                await api.Project.IotGateway.UpdateRestClientAgentAsync(restClientAgent);
+
+                // Add an IoT Item to the REST Client agent
+                var restClientItem = await api.Project.IotGateway.GetOrCreateIotItemAsync(
+                    $"{channel1.Name}.{device.Name}.SineByApi", restClientAgent);
+                await api.Project.IotGateway.DeleteIotItemAsync(restClientItem);
+                await api.Project.IotGateway.DeleteRestClientAgentAsync(restClientAgent);
+
+                // --- IoT Gateway: REST Server Agent ---
+                var restServerAgent = await api.Project.IotGateway.GetOrCreateRestServerAgentAsync("REST Server by Api");
+                restServerAgent.PortNumber = 39321;
+                restServerAgent.EnableWriteEndpoint = true;
+                await api.Project.IotGateway.UpdateRestServerAgentAsync(restServerAgent);
+
+                // Add an IoT Item to the REST Server agent
+                var restServerItem = await api.Project.IotGateway.GetOrCreateIotItemAsync(
+                    $"{channel1.Name}.{device.Name}.RampByApi", restServerAgent);
+                await api.Project.IotGateway.DeleteIotItemAsync(restServerItem);
+                await api.Project.IotGateway.DeleteRestServerAgentAsync(restServerAgent);
+
+                // Clean up channel and device
                 await api.Project.Devices.DeleteDeviceAsync(device);
                 await api.Project.Channels.DeleteChannelAsync(channel1);
 

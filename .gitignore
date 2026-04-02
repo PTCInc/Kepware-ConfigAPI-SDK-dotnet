@@ -8,6 +8,7 @@ docs/docfx/api/
 docs/docfx/_*
 docs/docfx/Kepware*
 docs/docfx/*.md
+.API *
 
 # User-specific files
 *.rsuser

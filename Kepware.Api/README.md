@@ -18,6 +18,7 @@ This package is designed to work with all versions of Kepware that support the C
 | :----------: | :----------: | :----------: |
 | **Project Properties** | Y | Y |
 | **Connectivity** <br /> *(Channel, Devices, Tags, Tag Groups)* | Y | Y |
+| **IoT Gateway** <br /> *(Agents, IoT Items)* | Y | Y |
 | **Administration** <br /> *(User Groups, Users, UA Endpoints, Local License Server)* | Y[^1] | Y |
 | **Product Info and Health Status** | Y[^4] | Y |
 | **Export Project** | Y | Y |

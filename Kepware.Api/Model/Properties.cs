@@ -97,6 +97,21 @@ namespace Kepware.Api.Model
             public const string ProjectTagsDefined = "servermain.PROJECT_TAGS_DEFINED";
 
             /// <summary>
+            /// Total number of tags configured under this agent (read-only).
+            /// </summary>
+            public const string ThisAgentTotal = "iot_gateway.AGENTTYPES_THIS_AGENT_TOTAL";
+
+            /// <summary>
+            /// Total number of tags configured under all agents (read-only).
+            /// </summary>
+            public const string AllAgentsTotal = "iot_gateway.AGENTTYPES_ALL_AGENTS_TOTAL";
+
+            /// <summary>
+            /// Maximum number of configured tags allowed by the license (read-only).
+            /// </summary>
+            public const string LicenseLimit = "iot_gateway.AGENTTYPES_LICENSE_LIMIT";
+
+            /// <summary>
             /// A set of non-serialized properties.
             /// </summary>
             public static readonly FrozenSet<string> AsHashSet = new HashSet<string>()

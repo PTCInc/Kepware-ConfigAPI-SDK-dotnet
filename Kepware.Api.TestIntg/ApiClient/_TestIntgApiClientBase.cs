@@ -216,5 +216,96 @@ namespace Kepware.Api.TestIntg.ApiClient
             return await _kepwareApiClient.GenericConfig.LoadEntityAsync<DeviceTagGroup>(tagGroup.Name, owner) ?? throw new Exception($"Failed to load tag group '{tagGroup.Name}' after insertion.");
 
         }
+        protected async Task<MqttClientAgent> AddTestMqttClientAgent(string name = "MqttTestAgent", Dictionary<string, JsonElement>? properties = null)
+        {
+            var agent = new MqttClientAgent(name);
+            if (properties != null)
+            {
+                foreach (var kvp in properties)
+                {
+                    agent.DynamicProperties[kvp.Key] = kvp.Value;
+                }
+            }
+
+            
+            await _kepwareApiClient.GenericConfig.InsertItemAsync<MqttClientAgent>(agent, cancellationToken: CancellationToken.None);
+            return await _kepwareApiClient.GenericConfig.LoadEntityAsync<MqttClientAgent>(agent.Name, cancellationToken: CancellationToken.None) ?? throw new Exception($"Failed to create MQTT Client Agent '{name}'.");
+        }
+
+        protected async Task<RestClientAgent> AddTestRestClientAgent(string name = "RestClientTestAgent", Dictionary<string, JsonElement>? properties = null)
+        {
+            var agent = new RestClientAgent(name);
+            if (properties != null)
+            {
+                foreach (var kvp in properties)
+                {
+                    agent.DynamicProperties[kvp.Key] = kvp.Value;
+                }
+            }
+            await _kepwareApiClient.GenericConfig.InsertItemAsync<RestClientAgent>(agent, cancellationToken: CancellationToken.None);
+            return await _kepwareApiClient.GenericConfig.LoadEntityAsync<RestClientAgent>(agent.Name, cancellationToken: CancellationToken.None) ?? throw new Exception($"Failed to create REST Client Agent '{name}'.");
+        }
+
+        protected async Task<RestServerAgent> AddTestRestServerAgent(string name = "RestServerTestAgent", Dictionary<string, JsonElement>? properties = null)
+        {
+            var agent = new RestServerAgent(name);
+            if (properties != null)
+            {
+                foreach (var kvp in properties)
+                {
+                    agent.DynamicProperties[kvp.Key] = kvp.Value;
+                }
+            }
+            await _kepwareApiClient.GenericConfig.InsertItemAsync<RestServerAgent>(agent, cancellationToken: CancellationToken.None);
+            return await _kepwareApiClient.GenericConfig.LoadEntityAsync<RestServerAgent>(agent.Name, cancellationToken: CancellationToken.None) ?? throw new Exception($"Failed to create REST Server Agent '{name}'.");
+        }
+
+        protected async Task DeleteAllIoTAgentsAsync()
+        {
+            var mqttAgents = await _kepwareApiClient.GenericConfig.LoadCollectionAsync<MqttClientAgentCollection, MqttClientAgent>();
+            if (mqttAgents != null)
+            {
+                foreach (var agent in mqttAgents)
+                {
+                    await _kepwareApiClient.Project.IotGateway.DeleteMqttClientAgentAsync(agent.Name);
+                }
+            }
+
+            var restClientAgents = await _kepwareApiClient.GenericConfig.LoadCollectionAsync<RestClientAgentCollection, RestClientAgent>();
+            if (restClientAgents != null)
+            {
+                foreach (var agent in restClientAgents)
+                {
+                    await _kepwareApiClient.Project.IotGateway.DeleteRestClientAgentAsync(agent.Name);
+                }
+            }
+
+            var restServerAgents = await _kepwareApiClient.GenericConfig.LoadCollectionAsync<RestServerAgentCollection, RestServerAgent>();
+            if (restServerAgents != null)
+            {
+                foreach (var agent in restServerAgents)
+                {
+                    await _kepwareApiClient.Project.IotGateway.DeleteRestServerAgentAsync(agent.Name);
+                }
+            }
+
+        }
+
+        // protected async Task<IotItem> AddTestIotItem(string name = "IotItemTest", Dictionary<string, JsonElement>? properties = null)
+        // {
+        //     var item = new IotItem(name);
+        //     if (properties != null)
+        //     {
+        //         foreach (var kvp in properties)
+        //         {
+        //             item.DynamicProperties[kvp.Key] = kvp.Value;
+        //         }
+        //     }
+        //     await _kepwareApiClient.GenericConfig.InsertItemAsync<IotItem>(item, cancellationToken: CancellationToken.None);
+        //     return await _kepwareApiClient.GenericConfig.LoadEntityAsync<IotItem>(item.Name, cancellationToken: CancellationToken.None) ?? throw new Exception($"Failed to create IoT Item '{name}'.");
+        // }
+
+
+
     }
 }
