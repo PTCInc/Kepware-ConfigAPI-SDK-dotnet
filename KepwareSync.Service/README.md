@@ -51,6 +51,93 @@ Deploy a centralized GIT configuration across multiple Kepware instances. Config
 - **HTTPS Support**: Secure connections with optional certificate validation.
 - **Overwrite Configuration Support**: Customize configurations dynamically using YAML files with environment variable placeholders.
 
+## Getting Started
+
+### Prerequisites
+- [.NET SDK 8.0+](https://dotnet.microsoft.com/download)
+- Kepware server with Configuration API enabled
+- Docker *(optional — for container deployment only)*
+
+### Step 1 — Clone and restore
+```bash
+git clone https://github.com/PTCInc/Kepware-ConfigAPI-SDK-dotnet.git
+cd Kepware-ConfigAPI-SDK-dotnet
+dotnet restore KepwareSync.Service/KepwareSync.Service.csproj
+```
+
+### Step 2 — Configure credentials
+
+Priority order: **CLI args > env vars > appsettings.json**
+
+**Environment variables (recommended)**
+
+| Variable | Required | Example |
+|---|---|---|
+| `KEPWARE__PRIMARY__HOST` | ✅ | `https://localhost:57512` |
+| `KEPWARE__PRIMARY__USERNAME` | ✅ | `Administrator` |
+| `KEPWARE__PRIMARY__PASSWORD` | ✅ | `YourPassword!` |
+| `STORAGE__DIRECTORY` | ✅ | `./ExportedYaml` |
+| `KEPWARE__DISABLECERTIFICATEVALIDATION` | — | `true` *(dev only)* |
+| `SYNC__SYNCMODE` | — | `OneWay` or `TwoWay` |
+| `SYNC__SYNCDIRECTION` | — | `KepwareToDisk` / `DiskToKepware` / `KepwareToKepware` |
+```bash
+# Linux/macOS
+export KEPWARE__PRIMARY__HOST=https://localhost:57512
+export KEPWARE__PRIMARY__USERNAME=Administrator
+export KEPWARE__PRIMARY__PASSWORD=YourPassword!
+export STORAGE__DIRECTORY=./ExportedYaml
+
+# Windows PowerShell
+$env:KEPWARE__PRIMARY__HOST     = "https://localhost:57512"
+$env:KEPWARE__PRIMARY__USERNAME = "Administrator"
+$env:KEPWARE__PRIMARY__PASSWORD = "YourPassword!"
+$env:STORAGE__DIRECTORY         = "./ExportedYaml"
+```
+
+**appsettings.json** (add to `.gitignore`)
+```json
+{
+  "Kepware": {
+    "DisableCertificateValidation": true,
+    "TimeoutInSeconds": 60,
+    "Primary": {
+      "Host":     "https://localhost:57512",
+      "Username": "Administrator",
+      "Password": "YourPassword!"
+    }
+  },
+  "Storage": { "Directory": "ExportedYaml" },
+  "Sync":    { "SyncMode": "OneWay", "SyncDirection": "KepwareToDisk" }
+}
+```
+
+### Step 3 — Build
+```bash
+dotnet build KepwareSync.Service/KepwareSync.Service.csproj
+```
+
+### Step 4 — Run: one-shot export (Kepware → disk)
+```bash
+dotnet run --project KepwareSync.Service/KepwareSync.Service.csproj -- \
+  SyncToDisk \
+  --primary-kep-api-username Administrator \
+  --primary-kep-api-password YourPassword! \
+  --primary-kep-api-host    https://localhost:57512 \
+  --directory ./ExportedYaml
+```
+YAML files for every channel/device appear in `./ExportedYaml/`.
+
+### Step 5 — Run: continuous agent mode
+```bash
+dotnet run --project KepwareSync.Service/KepwareSync.Service.csproj -- \
+  --primary-kep-api-username Administrator \
+  --primary-kep-api-password YourPassword! \
+  --primary-kep-api-host    https://localhost:57512 \
+  --directory ./ExportedYaml
+```
+Watches both sides and syncs on any change. Press `Ctrl+C` to stop.
+
+
 ## Usage
 
 ### CLI Commands

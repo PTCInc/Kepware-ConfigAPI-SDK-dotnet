@@ -79,6 +79,73 @@ Sample console applications demonstrating how to use `Kepware.Api` NuGet package
 
 [Readme for Kepware.Api.Sample](./Kepware.Api.Sample/README.md)
 
+## Getting Started
+
+| Goal | Section |
+|---|---|
+| Use the API library | [→ Kepware.Api](#kepwareapi-quick-start) |
+| Run the sync service | [→ KepwareSync.Service](#kepwaresyncservice-quick-start) |
+| Run the demo app | [→ Kepware.Api.Sample](#kepwareapisample-quick-start) |
+
+### Prerequisites
+- [.NET SDK 8.0+](https://dotnet.microsoft.com/download)
+- A running Kepware server with the Configuration API enabled
+```bash
+dotnet --version   # must be 8.0.x or later
+```
+
+---
+
+### Kepware.Api quick-start
+```bash
+dotnet add package Kepware.Api
+dotnet restore
+```
+```csharp
+// Register in Program.cs
+services.AddKepwareApiClient(
+    name: "default",
+    baseUrl: "https://localhost:57512",
+    apiUserName: "Administrator",
+    apiPassword: "YourPassword!",
+    disableCertificateValidation: true
+);
+
+// List all channels
+var api = host.Services.GetRequiredService<KepwareApiClient>();
+if (await api.TestConnectionAsync())
+{
+    var project = await api.LoadProject(blnLoadFullProject: false);
+    foreach (var ch in project.Channels)
+        Console.WriteLine($"Channel: {ch.Name}  Driver: {ch.DeviceDriver}");
+}
+```
+
+---
+
+### KepwareSync.Service quick-start
+```bash
+dotnet restore KepwareSync.Service/KepwareSync.Service.csproj
+dotnet build   KepwareSync.Service/KepwareSync.Service.csproj
+dotnet run --project KepwareSync.Service/KepwareSync.Service.csproj -- \
+  SyncToDisk \
+  --primary-kep-api-username Administrator \
+  --primary-kep-api-password YourPassword! \
+  --primary-kep-api-host    https://localhost:57512 \
+  --directory ./ExportedYaml
+```
+
+---
+
+### Kepware.Api.Sample quick-start
+```bash
+dotnet restore Kepware.Api.Sample/Kepware.Api.Sample.csproj
+dotnet build   Kepware.Api.Sample/Kepware.Api.Sample.csproj
+dotnet run    --project Kepware.Api.Sample/Kepware.Api.Sample.csproj
+```
+Update credentials in `Kepware.Api.Sample/Program.cs` before running — see section below.
+
+
 ## Contribution Guidelines
 We welcome contributions to this repository. Please review the [Repository Guidelines](./docs/repo-guidelines.md) for information on Commit Message Conventions, Pull Request process and other details.
 
