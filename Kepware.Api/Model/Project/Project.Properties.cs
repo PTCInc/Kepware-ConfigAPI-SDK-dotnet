@@ -20,8 +20,7 @@ namespace Kepware.Api.Model
             /// <summary>
             /// Count of tags identified in the project.
             /// </summary>
-            // TODO: Does this need to be moved to non-seralized properties?
-            public const string TagsDefined = "servermain.PROJECT_TAGS_DEFINED";
+            public const string TagsDefined = Properties.NonSerialized.ProjectTagsDefined;
 
             #endregion
 

@@ -42,7 +42,7 @@ namespace Kepware.Api.ClientHandler
         /// <returns>The current <see cref="AdminSettings"/> or null if retrieval fails.</returns>
         public Task<AdminSettings?> GetAdminSettingsAsync(CancellationToken cancellationToken = default)
         {
-            return m_kepwareApiClient.GenericConfig.LoadEntityAsync<AdminSettings>(name: null, cancellationToken);
+            return m_kepwareApiClient.GenericConfig.LoadEntityAsync<AdminSettings>(name: null, cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace Kepware.Api.ClientHandler
         /// <returns>The <see cref="UaEndpoint"/> configuration, or null if not found.</returns>
         public Task<UaEndpoint?> GetUaEndpointAsync(string name, CancellationToken cancellationToken = default)
         {
-            return m_kepwareApiClient.GenericConfig.LoadEntityAsync<UaEndpoint>(name, cancellationToken);
+            return m_kepwareApiClient.GenericConfig.LoadEntityAsync<UaEndpoint>(name, cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Kepware.Api.ClientHandler
             try
             {
                 var endpointUrl = EndpointResolver.ResolveEndpoint<UaEndpoint>([endpoint.Name]);
-                var currentEndpoint = await m_kepwareApiClient.GenericConfig.LoadEntityByEndpointAsync<UaEndpoint>(endpointUrl, cancellationToken);
+                var currentEndpoint = await m_kepwareApiClient.GenericConfig.LoadEntityByEndpointAsync<UaEndpoint>(endpointUrl, cancellationToken: cancellationToken);
 
                 if (currentEndpoint == null)
                 {
@@ -162,7 +162,7 @@ namespace Kepware.Api.ClientHandler
         /// <param name="cancellationToken">A token that can be used to request cancellation of the operation.</param>
         /// <returns>True if the endpoint was successfully deleted; otherwise, false.</returns>
         public Task<bool> DeleteUaEndpointAsync(string name, CancellationToken cancellationToken = default)
-            => m_kepwareApiClient.GenericConfig.DeleteItemAsync<UaEndpoint>(name, cancellationToken);
+            => m_kepwareApiClient.GenericConfig.DeleteItemAsync<UaEndpoint>(name, cancellationToken: cancellationToken);
 
         #endregion
 
@@ -186,7 +186,7 @@ namespace Kepware.Api.ClientHandler
         /// <returns>The <see cref="ServerUserGroup"/> configuration, or null if not found.</returns>
         public Task<ServerUserGroup?> GetServerUserGroupAsync(string name, CancellationToken cancellationToken = default)
         {
-            return m_kepwareApiClient.GenericConfig.LoadEntityAsync<ServerUserGroup>(name, cancellationToken);
+            return m_kepwareApiClient.GenericConfig.LoadEntityAsync<ServerUserGroup>(name, cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace Kepware.Api.ClientHandler
             try
             {
                 var endpointUrl = EndpointResolver.ResolveEndpoint<ServerUserGroup>([userGroup.Name]);
-                var currentGroup = await m_kepwareApiClient.GenericConfig.LoadEntityByEndpointAsync<ServerUserGroup>(endpointUrl, cancellationToken);
+                var currentGroup = await m_kepwareApiClient.GenericConfig.LoadEntityByEndpointAsync<ServerUserGroup>(endpointUrl, cancellationToken: cancellationToken);
 
                 if (currentGroup == null)
                 {
@@ -231,7 +231,7 @@ namespace Kepware.Api.ClientHandler
         /// <param name="cancellationToken">A token that can be used to request cancellation of the operation.</param>
         /// <returns>True if the group was successfully deleted; otherwise, false.</returns>
         public Task<bool> DeleteServerUserGroupAsync(string name, CancellationToken cancellationToken = default)
-            => m_kepwareApiClient.GenericConfig.DeleteItemAsync<ServerUserGroup>(name, cancellationToken);
+            => m_kepwareApiClient.GenericConfig.DeleteItemAsync<ServerUserGroup>(name, cancellationToken: cancellationToken);
 
         #endregion
 
@@ -254,7 +254,7 @@ namespace Kepware.Api.ClientHandler
         /// <returns>The <see cref="ServerUser"/> configuration, or null if not found.</returns>
         public Task<ServerUser?> GetServerUserAsync(string name, CancellationToken cancellationToken = default)
         {
-            return m_kepwareApiClient.GenericConfig.LoadEntityAsync<ServerUser>(name, cancellationToken);
+            return m_kepwareApiClient.GenericConfig.LoadEntityAsync<ServerUser>(name, cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -272,7 +272,7 @@ namespace Kepware.Api.ClientHandler
             try
             {
                 var endpointUrl = EndpointResolver.ResolveEndpoint<ServerUser>([user.Name]);
-                var currentUser = await m_kepwareApiClient.GenericConfig.LoadEntityByEndpointAsync<ServerUser>(endpointUrl, cancellationToken);
+                var currentUser = await m_kepwareApiClient.GenericConfig.LoadEntityByEndpointAsync<ServerUser>(endpointUrl, cancellationToken: cancellationToken);
 
                 if (currentUser == null)
                 {
@@ -309,7 +309,7 @@ namespace Kepware.Api.ClientHandler
         /// <param name="cancellationToken">A token that can be used to request cancellation of the operation.</param>
         /// <returns>True if the user was successfully deleted; otherwise, false.</returns>
         public Task<bool> DeleteServerUserAsync(string name, CancellationToken cancellationToken = default)
-            => m_kepwareApiClient.GenericConfig.DeleteItemAsync<ServerUser>(name, cancellationToken);
+            => m_kepwareApiClient.GenericConfig.DeleteItemAsync<ServerUser>(name, cancellationToken: cancellationToken);
 
         #endregion
 
@@ -345,7 +345,7 @@ namespace Kepware.Api.ClientHandler
         public Task<ProjectPermission?> GetProjectPermissionAsync(string serverUserGroupName, ProjectPermissionName projectPermissionName, CancellationToken cancellationToken = default)
         {
             var endpoint = EndpointResolver.ResolveEndpoint<ProjectPermission>([serverUserGroupName, projectPermissionName]);
-            return m_kepwareApiClient.GenericConfig.LoadEntityByEndpointAsync<ProjectPermission>(endpoint, cancellationToken);
+            return m_kepwareApiClient.GenericConfig.LoadEntityByEndpointAsync<ProjectPermission>(endpoint, cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -371,7 +371,7 @@ namespace Kepware.Api.ClientHandler
             try
             {
                 var endpointUrl = EndpointResolver.ResolveEndpoint<ProjectPermission>([serverUserGroupName, projectPermission.Name]);
-                var existingPermission = await m_kepwareApiClient.GenericConfig.LoadEntityByEndpointAsync<ProjectPermission>(endpointUrl, cancellationToken);
+                var existingPermission = await m_kepwareApiClient.GenericConfig.LoadEntityByEndpointAsync<ProjectPermission>(endpointUrl, cancellationToken: cancellationToken);
 
                 if (existingPermission == null)
                 {

@@ -71,6 +71,12 @@ namespace Kepware.Api.Model
         public DeviceTagGroupCollection? TagGroups { get; set; }
 
         /// <summary>
+        /// Gets the driver used by this device.
+        /// </summary>
+        [YamlIgnore, JsonIgnore]
+        public string? DeviceDriver => GetDynamicProperty<string>(Properties.Device.DeviceDriver);
+
+        /// <summary>
         /// Gets the unique ID key for the device.
         /// </summary>
         protected override string UniqueIdKey => Properties.NonUpdatable.DeviceUniqueId;

@@ -18,16 +18,18 @@ This package is designed to work with all versions of Kepware that support the C
 | :----------: | :----------: | :----------: |
 | **Project Properties** | Y | Y |
 | **Connectivity** <br /> *(Channel, Devices, Tags, Tag Groups)* | Y | Y |
+| **IoT Gateway** <br /> *(Agents, IoT Items)* | Y | Y |
 | **Administration** <br /> *(User Groups, Users, UA Endpoints, Local License Server)* | Y[^1] | Y |
 | **Product Info and Health Status** | Y[^4] | Y |
-| **Export Project** | Y[^2] | Y |
-| **Import Project (via JsonProjectLoad Service)[^3]** | N | N |
+| **Export Project** | Y | Y |
+| **Import Project (via JsonProjectLoad Service)** | N[^2] | N |
 | **Import Project (via CompareAndApply)[^3]** | Y | Y |
 
-[^1]: UA Endpoints and Local License Server supported for Kepware Edge only
-[^2]: Json serialization for the whole project was added to Kepware Server v6.17 and later builds, the SDK detects the server version and uses the appropriate service or exports the project by multiple requests if using KepwareApiClient.LoadProject.
-[^3]: CompareAndApply is handled by the SDK, it compares the source project with the server project and applies the changes. The JsonProjectLoad service (added v6.17 and later) is a direct call to the server to load a new project serialize JSON configuration to the server/edge instance.
+[^2]: JsonProjectLoad was added to Kepware Server v6.17 and later builds.
+[^3]: [CompareAndApply](/Kepware.Api/ClientHandler/ProjectApiHandler.cs) is handled by the SDK. It compares the source project with another server project and applies the changes.
 [^4]: Added to Kepware Server v6.13 and later builds
+
+**NOTE:** Exporting a project from a Kepware server is done using the KepwareApiClient.LoadProjectAsync method. This detects the server version and uses the appropriate method to either export/load the whole project or loads the project by multiple requests. This ensures that large projects can be exported/loaded from the Kepware instance as optimally as possible based on the current API design. See [LoadProjectAsync](/Kepware.Api/ClientHandler/ProjectApiHandler.cs) for more details.
 
 3. Configuration API *Services* implemented:
 
@@ -38,9 +40,8 @@ This package is designed to work with all versions of Kepware that support the C
 | **ProjectLoad and ProjectSave** | N | N |
 | **JsonProjectLoad\*\*** <br /> *(used for import project feature)* | N | N |
 
-4.  Synchronize configurations between your application and Kepware server.
-5.  Supports advanced operations like project comparison, entity synchronization, and driver property queries.
-6.  Built-in support for Dependency Injection to simplify integration.
+4.  Supports advanced operations like project comparison, entity synchronization, and driver property queries.
+5.  Built-in support for Dependency Injection to simplify integration.
 
 ## Installation
 
@@ -52,16 +53,36 @@ Kepware.Api NuGet package is available from NuGet repository.
    ```
 
 2. Register the `KepwareApiClient` in your application using Dependency Injection:
+
    ```csharp
    services.AddKepwareApiClient(
        name: "default",
        baseUrl: "https://localhost:57512",
        apiUserName: "Administrator",
        apiPassword: "StrongAdminPassword2025!",
-       disableCertificateValidation: true
+       disableCertificateValidation: false
    );
    ```
 
+    or
+
+   ```csharp
+   var clientOptions = new KepwareClientOptions
+   {
+        HostUri = new Uri("https://localhost:57512"),
+        Username = "Administrator",
+        Password = "StrongAdminPassword2025!",
+        Timeout = TimeSpan.FromSeconds(60),
+        DisableCertifcateValidation = false,
+        ProjectLoadTagLimit = 100000
+   };
+   
+   services.AddKepwareApiClient(
+       name: "default",
+       options: clientOptions
+   );
+   ```
+   
 ## Key Methods
 
 ### Connection and Status
@@ -78,9 +99,9 @@ Kepware.Api NuGet package is available from NuGet repository.
   Retrieves product information about the Kepware server.
 
 ### Project Management
-- **Load Project:**
+- **Export / Load Project:**
   ```csharp
-  var project = await api.LoadProject(blnLoadFullProject:true);
+  var project = await api.LoadProjectAsync(blnLoadFullProject:true);
   ```
   Loads the current project from the Kepware server.
 

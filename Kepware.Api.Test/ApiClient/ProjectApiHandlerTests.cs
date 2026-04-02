@@ -464,7 +464,7 @@ namespace Kepware.Api.Test.ApiClient
             newProject.SetDynamicProperty("uaserverinterface.PROJECT_OPC_UA_ANONYMOUS_LOGIN", false);
 
             // Act
-            var result = await _projectApiHandler.CompareAndApply(newProject);
+            var result = await _projectApiHandler.CompareAndApplyAsync(newProject);
 
             // Assert
             Assert.Equal(2, result.inserts);  // 2 new channels added

@@ -122,7 +122,7 @@ namespace Kepware.SyncService
 
         private static async Task<long> FetchCurrentProjectIdAsync(KepwareApiClient client, CancellationToken cancellationToken)
         {
-            var project = await client.Project.LoadProject(false, cancellationToken).ConfigureAwait(false);
+            var project = await client.Project.LoadProjectAsync(false, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             return project?.ProjectId ?? -1;
         }
@@ -166,7 +166,7 @@ namespace Kepware.SyncService
         internal async Task SyncFromPrimaryKepServerAsync(CancellationToken cancellationToken = default)
         {
             m_logger.LogInformation("Synchronizing full project from primary Kepware...");
-            var project = await m_kepServerClient.Project.LoadProject(true);
+            var project = await m_kepServerClient.Project.LoadProjectAsync(true);
             await project.Cleanup(m_kepServerClient, true, cancellationToken);
 
             if (m_kepServerClient.ClientOptions.Tag is KepwareSyncTarget targetOptions &&
@@ -239,7 +239,7 @@ namespace Kepware.SyncService
                     m_logger.LogInformation("Syncing from secondary client {ClientHostName}...", clientToSyncFrom.ClientHostName);
                 }
 
-                var projectFromSecondary = await clientToSyncFrom.Project.LoadProject(true, cancellationToken).ConfigureAwait(false);
+                var projectFromSecondary = await clientToSyncFrom.Project.LoadProjectAsync(true, cancellationToken: cancellationToken).ConfigureAwait(false);
                 await SyncProjectToKepServerAsync("secondary", projectFromSecondary, m_kepServerClient, "Primary",
                     onSyncedWithChanges: () => NotifyChange(new ChangeEvent { Source = ChangeSource.PrimaryKepServer, Reason = "Sync from secondary kepserver" }),
                     cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -285,12 +285,12 @@ namespace Kepware.SyncService
 
             if (await kepServerClient.TestConnectionAsync(cancellationToken).ConfigureAwait(false))
             {
-                var (inserts, updates, deletes) = await kepServerClient.Project.CompareAndApply(project, cancellationToken).ConfigureAwait(false);
+                var compareAndApplyResults = await kepServerClient.Project.CompareAndApplyDetailedAsync(project, cancellationToken).ConfigureAwait(false);
 
-                if (updates > 0 || deletes > 0 || inserts > 0)
+                if (compareAndApplyResults.Updates > 0 || compareAndApplyResults.Deletes > 0 || compareAndApplyResults.Inserts > 0 || compareAndApplyResults.Failures > 0)
                 {
-                    m_logger.LogInformation("Completed synchronisation from {ProjectSource} to {ClientName}-kepserver ({ClientHostName}): {NumUpdates} updates, {NumInserts} inserts, {NumDeletes} deletes",
-                     projectSource, clientName, kepServerClient.ClientHostName, updates, inserts, deletes);
+                    m_logger.LogInformation("Completed synchronisation from {ProjectSource} to {ClientName}-kepserver ({ClientHostName}): {NumUpdates} updates, {NumInserts} inserts, {NumDeletes} deletes, {NumFailures} failures",
+                     projectSource, clientName, kepServerClient.ClientHostName, compareAndApplyResults.Updates, compareAndApplyResults.Inserts, compareAndApplyResults.Deletes, compareAndApplyResults.Failures);
                     onSyncedWithChanges?.Invoke();
                 }
                 else

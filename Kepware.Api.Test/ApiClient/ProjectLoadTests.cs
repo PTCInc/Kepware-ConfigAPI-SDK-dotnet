@@ -15,68 +15,12 @@ using Kepware.Api.Serializer;
 using Kepware.Api.Test.ApiClient;
 using Kepware.Api.Util;
 using Shouldly;
+using Xunit.Sdk;
 
 namespace Kepware.Api.Test.ApiClient
 {
     public class ProjectLoadTests : TestApiClientBase
     {
-
-        //private async Task ConfigureToServeEndpoints()
-        //{
-        //    var projectData = await LoadJsonTestDataAsync();
-
-        //    var channels = projectData.Project?.Channels?.Select(c => new Channel { Name = c.Name, Description = c.Description, DynamicProperties = c.DynamicProperties }).ToList() ?? [];
-
-        //    // Serve project details
-        //    _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project")
-        //                           .ReturnsResponse(JsonSerializer.Serialize(new Project { Description = projectData?.Project?.Description, DynamicProperties = projectData?.Project?.DynamicProperties ?? [] }), "application/json");
-
-        //    // Serve channels without nested devices
-        //    _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project/channels")
-        //                           .ReturnsResponse(JsonSerializer.Serialize(channels), "application/json");
-
-        //    foreach (var channel in projectData?.Project?.Channels ?? [])
-        //    {
-        //        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + $"/config/v1/project/channels/{channel.Name}")
-        //                               .ReturnsResponse(JsonSerializer.Serialize(new Channel { Name = channel.Name, Description = channel.Description, DynamicProperties = channel.DynamicProperties }), "application/json");
-
-        //        if (channel.Devices != null)
-        //        {
-        //            var devices = channel.Devices.Select(d => new Device { Name = d.Name, Description = d.Description, DynamicProperties = d.DynamicProperties }).ToList();
-        //            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + $"/config/v1/project/channels/{channel.Name}/devices")
-        //                                   .ReturnsResponse(JsonSerializer.Serialize(devices), "application/json");
-
-        //            foreach (var device in channel.Devices)
-        //            {
-        //                var deviceEndpoint = TEST_ENDPOINT + $"/config/v1/project/channels/{channel.Name}/devices/{device.Name}";
-        //                _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, deviceEndpoint)
-        //                                       .ReturnsResponse(JsonSerializer.Serialize(new Device { Name = device.Name, Description = device.Description, DynamicProperties = device.DynamicProperties }), "application/json");
-
-
-        //                _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, deviceEndpoint + "/tags")
-        //                                      .ReturnsResponse(JsonSerializer.Serialize(device.Tags), "application/json");
-
-        //                ConfigureToServeEndpointsTagGroupsRecursive(deviceEndpoint, device.TagGroups ?? []);
-        //            }
-        //        }
-        //    }
-        //}
-
-        //private void ConfigureToServeEndpointsTagGroupsRecursive(string endpoint, IEnumerable<DeviceTagGroup> tagGroups)
-        //{
-        //    var tagGroupEndpoint = endpoint + "/tag_groups";
-
-        //    _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, tagGroupEndpoint)
-        //                                     .ReturnsResponse(JsonSerializer.Serialize(tagGroups), "application/json");
-
-        //    foreach (var tagGroup in tagGroups)
-        //    {
-        //        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, string.Concat(tagGroupEndpoint, "/", tagGroup.Name, "/tags"))
-        //                                     .ReturnsResponse(JsonSerializer.Serialize(tagGroup.Tags), "application/json");
-
-        //        ConfigureToServeEndpointsTagGroupsRecursive(string.Concat(tagGroupEndpoint, "/", tagGroup.Name), tagGroup.TagGroups ?? []);
-        //    }
-        //}
 
         [Theory]
         [InlineData("KEPServerEX", "12", 6, 17, true)]
@@ -87,6 +31,12 @@ namespace Kepware.Api.Test.ApiClient
         public async Task LoadProject_ShouldLoadCorrectly_BasedOnProductSupport(
             string productName, string productId, int majorVersion, int minorVersion, bool supportsJsonLoad)
         {
+            // This test will validate that the LoadProjectAsync method correctly loads the project structure and
+            // content based on whether the connected server version supports JsonProjectLoad. It will compare the loaded project against expected test data to ensure accuracy.
+            // For servers that support JsonProjectLoad, the test will configure the mock server to serve a full JSON project
+            // and validate that the loaded project matches the test data exactly.
+
+            // Arrange
             ConfigureConnectedClient(productName, productId, majorVersion, minorVersion);
 
             if (supportsJsonLoad)
@@ -98,8 +48,10 @@ namespace Kepware.Api.Test.ApiClient
                 await ConfigureToServeEndpoints();
             }
 
-            var project = await _kepwareApiClient.Project.LoadProject(true);
+            // Act
+            var project = await _kepwareApiClient.Project.LoadProjectAsync(blnLoadFullProject: true);
 
+            // Assert
             project.IsLoadedByProjectLoadService.ShouldBe(supportsJsonLoad);
 
             project.ShouldNotBeNull();
@@ -137,6 +89,88 @@ namespace Kepware.Api.Test.ApiClient
 
                     CompareTagGroupsRecursive(ExpectedDevice.TagGroups, LoadedDevice.TagGroups, ExpectedDevice.Name);
                 }
+            }
+        }
+
+        [Theory]
+        [InlineData("KEPServerEX", "12", 6, 17, true)]
+        [InlineData("ThingWorxKepwareServer", "12", 6, 17, true)]
+        [InlineData("ThingWorxKepwareEdge", "13", 1, 10, true)]
+        [InlineData("Kepware Edge", "13", 1, 0, true)]
+        public async Task LoadProject_ShouldLoadCorrectly_Serialize_BasedOnProductSupport(
+            string productName, string productId, int majorVersion, int minorVersion, bool supportsJsonLoad)
+        {
+            // This test will validate that the LoadProjectAsync method correctly loads the project structure using the optimized recursion method.
+            // It will compare the loaded project against expected test data to ensure accuracy. The test will configure the mock server to serve
+            // endpoints to support an optimized recursion load and validate that the loaded project matches the test data exactly.
+
+            // Arrange
+            ConfigureConnectedClient(productName, productId, majorVersion, minorVersion);
+
+            if (supportsJsonLoad)
+            {
+                await ConfigureToServeEndpoints();
+            }
+            else
+            {
+                // Skip this test case at runtime because it expects the server to serve a full JSON project.
+                throw SkipException.ForSkip($"Product {productName} v{majorVersion}.{minorVersion} (id={productId}) does not support JSON project load. Skipping full-project test case.");
+            }
+
+            // Override the tag limit to ensure that we are testing the optimized recursion and selectively load objects based on the tag limit.
+            // See _data/simdemo_en.json and json chunks in _data/projectLoadSerializeData for data that is served by the mock server for this test.
+            var tagLimitOverride = 100;
+
+
+            // Act
+            var project = await _kepwareApiClient.Project.LoadProjectAsync(blnLoadFullProject: true, projectLoadTagLimit: tagLimitOverride);
+
+
+            // Assert
+            // Optimized recursion is done for this test, which will result in false.
+            project.IsLoadedByProjectLoadService.ShouldBeFalse();
+
+            project.ShouldNotBeNull();
+            project.Channels.ShouldNotBeEmpty("Channels list should not be empty.");
+
+            var testProject = await LoadJsonTestDataAsync();
+            var compareResult = EntityCompare.Compare<ChannelCollection, Channel>(testProject?.Project?.Channels, project?.Channels);
+
+            compareResult.ShouldNotBeNull();
+            compareResult.UnchangedItems.ShouldNotBeEmpty("All channels should be unchanged.");
+            compareResult.ChangedItems.ShouldBeEmpty("No channels should be changed.");
+            compareResult.ItemsOnlyInLeft.ShouldBeEmpty("No channels should exist only in the test data.");
+            compareResult.ItemsOnlyInRight.ShouldBeEmpty("No channels should exist only in the loaded project.");
+
+            foreach (var (ExpectedChannel, LoadedChannel) in testProject?.Project?.Channels?.Zip(project?.Channels ?? []) ?? [])
+            {
+                var deviceCompareResult = EntityCompare.Compare<DeviceCollection, Device>(ExpectedChannel.Devices, LoadedChannel.Devices);
+                deviceCompareResult.ShouldNotBeNull();
+                deviceCompareResult.UnchangedItems.ShouldNotBeEmpty($"All devices in channel {ExpectedChannel.Name} should be unchanged.");
+                deviceCompareResult.ChangedItems.ShouldBeEmpty($"No devices in channel {ExpectedChannel.Name} should be changed.");
+                deviceCompareResult.ItemsOnlyInLeft.ShouldBeEmpty($"No devices should exist only in the test data for channel {ExpectedChannel.Name}.");
+                deviceCompareResult.ItemsOnlyInRight.ShouldBeEmpty($"No devices should exist only in the loaded project for channel {ExpectedChannel.Name}.");
+
+                foreach (var (ExpectedDevice, LoadedDevice) in ExpectedChannel.Devices?.Zip(LoadedChannel.Devices ?? []) ?? [])
+                {
+                    if (ExpectedDevice.Tags?.Count > 0 || LoadedDevice.Tags?.Count > 0)
+                    {
+                        var tagCompareResult = EntityCompare.Compare<DeviceTagCollection, Tag>(ExpectedDevice.Tags, LoadedDevice.Tags);
+                        tagCompareResult.ShouldNotBeNull();
+                        tagCompareResult.UnchangedItems.ShouldNotBeEmpty($"All tags in device {ExpectedDevice.Name} should be unchanged.");
+                        tagCompareResult.ChangedItems.ShouldBeEmpty($"No tags in device {ExpectedDevice.Name} should be changed.");
+                        tagCompareResult.ItemsOnlyInLeft.ShouldBeEmpty($"No tags should exist only in the test data for device {ExpectedDevice.Name}.");
+                        tagCompareResult.ItemsOnlyInRight.ShouldBeEmpty($"No tags should exist only in the loaded project for device {ExpectedDevice.Name}.");
+                    }
+
+                    CompareTagGroupsRecursive(ExpectedDevice.TagGroups, LoadedDevice.TagGroups, ExpectedDevice.Name);
+                }
+            }
+
+            // Verify expected number of calls to the project load endpoints to ensure that the optimized recursion is selectively loading objects based on the tag limit.
+            foreach (var uri in _optimizedRecursionUris)
+            {
+                _httpMessageHandlerMock.VerifyRequest(HttpMethod.Get, uri);
             }
         }
 
@@ -182,7 +216,7 @@ namespace Kepware.Api.Test.ApiClient
 
             await ConfigureToServeEndpoints();
 
-            var project = await _kepwareApiClient.Project.LoadProject(blnLoadFullProject: false);
+            var project = await _kepwareApiClient.Project.LoadProjectAsync(blnLoadFullProject: false);
 
             project.ShouldNotBeNull();
             project.Channels.ShouldBeNull("Channels list should be null.");
@@ -201,7 +235,7 @@ namespace Kepware.Api.Test.ApiClient
                                    .ThrowsAsync(new HttpRequestException());
 
             // Act
-            var project = await _kepwareApiClient.Project.LoadProject(true);
+            var project = await _kepwareApiClient.Project.LoadProjectAsync(true);
 
             // Assert
             project.ShouldNotBeNull();

@@ -34,9 +34,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="_data/*.*">
+    <Content Include="_data/**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
 
 </Project>

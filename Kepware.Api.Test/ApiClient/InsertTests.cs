@@ -143,7 +143,7 @@ public class InsertTests : TestApiClientBase
     }
 
     [Fact]
-    public async Task Insert_MultipleItems_WithUnsupportedDriver_ShouldSkipItems()
+    public async Task Insert_MultipleItems_WithUnsupportedDriver_ShouldFailUnsupportedItems()
     {
         // Arrange
         await ConfigureToServeDrivers();
@@ -159,8 +159,10 @@ public class InsertTests : TestApiClientBase
         var results = await _kepwareApiClient.GenericConfig.InsertItemsAsync<ChannelCollection, Channel>(channels);
 
         // Assert
-        results.Length.ShouldBe(1); // Nur der Advanced Simulator-Channel sollte eingefügt werden
-        results[0].ShouldBeTrue();
+        results.Length.ShouldBe(2); // Both channels have results  
+        results[0].ShouldBeFalse(); // UnsupportedDriver should fail
+        results[1].ShouldBeTrue();  // Advanced Simulator should succeed
+        
         _httpMessageHandlerMock.VerifyRequest(HttpMethod.Post, $"{TEST_ENDPOINT}{endpoint}", Times.Once());
         _loggerMockGeneric.Verify(logger => 
             logger.Log(

@@ -16,6 +16,24 @@ namespace Kepware.Api.Model
     public class ApiResult
     {
         /// <summary>
+        /// Gets or sets the property name associated with a validation failure.
+        /// </summary>
+        [JsonPropertyName("property")]
+        public string? Property { get; set; }
+
+        /// <summary>
+        /// Gets or sets the description associated with a validation failure.
+        /// </summary>
+        [JsonPropertyName("description")]
+        public string? Description { get; set; }
+
+        /// <summary>
+        /// Gets or sets the error line associated with a validation failure.
+        /// </summary>
+        [JsonPropertyName("error_line")]
+        public int? ErrorLine { get; set; }
+
+        /// <summary>
         /// Gets or sets the status code of the API result.
         /// </summary>
         [JsonPropertyName("code")]
@@ -38,6 +56,18 @@ namespace Kepware.Api.Model
         /// </summary>
         [JsonIgnore]
         public bool IsSuccessStatusCode => Code >= 200 && Code < 300;
+    }
+
+    /// <summary>
+    /// Represents the response from an update endpoint that may include partially applied properties.
+    /// </summary>
+    public class UpdateApiResponseMessage : ApiResponseMessage
+    {
+        /// <summary>
+        /// Gets or sets the properties that were not applied.
+        /// </summary>
+        [JsonPropertyName("not_applied")]
+        public Dictionary<string, JsonElement>? NotApplied { get; set; }
     }
 
     /// <summary>

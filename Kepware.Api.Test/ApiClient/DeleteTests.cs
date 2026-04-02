@@ -4,6 +4,7 @@ using Moq;
 using Moq.Contrib.HttpClient;
 using Shouldly;
 using System.Net;
+using System.Linq;
 
 namespace Kepware.Api.Test.ApiClient;
 
@@ -302,7 +303,8 @@ public class DeleteTests : TestApiClientBase
         var result = await _kepwareApiClient.GenericConfig.DeleteItemsAsync<DeviceTagCollection, Tag>(tags, owner: device);
 
         // Assert
-        result.ShouldBeTrue();
+        result.Length.ShouldBe(tags.Count);
+        result.All(r => r).ShouldBeTrue();
         foreach (var tag in tags)
         {
             var endpoint = $"/config/v1/project/channels/{channel.Name}/devices/{device.Name}/tags/{tag.Name}";
@@ -326,7 +328,8 @@ public class DeleteTests : TestApiClientBase
         var result = await _kepwareApiClient.GenericConfig.DeleteItemsAsync<DeviceTagCollection, Tag>(tags, owner: device);
 
         // Assert
-        result.ShouldBeFalse();
+        result.Length.ShouldBe(tags.Count);
+        result[0].ShouldBeFalse();
         _httpMessageHandlerMock.VerifyRequest(HttpMethod.Delete, $"{TEST_ENDPOINT}{endpoint}", Times.Once());
         _loggerMockGeneric.Verify(logger =>
             logger.Log(
@@ -354,7 +357,8 @@ public class DeleteTests : TestApiClientBase
         var result = await _kepwareApiClient.GenericConfig.DeleteItemsAsync<DeviceTagCollection, Tag>(tags, owner: device);
 
         // Assert
-        result.ShouldBeFalse();
+        result.Length.ShouldBe(tags.Count);
+        result[0].ShouldBeFalse();
         _httpMessageHandlerMock.VerifyRequest(HttpMethod.Delete, $"{TEST_ENDPOINT}{endpoint}", Times.Once());
         _loggerMockGeneric.Verify(logger =>
             logger.Log(
@@ -379,7 +383,41 @@ public class DeleteTests : TestApiClientBase
         var result = await _kepwareApiClient.GenericConfig.DeleteItemsAsync<DeviceTagCollection, Tag>(tags, owner: device);
 
         // Assert
-        result.ShouldBeTrue();
+        result.Length.ShouldBe(0);
         _httpMessageHandlerMock.VerifyRequest(HttpMethod.Delete, $"{TEST_ENDPOINT}{endpoint}", Times.Never());
+    }
+
+    [Fact]
+    public async Task Delete_MultipleItems_WithMixedResults_ShouldReturnOrderedResults()
+    {
+        // Arrange
+        var channel = new Channel { Name = "TestChannel" };
+        var device = new Device { Name = "ParentDevice", Owner = channel };
+        var tags = CreateTestTags();
+        var firstEndpoint = $"/config/v1/project/channels/{channel.Name}/devices/{device.Name}/tags/{tags[0].Name}";
+        var secondEndpoint = $"/config/v1/project/channels/{channel.Name}/devices/{device.Name}/tags/{tags[1].Name}";
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Delete, $"{TEST_ENDPOINT}{firstEndpoint}")
+            .ReturnsResponse(HttpStatusCode.OK);
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Delete, $"{TEST_ENDPOINT}{secondEndpoint}")
+            .ReturnsResponse(HttpStatusCode.InternalServerError, "Server Error");
+
+        // Act
+        var result = await _kepwareApiClient.GenericConfig.DeleteItemsAsync<DeviceTagCollection, Tag>(tags, owner: device);
+
+        // Assert
+        result.Length.ShouldBe(tags.Count);
+        result[0].ShouldBeTrue();
+        result[1].ShouldBeFalse();
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Delete, $"{TEST_ENDPOINT}{firstEndpoint}", Times.Once());
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Delete, $"{TEST_ENDPOINT}{secondEndpoint}", Times.Once());
+        _loggerMockGeneric.Verify(logger =>
+            logger.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)),
+            Times.Once);
     }
 }

@@ -39,12 +39,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="appsettings.json">
+    <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-	<None Update="_data/*.*">
+    </Content>
+	<Content Include="_data/**">
 		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</None>
+	</Content>
   </ItemGroup>
 
 </Project>

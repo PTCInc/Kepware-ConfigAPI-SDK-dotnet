@@ -52,6 +52,7 @@ namespace Kepware.Api.ClientHandler
                 channel = await CreateChannelAsync(name, driverName, properties, cancellationToken);
                 if (channel != null)
                 {
+                    // TODO: Review this section. This should not do an update
                     if (properties != null)
                     {
                         var currentHash = channel.Hash;

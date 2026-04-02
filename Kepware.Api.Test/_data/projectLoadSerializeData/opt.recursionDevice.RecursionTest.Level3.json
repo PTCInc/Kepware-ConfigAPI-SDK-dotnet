@@ -1,0 +1,403 @@
+{
+  "tag_groups": {
+    "common.ALLTYPES_NAME": "Level3",
+    "tags": [
+      {
+        "common.ALLTYPES_NAME": "Boolean1",
+        "common.ALLTYPES_DESCRIPTION": "1-Bit Boolean",
+        "servermain.TAG_ADDRESS": "K0100.00",
+        "servermain.TAG_DATA_TYPE": 1,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Boolean2",
+        "common.ALLTYPES_DESCRIPTION": "1-Bit Boolean",
+        "servermain.TAG_ADDRESS": "K0100.01",
+        "servermain.TAG_DATA_TYPE": 1,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Boolean3",
+        "common.ALLTYPES_DESCRIPTION": "1-Bit Boolean",
+        "servermain.TAG_ADDRESS": "K0100.02",
+        "servermain.TAG_DATA_TYPE": 1,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Boolean4",
+        "common.ALLTYPES_DESCRIPTION": "1-Bit Boolean",
+        "servermain.TAG_ADDRESS": "K0100.03",
+        "servermain.TAG_DATA_TYPE": 1,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Double1",
+        "common.ALLTYPES_DESCRIPTION": "64-Bit IEEE floating point",
+        "servermain.TAG_ADDRESS": "K0400",
+        "servermain.TAG_DATA_TYPE": 9,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Double2",
+        "common.ALLTYPES_DESCRIPTION": "64-Bit IEEE floating point",
+        "servermain.TAG_ADDRESS": "K0404",
+        "servermain.TAG_DATA_TYPE": 9,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Double3",
+        "common.ALLTYPES_DESCRIPTION": "64-Bit IEEE floating point",
+        "servermain.TAG_ADDRESS": "K0408",
+        "servermain.TAG_DATA_TYPE": 9,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Double4",
+        "common.ALLTYPES_DESCRIPTION": "64-Bit IEEE floating point",
+        "servermain.TAG_ADDRESS": "K0412",
+        "servermain.TAG_DATA_TYPE": 9,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "DoubleArray",
+        "common.ALLTYPES_DESCRIPTION": "64-Bit IEEE floating point array",
+        "servermain.TAG_ADDRESS": "K0440 [4]",
+        "servermain.TAG_DATA_TYPE": 29,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "DWord1",
+        "common.ALLTYPES_DESCRIPTION": "32-Bit unsigned integer",
+        "servermain.TAG_ADDRESS": "K0500",
+        "servermain.TAG_DATA_TYPE": 7,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "DWord2",
+        "common.ALLTYPES_DESCRIPTION": "32-Bit unsigned integer",
+        "servermain.TAG_ADDRESS": "K0502",
+        "servermain.TAG_DATA_TYPE": 7,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "DWord3",
+        "common.ALLTYPES_DESCRIPTION": "32-Bit unsigned integer",
+        "servermain.TAG_ADDRESS": "K0504",
+        "servermain.TAG_DATA_TYPE": 7,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "DWord4",
+        "common.ALLTYPES_DESCRIPTION": "32-Bit unsigned integer",
+        "servermain.TAG_ADDRESS": "K0506",
+        "servermain.TAG_DATA_TYPE": 7,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "DWordArray",
+        "common.ALLTYPES_DESCRIPTION": "32-Bit unsigned integer array",
+        "servermain.TAG_ADDRESS": "K0550 [4]",
+        "servermain.TAG_DATA_TYPE": 27,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Float1",
+        "common.ALLTYPES_DESCRIPTION": "32-Bit IEEE floating point",
+        "servermain.TAG_ADDRESS": "K0600",
+        "servermain.TAG_DATA_TYPE": 8,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Float2",
+        "common.ALLTYPES_DESCRIPTION": "32-Bit IEEE floating point",
+        "servermain.TAG_ADDRESS": "K0602",
+        "servermain.TAG_DATA_TYPE": 8,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Float3",
+        "common.ALLTYPES_DESCRIPTION": "32-Bit IEEE floating point",
+        "servermain.TAG_ADDRESS": "K0604",
+        "servermain.TAG_DATA_TYPE": 8,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Float4",
+        "common.ALLTYPES_DESCRIPTION": "32-Bit IEEE floating point",
+        "servermain.TAG_ADDRESS": "K0606",
+        "servermain.TAG_DATA_TYPE": 8,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "FloatArray",
+        "common.ALLTYPES_DESCRIPTION": "32-Bit IEEE floating point array",
+        "servermain.TAG_ADDRESS": "K0660 [4]",
+        "servermain.TAG_DATA_TYPE": 28,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "LLong1",
+        "common.ALLTYPES_DESCRIPTION": "64 bit signed integer",
+        "servermain.TAG_ADDRESS": "K1200",
+        "servermain.TAG_DATA_TYPE": 13,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "LLong2",
+        "common.ALLTYPES_DESCRIPTION": "64 bit signed integer",
+        "servermain.TAG_ADDRESS": "K1204",
+        "servermain.TAG_DATA_TYPE": 13,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "LLong3",
+        "common.ALLTYPES_DESCRIPTION": "64 bit signed integer",
+        "servermain.TAG_ADDRESS": "K1208",
+        "servermain.TAG_DATA_TYPE": 13,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "LLong4",
+        "common.ALLTYPES_DESCRIPTION": "64 bit signed integer",
+        "servermain.TAG_ADDRESS": "K1212",
+        "servermain.TAG_DATA_TYPE": 13,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "LLongArray",
+        "common.ALLTYPES_DESCRIPTION": "64-bit signed integer array",
+        "servermain.TAG_ADDRESS": "K1240 [4]",
+        "servermain.TAG_DATA_TYPE": 33,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Long1",
+        "common.ALLTYPES_DESCRIPTION": "32-Bit signed integer",
+        "servermain.TAG_ADDRESS": "K0700",
+        "servermain.TAG_DATA_TYPE": 6,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Long2",
+        "common.ALLTYPES_DESCRIPTION": "32-Bit signed integer",
+        "servermain.TAG_ADDRESS": "K0702",
+        "servermain.TAG_DATA_TYPE": 6,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Long3",
+        "common.ALLTYPES_DESCRIPTION": "32-Bit signed integer",
+        "servermain.TAG_ADDRESS": "K0704",
+        "servermain.TAG_DATA_TYPE": 6,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Long4",
+        "common.ALLTYPES_DESCRIPTION": "32-Bit signed integer",
+        "servermain.TAG_ADDRESS": "K0706",
+        "servermain.TAG_DATA_TYPE": 6,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "LongArray",
+        "common.ALLTYPES_DESCRIPTION": "32-Bit signed integer array",
+        "servermain.TAG_ADDRESS": "K0770 [4]",
+        "servermain.TAG_DATA_TYPE": 26,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "QWord1",
+        "common.ALLTYPES_DESCRIPTION": "64-bit unsigned integer",
+        "servermain.TAG_ADDRESS": "K1100",
+        "servermain.TAG_DATA_TYPE": 14,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "QWord2",
+        "common.ALLTYPES_DESCRIPTION": "64-bit unsigned integer",
+        "servermain.TAG_ADDRESS": "K1104",
+        "servermain.TAG_DATA_TYPE": 14,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "QWord3",
+        "common.ALLTYPES_DESCRIPTION": "64-bit unsigned integer",
+        "servermain.TAG_ADDRESS": "K1108",
+        "servermain.TAG_DATA_TYPE": 14,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "QWord4",
+        "common.ALLTYPES_DESCRIPTION": "64-bit unsigned integer",
+        "servermain.TAG_ADDRESS": "K1112",
+        "servermain.TAG_DATA_TYPE": 14,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "QWordArray",
+        "common.ALLTYPES_DESCRIPTION": "64-bit unsigned Integer array",
+        "servermain.TAG_ADDRESS": "K1140 [4]",
+        "servermain.TAG_DATA_TYPE": 34,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Short1",
+        "common.ALLTYPES_DESCRIPTION": "16-Bit signed integer",
+        "servermain.TAG_ADDRESS": "K0800",
+        "servermain.TAG_DATA_TYPE": 4,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Short2",
+        "common.ALLTYPES_DESCRIPTION": "16-Bit signed integer",
+        "servermain.TAG_ADDRESS": "K0801",
+        "servermain.TAG_DATA_TYPE": 4,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Short3",
+        "common.ALLTYPES_DESCRIPTION": "16-Bit signed integer",
+        "servermain.TAG_ADDRESS": "K0802",
+        "servermain.TAG_DATA_TYPE": 4,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Short4",
+        "common.ALLTYPES_DESCRIPTION": "16-Bit signed integer",
+        "servermain.TAG_ADDRESS": "K0803",
+        "servermain.TAG_DATA_TYPE": 4,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "ShortArray",
+        "common.ALLTYPES_DESCRIPTION": "16-Bit signed integer array",
+        "servermain.TAG_ADDRESS": "K0880 [4]",
+        "servermain.TAG_DATA_TYPE": 24,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Word1",
+        "common.ALLTYPES_DESCRIPTION": "16-Bit unsigned integer",
+        "servermain.TAG_ADDRESS": "K0900",
+        "servermain.TAG_DATA_TYPE": 5,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Word2",
+        "common.ALLTYPES_DESCRIPTION": "16-Bit unsigned integer",
+        "servermain.TAG_ADDRESS": "K0901",
+        "servermain.TAG_DATA_TYPE": 5,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Word3",
+        "common.ALLTYPES_DESCRIPTION": "16-Bit unsigned integer",
+        "servermain.TAG_ADDRESS": "K0902",
+        "servermain.TAG_DATA_TYPE": 5,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "Word4",
+        "common.ALLTYPES_DESCRIPTION": "16-Bit unsigned integer",
+        "servermain.TAG_ADDRESS": "K0903",
+        "servermain.TAG_DATA_TYPE": 5,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      },
+      {
+        "common.ALLTYPES_NAME": "WordArray",
+        "common.ALLTYPES_DESCRIPTION": "16-Bit unsigned integer array",
+        "servermain.TAG_ADDRESS": "K0990 [4]",
+        "servermain.TAG_DATA_TYPE": 25,
+        "servermain.TAG_READ_WRITE_ACCESS": 1,
+        "servermain.TAG_SCAN_RATE_MILLISECONDS": 100,
+        "servermain.TAG_SCALING_TYPE": 0
+      }
+    ]
+  }
+}
