@@ -35,7 +35,7 @@
 
   <ItemGroup>
     <Content Include="_data/**/*.*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
