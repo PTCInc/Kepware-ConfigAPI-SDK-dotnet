@@ -13,12 +13,10 @@ using Xunit.Extensions.Ordering;
 
 namespace Kepware.Api.TestIntg.ApiClient
 {
-    [TestCaseOrderer("Xunit.Extensions.Ordering.TestCaseOrderer", "Xunit.Extensions.Ordering")]
     public class UaEndpointTests : TestIntgApiClientBase
     {
 
         [SkippableFact]
-        [Order(1)]
         public async Task CreateOrUpdateUaEndpointAsync_ShouldCreateUaEndpoint_WhenItDoesNotExist()
         {
             // Skip the test if the product is not "Edge" productId
@@ -32,10 +30,13 @@ namespace Kepware.Api.TestIntg.ApiClient
 
             // Assert
             result.ShouldBeTrue();
+
+            // Clean up
+            await _kepwareApiClient.Admin.DeleteUaEndpointAsync(uaEndpoint.Name);
+
         }
 
         [SkippableFact]
-        [Order(2)]
         public async Task CreateOrUpdateUaEndpointAsync_ShouldUpdateUaEndpoint_WhenItExists()
         {
             // Skip the test if the product is not "Edge" productId
@@ -43,6 +44,10 @@ namespace Kepware.Api.TestIntg.ApiClient
 
             // Arrange
             var uaEndpoint = CreateTestUaEndpoint();
+            await _kepwareApiClient.GenericConfig.InsertItemAsync<UaEndpoint>(uaEndpoint);
+
+            uaEndpoint = await _kepwareApiClient.GenericConfig.LoadEntityAsync<UaEndpoint>(uaEndpoint.Name);
+            uaEndpoint.ShouldNotBeNull();
             uaEndpoint.Port = 4840;
 
             // Act
@@ -50,10 +55,12 @@ namespace Kepware.Api.TestIntg.ApiClient
 
             // Assert
             result.ShouldBeTrue();
+
+            // Clean up
+            await _kepwareApiClient.Admin.DeleteUaEndpointAsync(uaEndpoint.Name);
         }
 
         [SkippableFact]
-        [Order(3)]
         public async Task GetUaEndpointAsync_ShouldReturnUaEndpoint_WhenApiRespondsSuccessfully()
         {
             // Skip the test if the product is not "Edge" productId
@@ -61,6 +68,7 @@ namespace Kepware.Api.TestIntg.ApiClient
 
             // Arrange
             var uaEndpoint = CreateTestUaEndpoint();
+            await _kepwareApiClient.GenericConfig.InsertItemAsync<UaEndpoint>(uaEndpoint);
 
             // Act
             var result = await _kepwareApiClient.Admin.GetUaEndpointAsync(uaEndpoint.Name);
@@ -69,10 +77,13 @@ namespace Kepware.Api.TestIntg.ApiClient
             result.ShouldNotBeNull();
             result.Name.ShouldBe(uaEndpoint.Name);
             result.Port.ShouldBeOfType<int>();
+
+            // Clean up
+            await _kepwareApiClient.Admin.DeleteUaEndpointAsync(uaEndpoint.Name);
+
         }
 
         [SkippableFact]
-        [Order(4)]
         public async Task GetUaEndpointsAsync_ShouldReturnUaEndpointCollection_WhenApiRespondsSuccessfully()
         {
             // Skip the test if the product is not "Edge" productId
@@ -83,12 +94,10 @@ namespace Kepware.Api.TestIntg.ApiClient
 
             // Assert
             result.ShouldNotBeNull();
-            // result.Count.ShouldBe(2);
         }
 
 
         [SkippableFact]
-        [Order(5)]
         public async Task DeleteUaEndpointAsync_ShouldReturnTrue_WhenDeleteSuccessful()
         {
             // Skip the test if the product is not "Edge" productId
@@ -96,6 +105,7 @@ namespace Kepware.Api.TestIntg.ApiClient
 
             // Arrange
             var uaEndpoint = CreateTestUaEndpoint();
+            await _kepwareApiClient.GenericConfig.InsertItemAsync<UaEndpoint>(uaEndpoint);
 
             // Act
             var result = await _kepwareApiClient.Admin.DeleteUaEndpointAsync(uaEndpoint.Name);
@@ -105,7 +115,6 @@ namespace Kepware.Api.TestIntg.ApiClient
         }
 
         [SkippableFact]
-        [Order(6)]
         public async Task DeleteUaEndpointAsync_ShouldReturnFalse_WhenDeleteFails()
         {
             // Skip the test if the product is not "Edge" productId
