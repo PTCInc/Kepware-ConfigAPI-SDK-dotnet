@@ -71,6 +71,39 @@ jobs:
         run: dotnet restore
       - name: Build
         run: dotnet build --no-restore --configuration release
+
+      # - name: Show current directory (debug)
+      #   run: |
+      #     echo "Current directory: $(pwd)"
+      # - name: Show repo files (debug)
+      #   if: ${{ matrix.platform == 'ubuntu' }}
+      #   run: |
+      #     echo "Repo root: $(pwd)"
+      #     ls -la
+      #     echo "List _data:"
+      #     ls -la Kepware.Api.Test/_data || true
+      #     echo "List _data/projectLoadSerializeData:"
+      #     ls -la Kepware.Api.Test/_data/projectLoadSerializeData || true
+
+      # - name: Build test project (debug)
+      #   if: ${{ matrix.platform == 'ubuntu' }}
+      #   run: dotnet build Kepware.Api.Test/Kepware.Api.Test.csproj -c Release
+
+      # - name: Show build output (debug)
+      #   if: ${{ matrix.platform == 'ubuntu' }}
+      #   run: ls -la Kepware.Api.Test/bin/Release || true
+
+      # - name: Show TFM outputs (debug)
+      #   if: ${{ matrix.platform == 'ubuntu' }}
+      #   run: ls -la Kepware.Api.Test/bin/Release/* || true
+
+      # - name: Show test _data (debug)
+      #   if: ${{ matrix.platform == 'ubuntu' }}
+      #   run: ls -la Kepware.Api.Test/bin/Release/net8.0/_data || true
+      # - name: Show test _data/projectLoadSerializeData (debug)
+      #   if: ${{ matrix.platform == 'ubuntu' }}
+      #   run: ls -la Kepware.Api.Test/bin/Release/net8.0/_data/projectLoadSerializeData || true
+
       - name: Test
         run: dotnet test Kepware.Api.Test/Kepware.Api.Test.csproj --no-build --verbosity normal --configuration Release  --logger "trx;LogFilePrefix=${{ matrix.platform }}-test-results"
       - name: Publish Test Reports (${{ matrix.platform }})

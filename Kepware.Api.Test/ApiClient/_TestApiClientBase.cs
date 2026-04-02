@@ -226,7 +226,7 @@ namespace Kepware.Api.Test.ApiClient
             // Additional endpoints for content=serialize mocking
             var projectPropertiesString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/projectProperties.json");
             var channel1String = await File.ReadAllTextAsync("_data/projectLoadSerializeData/Channel1.json");
-            var sixteenBitDeviceString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/dataTypeExamples.16BitDevice.json");
+            var sixteenBitDeviceString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/dataTypeExamples.16bitDevice.json");
             var simExamplesChannelString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/simulationExamples.json");
             var dte8BitBRegTagGroupString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/dte.8bitDevice.Breg.json");
             var dte8BitKRegTagGroupString = await File.ReadAllTextAsync("_data/projectLoadSerializeData/dte.8bitDevice.Kreg.json");
