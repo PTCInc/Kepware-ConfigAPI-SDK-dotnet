@@ -155,6 +155,161 @@ namespace Kepware.Api.ClientHandler
 
         #endregion
 
+        #region Log Item
+
+        /// <summary>
+        /// Gets a log item with the specified name from the given parent log group.
+        /// </summary>
+        /// <param name="name">The name of the log item.</param>
+        /// <param name="parent">The parent log group.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The loaded <see cref="LogItem"/> or null if not found.</returns>
+        /// <exception cref="ArgumentException">Thrown when the name is null or empty.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the parent is null.</exception>
+        public async Task<LogItem?> GetLogItemAsync(string name, LogGroup parent, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException("Log item name cannot be null or empty", nameof(name));
+            ArgumentNullException.ThrowIfNull(parent);
+
+            return await m_kepwareApiClient.GenericConfig.LoadEntityAsync<LogItem>(name, parent, cancellationToken: cancellationToken);
+        }
+
+        /// <summary>
+        /// Gets all log items from the given parent log group.
+        /// </summary>
+        /// <param name="parent">The parent log group.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The loaded <see cref="LogItemCollection"/>, or null if none exist.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the parent is null.</exception>
+        public async Task<LogItemCollection?> GetLogItemsAsync(LogGroup parent, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(parent);
+            return await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<LogItemCollection, LogItem>(parent, cancellationToken: cancellationToken);
+        }
+
+        /// <summary>
+        /// Gets or creates a log item with the specified name under the given parent log group.
+        /// If the item exists, it is loaded and returned. If it does not exist, it is created.
+        /// </summary>
+        /// <param name="name">The name of the log item.</param>
+        /// <param name="parent">The parent log group.</param>
+        /// <param name="properties">Optional properties to set on the log item.</param>
+        /// <param name="autoDisable">When true, disables the parent group before mutating and re-enables it after.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The created or loaded <see cref="LogItem"/>.</returns>
+        /// <exception cref="ArgumentException">Thrown when the name is null or empty.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the parent is null.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the log item cannot be created or loaded.</exception>
+        public async Task<LogItem> GetOrCreateLogItemAsync(string name, LogGroup parent, IDictionary<string, object>? properties = null, bool autoDisable = false, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException("Log item name cannot be null or empty", nameof(name));
+            ArgumentNullException.ThrowIfNull(parent);
+
+            var item = await m_kepwareApiClient.GenericConfig.LoadEntityAsync<LogItem>(name, parent, cancellationToken: cancellationToken);
+
+            if (item == null)
+            {
+                item = await CreateLogItemAsync(name, parent, properties, autoDisable, cancellationToken);
+                if (item == null)
+                    throw new InvalidOperationException($"Failed to create or load log item '{name}'");
+            }
+
+            return item;
+        }
+
+        /// <summary>
+        /// Creates a new log item with the specified name under the given parent log group.
+        /// </summary>
+        /// <param name="name">The name of the log item.</param>
+        /// <param name="parent">The parent log group.</param>
+        /// <param name="properties">Optional properties to set on the log item.</param>
+        /// <param name="autoDisable">When true, disables the parent group before creating and re-enables it after.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The created <see cref="LogItem"/>, or null if creation failed.</returns>
+        /// <exception cref="ArgumentException">Thrown when the name is null or empty.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the parent is null.</exception>
+        public async Task<LogItem?> CreateLogItemAsync(string name, LogGroup parent, IDictionary<string, object>? properties = null, bool autoDisable = false, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException("Log item name cannot be null or empty", nameof(name));
+            ArgumentNullException.ThrowIfNull(parent);
+
+            return await WithAutoDisableAsync(parent, autoDisable, async () =>
+            {
+                var item = new LogItem(name) { Owner = parent };
+                if (properties != null)
+                {
+                    foreach (var property in properties)
+                        item.SetDynamicProperty(property.Key, property.Value);
+                }
+
+                if (await m_kepwareApiClient.GenericConfig.InsertItemAsync<LogItemCollection, LogItem>(item, parent, cancellationToken: cancellationToken))
+                    return item;
+
+                return null;
+            }, cancellationToken);
+        }
+
+        /// <summary>
+        /// Updates the specified log item.
+        /// </summary>
+        /// <param name="item">The log item to update.</param>
+        /// <param name="parent">The parent log group.</param>
+        /// <param name="autoDisable">When true, disables the parent group before updating and re-enables it after.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A boolean indicating whether the update was successful.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the item or parent is null.</exception>
+        public Task<bool> UpdateLogItemAsync(LogItem item, LogGroup parent, bool autoDisable = false, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+            ArgumentNullException.ThrowIfNull(parent);
+            return WithAutoDisableAsync(parent, autoDisable,
+                () => m_kepwareApiClient.GenericConfig.UpdateItemAsync(item, oldItem: null, cancellationToken),
+                cancellationToken);
+        }
+
+        /// <summary>
+        /// Deletes the specified log item.
+        /// </summary>
+        /// <param name="item">The log item to delete.</param>
+        /// <param name="parent">The parent log group.</param>
+        /// <param name="autoDisable">When true, disables the parent group before deleting and re-enables it after.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A boolean indicating whether the deletion was successful.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the item or parent is null.</exception>
+        public Task<bool> DeleteLogItemAsync(LogItem item, LogGroup parent, bool autoDisable = false, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+            ArgumentNullException.ThrowIfNull(parent);
+            return WithAutoDisableAsync(parent, autoDisable,
+                () => m_kepwareApiClient.GenericConfig.DeleteItemAsync(item, cancellationToken: cancellationToken),
+                cancellationToken);
+        }
+
+        /// <summary>
+        /// Deletes the log item with the specified name from the given parent log group.
+        /// </summary>
+        /// <param name="name">The name of the log item to delete.</param>
+        /// <param name="parent">The parent log group.</param>
+        /// <param name="autoDisable">When true, disables the parent group before deleting and re-enables it after.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A boolean indicating whether the deletion was successful.</returns>
+        /// <exception cref="ArgumentException">Thrown when the name is null or empty.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the parent is null.</exception>
+        public Task<bool> DeleteLogItemAsync(string name, LogGroup parent, bool autoDisable = false, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException("Log item name cannot be null or empty", nameof(name));
+            ArgumentNullException.ThrowIfNull(parent);
+            return WithAutoDisableAsync(parent, autoDisable,
+                () => m_kepwareApiClient.GenericConfig.DeleteItemAsync(new LogItem(name) { Owner = parent }, cancellationToken),
+                cancellationToken);
+        }
+
+        #endregion
+
         #region Auto-Disable Helper
 
         /// <summary>
