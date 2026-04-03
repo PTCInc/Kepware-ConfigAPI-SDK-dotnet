@@ -46,6 +46,18 @@ namespace Kepware.Api.Model
             /// </summary>
             public const string ThingworxStoreAndForwardDatastoreId = "thingworxinterface.DATASTORE_ID";
 
+            // DataLogger read-only property keys
+            /// <summary>Data type of the batch ID item (read-only).</summary>
+            public const string DataLoggerLogGroupBatchIdItemType = "datalogger.LOG_GROUP_BATCH_ID_ITEM_TYPE";
+            /// <summary>Data type of a log item (read-only).</summary>
+            public const string DataLoggerLogItemDataType = "datalogger.LOG_ITEM_DATA_TYPE";
+            /// <summary>Data type of the trigger monitor item (read-only).</summary>
+            public const string DataLoggerTriggerMonitorItemDataType = "datalogger.TRIGGER_MONITOR_ITEM_DATA_TYPE";
+            /// <summary>Data type of the trigger start condition item (read-only).</summary>
+            public const string DataLoggerTriggerConditionStartItemDataType = "datalogger.TRIGGER_CONDITION_START_ITEM_DATA_TYPE";
+            /// <summary>Data type of the trigger stop condition item (read-only).</summary>
+            public const string DataLoggerTriggerConditionStopItemDataType = "datalogger.TRIGGER_CONDITION_STOP_ITEM_DATA_TYPE";
+
             /// <summary>
             /// A set of non-updatable properties.
             /// </summary>
@@ -54,6 +66,11 @@ namespace Kepware.Api.Model
                     ChannelUniqueId,
                     DeviceUniqueId,
                     ThingworxStoreAndForwardDatastoreId,
+                    DataLoggerLogGroupBatchIdItemType,
+                    DataLoggerLogItemDataType,
+                    DataLoggerTriggerMonitorItemDataType,
+                    DataLoggerTriggerConditionStartItemDataType,
+                    DataLoggerTriggerConditionStopItemDataType,
                 }.ToFrozenSet();
         }
 
