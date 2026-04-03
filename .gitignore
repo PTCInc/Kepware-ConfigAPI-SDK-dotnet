@@ -9,6 +9,8 @@ docs/docfx/_*
 docs/docfx/Kepware*
 docs/docfx/*.md
 .API *
+CLAUDE.md
+
 
 # User-specific files
 *.rsuser
