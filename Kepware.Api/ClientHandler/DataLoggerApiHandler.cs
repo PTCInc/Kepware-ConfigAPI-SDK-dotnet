@@ -364,6 +364,160 @@ namespace Kepware.Api.ClientHandler
 
         #endregion
 
+        #region Triggers
+
+        /// <summary>
+        /// Gets a trigger with the specified name from the given parent log group.
+        /// </summary>
+        /// <param name="name">The name of the trigger.</param>
+        /// <param name="parent">The parent log group.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The loaded <see cref="Trigger"/> or null if not found.</returns>
+        /// <exception cref="ArgumentException">Thrown when the name is null or empty.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the parent is null.</exception>
+        public async Task<Trigger?> GetTriggerAsync(string name, LogGroup parent, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException("Trigger name cannot be null or empty", nameof(name));
+            ArgumentNullException.ThrowIfNull(parent);
+            return await m_kepwareApiClient.GenericConfig.LoadEntityAsync<Trigger>(name, parent, cancellationToken: cancellationToken);
+        }
+
+        /// <summary>
+        /// Gets all triggers from the given parent log group.
+        /// </summary>
+        /// <param name="parent">The parent log group.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The loaded <see cref="TriggerCollection"/>, or null if none exist.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the parent is null.</exception>
+        public async Task<TriggerCollection?> GetTriggersAsync(LogGroup parent, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(parent);
+            return await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<TriggerCollection, Trigger>(parent, cancellationToken: cancellationToken);
+        }
+
+        /// <summary>
+        /// Gets or creates a trigger with the specified name under the given parent log group.
+        /// If the trigger exists, it is loaded and returned. If it does not exist, it is created.
+        /// </summary>
+        /// <param name="name">The name of the trigger.</param>
+        /// <param name="parent">The parent log group.</param>
+        /// <param name="properties">Optional properties to set on the trigger.</param>
+        /// <param name="autoDisable">When true, disables the parent group before mutating and re-enables it after.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The created or loaded <see cref="Trigger"/>.</returns>
+        /// <exception cref="ArgumentException">Thrown when the name is null or empty.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the parent is null.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the trigger cannot be created or loaded.</exception>
+        public async Task<Trigger> GetOrCreateTriggerAsync(string name, LogGroup parent, IDictionary<string, object>? properties = null, bool autoDisable = false, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException("Trigger name cannot be null or empty", nameof(name));
+            ArgumentNullException.ThrowIfNull(parent);
+
+            var trigger = await m_kepwareApiClient.GenericConfig.LoadEntityAsync<Trigger>(name, parent, cancellationToken: cancellationToken);
+
+            if (trigger == null)
+            {
+                trigger = await CreateTriggerAsync(name, parent, properties, autoDisable, cancellationToken);
+                if (trigger == null)
+                    throw new InvalidOperationException($"Failed to create or load trigger '{name}'");
+            }
+
+            return trigger;
+        }
+
+        /// <summary>
+        /// Creates a new trigger with the specified name under the given parent log group.
+        /// </summary>
+        /// <param name="name">The name of the trigger.</param>
+        /// <param name="parent">The parent log group.</param>
+        /// <param name="properties">Optional properties to set on the trigger.</param>
+        /// <param name="autoDisable">When true, disables the parent group before creating and re-enables it after.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The created <see cref="Trigger"/>, or null if creation failed.</returns>
+        /// <exception cref="ArgumentException">Thrown when the name is null or empty.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the parent is null.</exception>
+        public async Task<Trigger?> CreateTriggerAsync(string name, LogGroup parent, IDictionary<string, object>? properties = null, bool autoDisable = false, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException("Trigger name cannot be null or empty", nameof(name));
+            ArgumentNullException.ThrowIfNull(parent);
+
+            return await WithAutoDisableAsync(parent, autoDisable, async () =>
+            {
+                var trigger = new Trigger(name) { Owner = parent };
+                if (properties != null)
+                {
+                    foreach (var property in properties)
+                        trigger.SetDynamicProperty(property.Key, property.Value);
+                }
+
+                if (await m_kepwareApiClient.GenericConfig.InsertItemAsync<TriggerCollection, Trigger>(trigger, parent, cancellationToken: cancellationToken))
+                    return trigger;
+
+                return null;
+            }, cancellationToken);
+        }
+
+        /// <summary>
+        /// Updates the specified trigger.
+        /// </summary>
+        /// <param name="trigger">The trigger to update.</param>
+        /// <param name="parent">The parent log group.</param>
+        /// <param name="autoDisable">When true, disables the parent group before updating and re-enables it after.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A boolean indicating whether the update was successful.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the trigger or parent is null.</exception>
+        public Task<bool> UpdateTriggerAsync(Trigger trigger, LogGroup parent, bool autoDisable = false, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(trigger);
+            ArgumentNullException.ThrowIfNull(parent);
+            return WithAutoDisableAsync(parent, autoDisable,
+                () => m_kepwareApiClient.GenericConfig.UpdateItemAsync(trigger, oldItem: null, cancellationToken),
+                cancellationToken);
+        }
+
+        /// <summary>
+        /// Deletes the specified trigger.
+        /// </summary>
+        /// <param name="trigger">The trigger to delete.</param>
+        /// <param name="parent">The parent log group.</param>
+        /// <param name="autoDisable">When true, disables the parent group before deleting and re-enables it after.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A boolean indicating whether the deletion was successful.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the trigger or parent is null.</exception>
+        public Task<bool> DeleteTriggerAsync(Trigger trigger, LogGroup parent, bool autoDisable = false, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(trigger);
+            ArgumentNullException.ThrowIfNull(parent);
+            return WithAutoDisableAsync(parent, autoDisable,
+                () => m_kepwareApiClient.GenericConfig.DeleteItemAsync(trigger, cancellationToken: cancellationToken),
+                cancellationToken);
+        }
+
+        /// <summary>
+        /// Deletes the trigger with the specified name from the given parent log group.
+        /// </summary>
+        /// <param name="name">The name of the trigger to delete.</param>
+        /// <param name="parent">The parent log group.</param>
+        /// <param name="autoDisable">When true, disables the parent group before deleting and re-enables it after.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A boolean indicating whether the deletion was successful.</returns>
+        /// <exception cref="ArgumentException">Thrown when the name is null or empty.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the parent is null.</exception>
+        public Task<bool> DeleteTriggerAsync(string name, LogGroup parent, bool autoDisable = false, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException("Trigger name cannot be null or empty", nameof(name));
+            ArgumentNullException.ThrowIfNull(parent);
+            return WithAutoDisableAsync(parent, autoDisable,
+                () => m_kepwareApiClient.GenericConfig.DeleteItemAsync(new Trigger(name) { Owner = parent }, cancellationToken),
+                cancellationToken);
+        }
+
+        #endregion
+
         #region Auto-Disable Helper
 
         /// <summary>

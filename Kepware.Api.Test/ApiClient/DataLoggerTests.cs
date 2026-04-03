@@ -513,4 +513,187 @@ public class DataLoggerTests : TestApiClientBase
     }
 
     #endregion
+
+    #region Trigger Tests
+
+    private const string TEST_TRIGGER_NAME = "TestTrigger";
+    private string TriggersEndpoint => $"{TEST_ENDPOINT}/config/v1/project/_datalogger/log_groups/{TEST_GROUP_NAME}/triggers";
+    private string TriggerEndpoint => $"{TEST_ENDPOINT}/config/v1/project/_datalogger/log_groups/{TEST_GROUP_NAME}/triggers/{TEST_TRIGGER_NAME}";
+
+    [Fact]
+    public async Task CreateTrigger_ShouldPostToCorrectEndpoint()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Post, TriggersEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK);
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.CreateTriggerAsync(TEST_TRIGGER_NAME, parent);
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Name.ShouldBe(TEST_TRIGGER_NAME);
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Post, TriggersEndpoint, Times.Once());
+    }
+
+    [Fact]
+    public async Task CreateTrigger_WithAutoDisableTrue_ShouldDisableThenReEnable()
+    {
+        // Arrange — group starts enabled
+        var parent = new LogGroup(TEST_GROUP_NAME) { Enabled = true };
+
+        var groupJson = $$"""{ "common.ALLTYPES_NAME": "{{TEST_GROUP_NAME}}", "datalogger.LOG_GROUP_ENABLED": true }""";
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, LogGroupEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK, groupJson, "application/json");
+
+        // Capture PUT bodies in order to verify disable then re-enable sequence
+        var putBodies = new List<string>();
+        _httpMessageHandlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync",
+                ItExpr.Is<HttpRequestMessage>(r =>
+                    r.Method == HttpMethod.Put &&
+                    r.RequestUri!.ToString() == LogGroupEndpoint),
+                ItExpr.IsAny<CancellationToken>())
+            .Returns<HttpRequestMessage, CancellationToken>(async (req, ct) =>
+            {
+                putBodies.Add(await req.Content!.ReadAsStringAsync(ct));
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            });
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Post, TriggersEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK);
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.CreateTriggerAsync(TEST_TRIGGER_NAME, parent, autoDisable: true);
+
+        // Assert — 2 PUTs: first disables, second re-enables
+        result.ShouldNotBeNull();
+        result.Name.ShouldBe(TEST_TRIGGER_NAME);
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Post, TriggersEndpoint, Times.Once());
+
+        putBodies.Count.ShouldBe(2);
+        putBodies[0].ShouldContain("\"datalogger.LOG_GROUP_ENABLED\": false"); // disable
+        putBodies[1].ShouldContain("\"datalogger.LOG_GROUP_ENABLED\": true");  // re-enable
+    }
+
+    [Fact]
+    public async Task UpdateTrigger_ShouldPutToCorrectEndpoint()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        var trigger = new Trigger(TEST_TRIGGER_NAME) { Owner = parent };
+
+        var triggerJson = $$"""{ "common.ALLTYPES_NAME": "{{TEST_TRIGGER_NAME}}" }""";
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TriggerEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK, triggerJson, "application/json");
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Put, TriggerEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK);
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.UpdateTriggerAsync(trigger, parent);
+
+        // Assert
+        result.ShouldBeTrue();
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Put, TriggerEndpoint, Times.Once());
+    }
+
+    [Fact]
+    public async Task DeleteTrigger_ShouldDeleteFromCorrectEndpoint()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        var trigger = new Trigger(TEST_TRIGGER_NAME) { Owner = parent };
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Delete, TriggerEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK);
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.DeleteTriggerAsync(trigger, parent);
+
+        // Assert
+        result.ShouldBeTrue();
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Delete, TriggerEndpoint, Times.Once());
+    }
+
+    [Fact]
+    public async Task DeleteTrigger_ByName_ShouldDeleteFromCorrectEndpoint()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Delete, TriggerEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK);
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.DeleteTriggerAsync(TEST_TRIGGER_NAME, parent);
+
+        // Assert
+        result.ShouldBeTrue();
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Delete, TriggerEndpoint, Times.Once());
+    }
+
+    [Fact]
+    public async Task GetTriggers_ShouldLoadFromParentEndpoint()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        var triggersJson = $$"""[ { "common.ALLTYPES_NAME": "{{TEST_TRIGGER_NAME}}" } ]""";
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TriggersEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK, triggersJson, "application/json");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.GetTriggersAsync(parent);
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Count.ShouldBe(1);
+        result[0].Name.ShouldBe(TEST_TRIGGER_NAME);
+    }
+
+    [Fact]
+    public async Task GetOrCreateTrigger_WhenExists_ShouldReturnExisting()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        var triggerJson = $$"""{ "common.ALLTYPES_NAME": "{{TEST_TRIGGER_NAME}}" }""";
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TriggerEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK, triggerJson, "application/json");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.GetOrCreateTriggerAsync(TEST_TRIGGER_NAME, parent);
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Name.ShouldBe(TEST_TRIGGER_NAME);
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Post, TriggersEndpoint, Times.Never());
+    }
+
+    [Fact]
+    public async Task GetOrCreateTrigger_WhenNotExists_ShouldCreateAndReturn()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TriggerEndpoint)
+            .ReturnsResponse(HttpStatusCode.NotFound, "Not Found");
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Post, TriggersEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK);
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.GetOrCreateTriggerAsync(TEST_TRIGGER_NAME, parent);
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Name.ShouldBe(TEST_TRIGGER_NAME);
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Post, TriggersEndpoint, Times.Once());
+    }
+
+    #endregion
 }
