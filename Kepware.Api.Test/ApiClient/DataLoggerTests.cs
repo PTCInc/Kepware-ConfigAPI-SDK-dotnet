@@ -401,4 +401,116 @@ public class DataLoggerTests : TestApiClientBase
     }
 
     #endregion
+
+    #region Column Mapping Tests
+
+    private const string TEST_MAPPING_NAME = "TestMapping";
+    private string ColumnMappingsEndpoint => $"{TEST_ENDPOINT}/config/v1/project/_datalogger/log_groups/{TEST_GROUP_NAME}/column_mappings";
+    private string ColumnMappingEndpoint => $"{TEST_ENDPOINT}/config/v1/project/_datalogger/log_groups/{TEST_GROUP_NAME}/column_mappings/{TEST_MAPPING_NAME}";
+
+    [Fact]
+    public async Task GetColumnMappings_ShouldLoadFromParentEndpoint()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        var mappingsJson = $$"""[ { "common.ALLTYPES_NAME": "{{TEST_MAPPING_NAME}}" } ]""";
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, ColumnMappingsEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK, mappingsJson, "application/json");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.GetColumnMappingsAsync(parent);
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Count.ShouldBe(1);
+        result[0].Name.ShouldBe(TEST_MAPPING_NAME);
+    }
+
+    [Fact]
+    public async Task GetColumnMapping_ShouldLoadSingleEntityFromParentEndpoint()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        var mappingJson = $$"""{ "common.ALLTYPES_NAME": "{{TEST_MAPPING_NAME}}" }""";
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, ColumnMappingEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK, mappingJson, "application/json");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.GetColumnMappingAsync(TEST_MAPPING_NAME, parent);
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Name.ShouldBe(TEST_MAPPING_NAME);
+    }
+
+    [Fact]
+    public async Task UpdateColumnMapping_ShouldPutToCorrectEndpoint()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        var mapping = new ColumnMapping(TEST_MAPPING_NAME) { Owner = parent };
+
+        var mappingJson = $$"""{ "common.ALLTYPES_NAME": "{{TEST_MAPPING_NAME}}" }""";
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, ColumnMappingEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK, mappingJson, "application/json");
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Put, ColumnMappingEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK);
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.UpdateColumnMappingAsync(mapping, parent);
+
+        // Assert
+        result.ShouldBeTrue();
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Put, ColumnMappingEndpoint, Times.Once());
+    }
+
+    [Fact]
+    public async Task UpdateColumnMapping_WithAutoDisableTrue_ShouldDisableThenReEnable()
+    {
+        // Arrange — group starts enabled
+        var parent = new LogGroup(TEST_GROUP_NAME) { Enabled = true };
+        var mapping = new ColumnMapping(TEST_MAPPING_NAME) { Owner = parent };
+
+        var groupJson = $$"""{ "common.ALLTYPES_NAME": "{{TEST_GROUP_NAME}}", "datalogger.LOG_GROUP_ENABLED": true }""";
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, LogGroupEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK, groupJson, "application/json");
+
+        var mappingJson = $$"""{ "common.ALLTYPES_NAME": "{{TEST_MAPPING_NAME}}" }""";
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, ColumnMappingEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK, mappingJson, "application/json");
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Put, ColumnMappingEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK);
+
+        // Capture PUT bodies on the log group to verify disable then re-enable
+        var groupPutBodies = new List<string>();
+        _httpMessageHandlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync",
+                ItExpr.Is<HttpRequestMessage>(r =>
+                    r.Method == HttpMethod.Put &&
+                    r.RequestUri!.ToString() == LogGroupEndpoint),
+                ItExpr.IsAny<CancellationToken>())
+            .Returns<HttpRequestMessage, CancellationToken>(async (req, ct) =>
+            {
+                groupPutBodies.Add(await req.Content!.ReadAsStringAsync(ct));
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            });
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.UpdateColumnMappingAsync(mapping, parent, autoDisable: true);
+
+        // Assert
+        result.ShouldBeTrue();
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Put, ColumnMappingEndpoint, Times.Once());
+
+        groupPutBodies.Count.ShouldBe(2);
+        groupPutBodies[0].ShouldContain("\"datalogger.LOG_GROUP_ENABLED\": false"); // disable
+        groupPutBodies[1].ShouldContain("\"datalogger.LOG_GROUP_ENABLED\": true");  // re-enable
+    }
+
+    #endregion
 }
