@@ -116,6 +116,34 @@ namespace Kepware.Api.Model
                             }
                         }
                     }
+                    else if (prop.Name == "_datalogger")
+                    {
+                        // _datalogger is an array containing a single wrapper object with
+                        // "common.ALLTYPES_NAME": "_DataLogger" and the log_groups collection array.
+                        if (prop.Value.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var dlElement in prop.Value.EnumerateArray())
+                            {
+                                if (dlElement.ValueKind == JsonValueKind.Object)
+                                {
+                                    var container = new DataLoggerContainer();
+
+                                    if (dlElement.TryGetProperty("log_groups", out var logGroupsProp))
+                                    {
+                                        var logGroupsTypeInfo = (JsonTypeInfo<List<LogGroup>>)options.GetTypeInfo(typeof(List<LogGroup>));
+                                        var groups = JsonSerializer.Deserialize(logGroupsProp.GetRawText(), logGroupsTypeInfo);
+                                        if (groups != null)
+                                        {
+                                            container.LogGroups = new LogGroupCollection();
+                                            foreach (var group in groups) container.LogGroups.Add(group);
+                                        }
+                                    }
+
+                                    project.DataLogger = container;
+                                }
+                            }
+                        }
+                    }
                     else if (prop.Name == "PROJECT_ID")
                     {
                         if (prop.Value.TryGetInt64(out var projectId))
@@ -182,6 +210,26 @@ namespace Kepware.Api.Model
                     writer.WritePropertyName("rest_servers");
                     var restServerTypeInfo = (JsonTypeInfo<List<RestServerAgent>>)options.GetTypeInfo(typeof(List<RestServerAgent>));
                     JsonSerializer.Serialize(writer, value.IotGateway.RestServerAgents.ToList(), restServerTypeInfo);
+                }
+
+                writer.WriteEndObject();
+                writer.WriteEndArray();
+            }
+
+            // Emit DataLogger container as array envelope (if present)
+            if (value.DataLogger != null && !value.DataLogger.IsEmpty)
+            {
+                writer.WritePropertyName("_datalogger");
+                writer.WriteStartArray();
+                writer.WriteStartObject();
+
+                writer.WriteString("common.ALLTYPES_NAME", "_DataLogger");
+
+                if (value.DataLogger.LogGroups != null && value.DataLogger.LogGroups.Count > 0)
+                {
+                    writer.WritePropertyName("log_groups");
+                    var logGroupsTypeInfo = (JsonTypeInfo<List<LogGroup>>)options.GetTypeInfo(typeof(List<LogGroup>));
+                    JsonSerializer.Serialize(writer, value.DataLogger.LogGroups.ToList(), logGroupsTypeInfo);
                 }
 
                 writer.WriteEndObject();

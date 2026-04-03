@@ -27,7 +27,7 @@ namespace Kepware.Api.Model
         /// <summary>
         /// If this is true, it indicates that this is an empty project object that was instantiated without data from the server.
         /// </summary>
-        public bool IsEmpty => Channels == null && (IotGateway == null || IotGateway.IsEmpty) && DynamicProperties.Count == 0;
+        public bool IsEmpty => Channels == null && (IotGateway == null || IotGateway.IsEmpty) && (DataLogger == null || DataLogger.IsEmpty) && DynamicProperties.Count == 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Project"/> class.
@@ -66,6 +66,15 @@ namespace Kepware.Api.Model
         [JsonPropertyOrder(101)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IotGatewayContainer? IotGateway { get; set; }
+
+        /// <summary>
+        /// Gets or sets the DataLogger container holding log group collections.
+        /// </summary>
+        [YamlIgnore]
+        [JsonPropertyName("_datalogger")]
+        [JsonPropertyOrder(102)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public DataLoggerContainer? DataLogger { get; set; }
 
         /// <summary>
         /// Recursively cleans up the project and all its children
