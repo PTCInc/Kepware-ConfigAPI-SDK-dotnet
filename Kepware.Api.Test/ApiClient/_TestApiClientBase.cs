@@ -26,6 +26,7 @@ namespace Kepware.Api.Test.ApiClient
         protected readonly Mock<ILogger<ProjectApiHandler>> _loggerMockProject;
         protected readonly Mock<ILogger<GenericApiHandler>> _loggerMockGeneric;
         protected readonly Mock<ILogger<IotGatewayApiHandler>> _loggerMockIotGateway;
+        protected readonly Mock<ILogger<DataLoggerApiHandler>> _loggerMockDataLogger;
         protected readonly Mock<ILoggerFactory> _loggerFactoryMock;
         protected readonly KepwareApiClient _kepwareApiClient;
 
@@ -42,6 +43,7 @@ namespace Kepware.Api.Test.ApiClient
             _loggerMockGeneric = new Mock<ILogger<GenericApiHandler>>();
             _loggerMockProject = new Mock<ILogger<ProjectApiHandler>>();
             _loggerMockIotGateway = new Mock<ILogger<IotGatewayApiHandler>>();
+            _loggerMockDataLogger = new Mock<ILogger<DataLoggerApiHandler>>();
             _loggerFactoryMock = new Mock<ILoggerFactory>();
 
             _loggerFactoryMock.Setup(factory => factory.CreateLogger(It.IsAny<string>())).Returns((string name) =>
@@ -56,6 +58,8 @@ namespace Kepware.Api.Test.ApiClient
                     return _loggerMockProject.Object;
                 else if (name == typeof(IotGatewayApiHandler).FullName)
                     return _loggerMockIotGateway.Object;
+                else if (name == typeof(DataLoggerApiHandler).FullName)
+                    return _loggerMockDataLogger.Object;
                 else
                     return Mock.Of<ILogger>();
             });

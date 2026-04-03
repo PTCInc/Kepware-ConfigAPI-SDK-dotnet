@@ -43,14 +43,21 @@ namespace Kepware.Api.ClientHandler
         public IotGatewayApiHandler IotGateway { get; }
 
         /// <summary>
+        /// Gets the DataLogger handlers.
+        /// </summary>
+        /// <remarks> See <see cref="Kepware.Api.ClientHandler.DataLoggerApiHandler"/> for method references.</remarks>
+        public DataLoggerApiHandler DataLogger { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ProjectApiHandler"/> class.
         /// </summary>
         /// <param name="kepwareApiClient">The Kepware API client.</param>
         /// <param name="channelApiHandler">The channel API handler.</param>
         /// <param name="deviceApiHandler">The device API handler.</param>
         /// <param name="iotGatewayApiHandler">The IoT Gateway API handler.</param>
+        /// <param name="dataLoggerApiHandler">The DataLogger API handler.</param>
         /// <param name="logger">The logger instance.</param>
-        public ProjectApiHandler(KepwareApiClient kepwareApiClient, ChannelApiHandler channelApiHandler, DeviceApiHandler deviceApiHandler, IotGatewayApiHandler iotGatewayApiHandler, ILogger<ProjectApiHandler> logger)
+        public ProjectApiHandler(KepwareApiClient kepwareApiClient, ChannelApiHandler channelApiHandler, DeviceApiHandler deviceApiHandler, IotGatewayApiHandler iotGatewayApiHandler, DataLoggerApiHandler dataLoggerApiHandler, ILogger<ProjectApiHandler> logger)
         {
             m_kepwareApiClient = kepwareApiClient;
             m_logger = logger;
@@ -58,6 +65,7 @@ namespace Kepware.Api.ClientHandler
             Channels = channelApiHandler;
             Devices = deviceApiHandler;
             IotGateway = iotGatewayApiHandler;
+            DataLogger = dataLoggerApiHandler;
         }
 
         #region CompareAndApply

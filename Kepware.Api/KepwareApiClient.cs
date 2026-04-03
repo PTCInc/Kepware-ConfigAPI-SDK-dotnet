@@ -129,7 +129,8 @@ namespace Kepware.Api
             var channelsApiHandler = new ChannelApiHandler(this, loggerFactory.CreateLogger<ChannelApiHandler>());
             var devicesApiHandler = new DeviceApiHandler(this, loggerFactory.CreateLogger<DeviceApiHandler>());
             var iotGatewayApiHandler = new IotGatewayApiHandler(this, loggerFactory.CreateLogger<IotGatewayApiHandler>());
-            Project = new ProjectApiHandler(this, channelsApiHandler, devicesApiHandler, iotGatewayApiHandler, loggerFactory.CreateLogger<ProjectApiHandler>());
+            var dataLoggerApiHandler = new DataLoggerApiHandler(this, loggerFactory.CreateLogger<DataLoggerApiHandler>());
+            Project = new ProjectApiHandler(this, channelsApiHandler, devicesApiHandler, iotGatewayApiHandler, dataLoggerApiHandler, loggerFactory.CreateLogger<ProjectApiHandler>());
             Admin = new AdminApiHandler(this, loggerFactory.CreateLogger<AdminApiHandler>());
             ApiServices = new ServicesApiHandler(this, loggerFactory.CreateLogger<ServicesApiHandler>());
         }
