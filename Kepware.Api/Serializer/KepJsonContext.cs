@@ -39,6 +39,7 @@ namespace Kepware.Api.Serializer
     [JsonSerializable(typeof(LogItemGroup))]
     [JsonSerializable(typeof(ColumnMappingGroup))]
     [JsonSerializable(typeof(TriggerGroup))]
+    [JsonSerializable(typeof(DataLoggerContainer))]
     [JsonSerializable(typeof(LogGroupCollection))]
     [JsonSerializable(typeof(LogItemCollection))]
     [JsonSerializable(typeof(ColumnMappingCollection))]
@@ -61,6 +62,9 @@ namespace Kepware.Api.Serializer
     [JsonSerializable(typeof(List<LogItem>))]
     [JsonSerializable(typeof(List<ColumnMapping>))]
     [JsonSerializable(typeof(List<Trigger>))]
+    [JsonSerializable(typeof(List<LogItemGroup>))]
+    [JsonSerializable(typeof(List<ColumnMappingGroup>))]
+    [JsonSerializable(typeof(List<TriggerGroup>))]
     [JsonSerializable(typeof(List<object?>))]
     [JsonSerializable(typeof(List<ApiResult>))]
     [JsonSerializable(typeof(List<ProjectPermission>))]
@@ -152,6 +156,18 @@ namespace Kepware.Api.Serializer
             {
                 return (JsonTypeInfo<T>)(object)Default.Trigger;
             }
+            else if (typeof(T) == typeof(LogItemGroup))
+            {
+                return (JsonTypeInfo<T>)(object)Default.LogItemGroup;
+            }
+            else if (typeof(T) == typeof(ColumnMappingGroup))
+            {
+                return (JsonTypeInfo<T>)(object)Default.ColumnMappingGroup;
+            }
+            else if (typeof(T) == typeof(TriggerGroup))
+            {
+                return (JsonTypeInfo<T>)(object)Default.TriggerGroup;
+            }
             else
             {
                 throw new NotSupportedException();
@@ -228,6 +244,18 @@ namespace Kepware.Api.Serializer
             else if (typeof(T) == typeof(Trigger))
             {
                 return (JsonTypeInfo<List<T>>)(object)Default.ListTrigger;
+            }
+            else if (typeof(T) == typeof(LogItemGroup))
+            {
+                return (JsonTypeInfo<List<T>>)(object)Default.ListLogItemGroup;
+            }
+            else if (typeof(T) == typeof(ColumnMappingGroup))
+            {
+                return (JsonTypeInfo<List<T>>)(object)Default.ListColumnMappingGroup;
+            }
+            else if (typeof(T) == typeof(TriggerGroup))
+            {
+                return (JsonTypeInfo<List<T>>)(object)Default.ListTriggerGroup;
             }
             else
             {
