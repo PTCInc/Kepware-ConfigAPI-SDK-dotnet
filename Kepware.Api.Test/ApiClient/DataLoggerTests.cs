@@ -1,10 +1,14 @@
 using Kepware.Api.ClientHandler;
 using Kepware.Api.Model;
+using Kepware.Api.Model.Services;
+using Kepware.Api.Test.Util;
 using Moq;
 using Moq.Contrib.HttpClient;
 using Moq.Protected;
 using Shouldly;
 using System.Net;
+using System.Net.Http;
+using System.Text.Json;
 
 namespace Kepware.Api.Test.ApiClient;
 
@@ -693,6 +697,258 @@ public class DataLoggerTests : TestApiClientBase
         result.ShouldNotBeNull();
         result.Name.ShouldBe(TEST_TRIGGER_NAME);
         _httpMessageHandlerMock.VerifyRequest(HttpMethod.Post, TriggersEndpoint, Times.Once());
+    }
+
+    #endregion
+
+    #region ResetColumnMapping Tests
+
+    private const string JOB_ID_RESET = $"/config/v1/project/_datalogger/log_groups/{TEST_GROUP_NAME}/services/ResetColumnMapping/jobs/job123";
+    private string ResetColumnMappingEndpoint => $"{TEST_ENDPOINT}/config/v1/project/_datalogger/log_groups/{TEST_GROUP_NAME}/services/ResetColumnMapping";
+    private string JobEndpointReset => $"{TEST_ENDPOINT}{JOB_ID_RESET}";
+
+    [Fact]
+    public async Task ResetColumnMapping_ShouldPutToCorrectServiceEndpoint()
+    {
+        // Arrange
+        var group = new LogGroup(TEST_GROUP_NAME);
+        var jobResponse = new JobResponseMessage { ResponseStatusCode = (int)ApiResponseCode.Accepted, JobId = JOB_ID_RESET };
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Put, ResetColumnMappingEndpoint)
+            .ReturnsResponse(HttpStatusCode.Accepted, JsonSerializer.Serialize(jobResponse), "application/json");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.ResetColumnMappingAsync(group);
+
+        // Assert
+        result.ShouldNotBeNull();
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Put, ResetColumnMappingEndpoint, Times.Once());
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Post, ResetColumnMappingEndpoint, Times.Never());
+    }
+
+    [Fact]
+    public async Task ResetColumnMapping_ShouldReturnKepServerJobPromise()
+    {
+        // Arrange
+        var group = new LogGroup(TEST_GROUP_NAME);
+        var jobId = $"/config/v1/project/_datalogger/log_groups/{TEST_GROUP_NAME}/services/ResetColumnMapping/jobs/job123";
+        var jobResponse = new JobResponseMessage { ResponseStatusCode = (int)ApiResponseCode.Accepted, JobId = jobId };
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Put, ResetColumnMappingEndpoint)
+            .ReturnsResponse(HttpStatusCode.Accepted, JsonSerializer.Serialize(jobResponse), "application/json");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.ResetColumnMappingAsync(group, TimeSpan.FromSeconds(30));
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Endpoint.ShouldBe($"/config/v1/project/_datalogger/log_groups/{TEST_GROUP_NAME}/services/ResetColumnMapping");
+        result.JobTimeToLive.ShouldBe(TimeSpan.FromSeconds(30));
+    }
+
+    [Fact]
+    public async Task ResetColumnMapping_WithAutoDisableTrue_ShouldDisableThenReEnable()
+    {
+        // Arrange — group starts enabled
+        var group = new LogGroup(TEST_GROUP_NAME) { Enabled = true };
+
+        var groupJson = $$"""{ "common.ALLTYPES_NAME": "{{TEST_GROUP_NAME}}", "datalogger.LOG_GROUP_ENABLED": true }""";
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, LogGroupEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK, groupJson, "application/json");
+
+        var jobResponse = new JobResponseMessage { ResponseStatusCode = (int)ApiResponseCode.Accepted, JobId = JOB_ID_RESET };
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Put, ResetColumnMappingEndpoint)
+            .ReturnsResponse(HttpStatusCode.Accepted, JsonSerializer.Serialize(jobResponse), "application/json");
+
+        // Capture log group PUT bodies to verify disable then re-enable
+        var groupPutBodies = new List<string>();
+        _httpMessageHandlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync",
+                ItExpr.Is<HttpRequestMessage>(r =>
+                    r.Method == HttpMethod.Put &&
+                    r.RequestUri!.ToString() == LogGroupEndpoint),
+                ItExpr.IsAny<CancellationToken>())
+            .Returns<HttpRequestMessage, CancellationToken>(async (req, ct) =>
+            {
+                groupPutBodies.Add(await req.Content!.ReadAsStringAsync(ct));
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            });
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.ResetColumnMappingAsync(group, autoDisable: true);
+
+        // Assert
+        result.ShouldNotBeNull();
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Put, ResetColumnMappingEndpoint, Times.Once());
+
+        groupPutBodies.Count.ShouldBe(2);
+        groupPutBodies[0].ShouldContain("\"datalogger.LOG_GROUP_ENABLED\": false"); // disable
+        groupPutBodies[1].ShouldContain("\"datalogger.LOG_GROUP_ENABLED\": true");  // re-enable
+    }
+
+    [Fact]
+    public async Task ResetColumnMapping_WhenServerReturnsError_ShouldReturnFailedJobPromise()
+    {
+        // Arrange
+        var group = new LogGroup(TEST_GROUP_NAME);
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Put, ResetColumnMappingEndpoint)
+            .ReturnsResponse(HttpStatusCode.BadRequest, "Bad Request");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.ResetColumnMappingAsync(group);
+        var jobResult = await result.AwaitCompletionAsync();
+
+        // Assert
+        result.ShouldNotBeNull();
+        jobResult.IsSuccess.ShouldBeFalse();
+        jobResult.ResponseCode.ShouldBe(ApiResponseCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task ResetColumnMapping_ShouldThrowException_WhenHttpClientThrowsException()
+    {
+        // Arrange
+        var group = new LogGroup(TEST_GROUP_NAME);
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Put, ResetColumnMappingEndpoint)
+            .Throws(new HttpRequestException("Network error"));
+
+        // Act & Assert
+        await Should.ThrowAsync<HttpRequestException>(async () =>
+        {
+            await _kepwareApiClient.Project.DataLogger.ResetColumnMappingAsync(group);
+        });
+    }
+
+    [Fact]
+    public async Task ResetColumnMapping_ShouldHandleTimeout_WhenOperationTimesOut()
+    {
+        // Arrange
+        var group = new LogGroup(TEST_GROUP_NAME);
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Put, ResetColumnMappingEndpoint)
+            .ReturnsResponse(HttpStatusCode.RequestTimeout, "Request Timeout");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.ResetColumnMappingAsync(group, TimeSpan.FromSeconds(30));
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Endpoint.ShouldBe($"/config/v1/project/_datalogger/log_groups/{TEST_GROUP_NAME}/services/ResetColumnMapping");
+        result.JobTimeToLive.ShouldBe(TimeSpan.FromSeconds(30));
+    }
+
+    [Fact]
+    public async Task ResetColumnMapping_ShouldThrowException_WhenTimeToLiveIsNegative()
+    {
+        // Arrange
+        var group = new LogGroup(TEST_GROUP_NAME);
+
+        // Act & Assert
+        await Should.ThrowAsync<ArgumentOutOfRangeException>(async () =>
+        {
+            await _kepwareApiClient.Project.DataLogger.ResetColumnMappingAsync(group, TimeSpan.FromSeconds(-1));
+        });
+    }
+
+    [Fact]
+    public async Task ResetColumnMapping_ShouldReturnSuccess_WhenJobCompletesSuccessfullyAfterFirstGet()
+    {
+        // Arrange
+        var group = new LogGroup(TEST_GROUP_NAME);
+        var jobResponse = new JobResponseMessage { ResponseStatusCode = (int)ApiResponseCode.Accepted, JobId = JOB_ID_RESET };
+        var jobStatus = new JobStatusMessage { Completed = true };
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Put, ResetColumnMappingEndpoint)
+            .ReturnsResponse(HttpStatusCode.Accepted, JsonSerializer.Serialize(jobResponse), "application/json");
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, JobEndpointReset)
+            .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(jobStatus), "application/json");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.ResetColumnMappingAsync(group, TimeSpan.FromSeconds(30));
+        var completionResult = await result.AwaitCompletionAsync();
+
+        // Assert
+        completionResult.Value.ShouldBeTrue();
+        completionResult.IsSuccess.ShouldBeTrue();
+        completionResult.ResponseCode.ShouldBe(ApiResponseCode.Success);
+    }
+
+    [Fact]
+    public async Task ResetColumnMapping_ShouldReturnSuccess_WhenJobCompletesSuccessfullyAfterMultipleGets()
+    {
+        // Arrange
+        var group = new LogGroup(TEST_GROUP_NAME);
+        var jobResponse = new JobResponseMessage { ResponseStatusCode = (int)ApiResponseCode.Accepted, JobId = JOB_ID_RESET };
+        var jobStatusIncomplete = new JobStatusMessage { Completed = false };
+        var jobStatusComplete = new JobStatusMessage { Completed = true };
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Put, ResetColumnMappingEndpoint)
+            .ReturnsResponse(HttpStatusCode.Accepted, JsonSerializer.Serialize(jobResponse), "application/json");
+        _httpMessageHandlerMock.SetupSequenceRequest(HttpMethod.Get, JobEndpointReset)
+            .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(jobStatusIncomplete), "application/json")
+            .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(jobStatusComplete), "application/json");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.ResetColumnMappingAsync(group, TimeSpan.FromSeconds(30));
+        var completionResult = await result.AwaitCompletionAsync();
+
+        // Assert
+        completionResult.Value.ShouldBeTrue();
+        completionResult.IsSuccess.ShouldBeTrue();
+        completionResult.ResponseCode.ShouldBe(ApiResponseCode.Success);
+    }
+
+    [Fact]
+    public async Task ResetColumnMapping_ShouldReturnFailure_WhenJobFailsAfterFirstGet()
+    {
+        // Arrange
+        var group = new LogGroup(TEST_GROUP_NAME);
+        var jobResponse = new JobResponseMessage { ResponseStatusCode = (int)ApiResponseCode.Accepted, JobId = JOB_ID_RESET };
+        var jobStatus = new JobStatusMessage { Completed = false };
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Put, ResetColumnMappingEndpoint)
+            .ReturnsResponse(HttpStatusCode.Accepted, JsonSerializer.Serialize(jobResponse), "application/json");
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, JobEndpointReset)
+            .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(jobStatus), "application/json");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.ResetColumnMappingAsync(group, TimeSpan.FromSeconds(1));
+        var completionResult = await result.AwaitCompletionAsync(TimeSpan.FromMilliseconds(100));
+
+        // Assert
+        completionResult.Value.ShouldBeFalse();
+        completionResult.IsSuccess.ShouldBeFalse();
+        completionResult.ResponseCode.ShouldBe(ApiResponseCode.Timeout);
+    }
+
+    [Fact]
+    public async Task ResetColumnMapping_ShouldReturnFailure_WhenJobFailsAfterMultipleGets()
+    {
+        // Arrange
+        var group = new LogGroup(TEST_GROUP_NAME);
+        var jobResponse = new JobResponseMessage { ResponseStatusCode = (int)ApiResponseCode.Accepted, JobId = JOB_ID_RESET };
+        var jobStatusIncomplete = new JobStatusMessage { Completed = false };
+        var jobStatusFailed = new JobStatusMessage { Completed = true, Message = "Job failed" };
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Put, ResetColumnMappingEndpoint)
+            .ReturnsResponse(HttpStatusCode.Accepted, JsonSerializer.Serialize(jobResponse), "application/json");
+        _httpMessageHandlerMock.SetupSequenceRequest(HttpMethod.Get, JobEndpointReset)
+            .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(jobStatusIncomplete), "application/json")
+            .ReturnsResponse(HttpStatusCode.OK, JsonSerializer.Serialize(jobStatusIncomplete), "application/json")
+            .ReturnsResponse(HttpStatusCode.ServiceUnavailable, JsonSerializer.Serialize(jobStatusFailed), "application/json");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.ResetColumnMappingAsync(group, TimeSpan.FromSeconds(5));
+        var completionResult = await result.AwaitCompletionAsync(TimeSpan.FromMilliseconds(100));
+
+        // Assert
+        completionResult.Value.ShouldBeFalse();
+        completionResult.IsSuccess.ShouldBeFalse();
+        completionResult.ResponseCode.ShouldBe(ApiResponseCode.ServiceUnavailable);
+        completionResult.Message.ShouldBe(jobStatusFailed.Message);
     }
 
     #endregion

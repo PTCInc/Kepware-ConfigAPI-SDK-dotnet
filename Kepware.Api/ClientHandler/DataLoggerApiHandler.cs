@@ -1,5 +1,9 @@
 using Kepware.Api.Model;
+using Kepware.Api.Model.Services;
+using Kepware.Api.Serializer;
 using Microsoft.Extensions.Logging;
+using System.Text;
+using System.Text.Json;
 
 namespace Kepware.Api.ClientHandler
 {
@@ -514,6 +518,72 @@ namespace Kepware.Api.ClientHandler
             return WithAutoDisableAsync(parent, autoDisable,
                 () => m_kepwareApiClient.GenericConfig.DeleteItemAsync(new Trigger(name) { Owner = parent }, cancellationToken),
                 cancellationToken);
+        }
+
+        #endregion
+
+        #region ResetColumnMapping
+
+        /// <summary>
+        /// Initiates the ResetColumnMapping service for the specified log group,
+        /// using a default time-to-live of 30 seconds.
+        /// </summary>
+        /// <param name="group">The log group whose column mappings should be reset.</param>
+        /// <param name="autoDisable">When true, disables the log group before the operation and re-enables it after.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A <see cref="KepServerJobPromise"/> representing the async server job.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the group is null.</exception>
+        public Task<KepServerJobPromise> ResetColumnMappingAsync(LogGroup group, bool autoDisable = false, CancellationToken cancellationToken = default)
+            => ResetColumnMappingAsync(group, TimeSpan.FromSeconds(30), autoDisable, cancellationToken);
+
+        /// <summary>
+        /// Initiates the ResetColumnMapping service for the specified log group.
+        /// </summary>
+        /// <param name="group">The log group whose column mappings should be reset.</param>
+        /// <param name="timeToLive">The job's desired time-to-live (1–300 seconds).</param>
+        /// <param name="autoDisable">When true, disables the log group before the operation and re-enables it after.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A <see cref="KepServerJobPromise"/> representing the async server job.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the group is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when timeToLive is outside the range 1–300 seconds.</exception>
+        public async Task<KepServerJobPromise> ResetColumnMappingAsync(LogGroup group, TimeSpan timeToLive, bool autoDisable = false, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(group);
+
+            if (timeToLive.TotalSeconds < 1)
+                throw new ArgumentOutOfRangeException(nameof(timeToLive), "Time to live must be at least 1 second");
+            if (timeToLive.TotalSeconds > 300)
+                throw new ArgumentOutOfRangeException(nameof(timeToLive), "Time to live must be at most 300 seconds");
+
+            var endpoint = $"/config/v1/project/_datalogger/log_groups/{group.Name}/services/ResetColumnMapping";
+
+            return await WithAutoDisableAsync(group, autoDisable, async () =>
+            {
+                var request = new ServiceInvocationRequest { TimeToLiveSeconds = (int)timeToLive.TotalSeconds };
+                HttpContent httpContent = new StringContent(
+                    JsonSerializer.Serialize(request, KepJsonContext.Default.ServiceInvocationRequest),
+                    Encoding.UTF8, "application/json");
+
+                var response = await m_kepwareApiClient.HttpClient.PutAsync(endpoint, httpContent, cancellationToken).ConfigureAwait(false);
+                var message = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+                if (!response.IsSuccessStatusCode)
+                    return new KepServerJobPromise(endpoint, timeToLive,
+                        (ApiResponseCode)(int)response.StatusCode,
+                        $"ResetColumnMapping request failed with status code {(ApiResponseCode)(int)response.StatusCode} and message: {message}");
+
+                try
+                {
+                    var jobResponse = JsonSerializer.Deserialize<JobResponseMessage>(message, KepJsonContext.Default.JobResponseMessage);
+                    return jobResponse != null
+                        ? new KepServerJobPromise(endpoint, timeToLive, jobResponse, m_kepwareApiClient.HttpClient)
+                        : new KepServerJobPromise(endpoint, timeToLive, (ApiResponseCode)(int)response.StatusCode, "Failed to deserialize response message");
+                }
+                catch (JsonException jex)
+                {
+                    return new KepServerJobPromise(endpoint, timeToLive, (ApiResponseCode)(int)response.StatusCode, jex.Message);
+                }
+            }, cancellationToken);
         }
 
         #endregion
