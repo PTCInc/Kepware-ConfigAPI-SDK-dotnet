@@ -32,6 +32,17 @@ namespace Kepware.Api.Serializer
     [JsonSerializable(typeof(RestServerAgent))]
     [JsonSerializable(typeof(IotItem))]
     [JsonSerializable(typeof(IotGatewayContainer))]
+    [JsonSerializable(typeof(LogGroup))]
+    [JsonSerializable(typeof(LogItem))]
+    [JsonSerializable(typeof(ColumnMapping))]
+    [JsonSerializable(typeof(Trigger))]
+    [JsonSerializable(typeof(LogItemGroup))]
+    [JsonSerializable(typeof(ColumnMappingGroup))]
+    [JsonSerializable(typeof(TriggerGroup))]
+    [JsonSerializable(typeof(LogGroupCollection))]
+    [JsonSerializable(typeof(LogItemCollection))]
+    [JsonSerializable(typeof(ColumnMappingCollection))]
+    [JsonSerializable(typeof(TriggerCollection))]
 
     [JsonSerializable(typeof(List<ApiStatus>))]
     [JsonSerializable(typeof(List<UaEndpoint>))]
@@ -46,6 +57,10 @@ namespace Kepware.Api.Serializer
     [JsonSerializable(typeof(List<RestClientAgent>))]
     [JsonSerializable(typeof(List<RestServerAgent>))]
     [JsonSerializable(typeof(List<IotItem>))]
+    [JsonSerializable(typeof(List<LogGroup>))]
+    [JsonSerializable(typeof(List<LogItem>))]
+    [JsonSerializable(typeof(List<ColumnMapping>))]
+    [JsonSerializable(typeof(List<Trigger>))]
     [JsonSerializable(typeof(List<object?>))]
     [JsonSerializable(typeof(List<ApiResult>))]
     [JsonSerializable(typeof(List<ProjectPermission>))]
@@ -121,6 +136,22 @@ namespace Kepware.Api.Serializer
             {
                 return (JsonTypeInfo<T>)(object)Default.IotItem;
             }
+            else if (typeof(T) == typeof(LogGroup))
+            {
+                return (JsonTypeInfo<T>)(object)Default.LogGroup;
+            }
+            else if (typeof(T) == typeof(LogItem))
+            {
+                return (JsonTypeInfo<T>)(object)Default.LogItem;
+            }
+            else if (typeof(T) == typeof(ColumnMapping))
+            {
+                return (JsonTypeInfo<T>)(object)Default.ColumnMapping;
+            }
+            else if (typeof(T) == typeof(Trigger))
+            {
+                return (JsonTypeInfo<T>)(object)Default.Trigger;
+            }
             else
             {
                 throw new NotSupportedException();
@@ -181,6 +212,22 @@ namespace Kepware.Api.Serializer
             else if (typeof(T) == typeof(IotItem))
             {
                 return (JsonTypeInfo<List<T>>)(object)Default.ListIotItem;
+            }
+            else if (typeof(T) == typeof(LogGroup))
+            {
+                return (JsonTypeInfo<List<T>>)(object)Default.ListLogGroup;
+            }
+            else if (typeof(T) == typeof(LogItem))
+            {
+                return (JsonTypeInfo<List<T>>)(object)Default.ListLogItem;
+            }
+            else if (typeof(T) == typeof(ColumnMapping))
+            {
+                return (JsonTypeInfo<List<T>>)(object)Default.ListColumnMapping;
+            }
+            else if (typeof(T) == typeof(Trigger))
+            {
+                return (JsonTypeInfo<List<T>>)(object)Default.ListTrigger;
             }
             else
             {
