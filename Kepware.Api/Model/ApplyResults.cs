@@ -185,6 +185,15 @@ namespace Kepware.Api.Model
         internal void Add(CollectionApplyResult<IotItem> result)
             => Add(result.Inserts, result.Updates, result.Deletes, result.FailureList);
 
+        internal void Add(CollectionApplyResult<LogGroup> result)
+            => Add(result.Inserts, result.Updates, result.Deletes, result.FailureList);
+
+        internal void Add(CollectionApplyResult<LogItem> result)
+            => Add(result.Inserts, result.Updates, result.Deletes, result.FailureList);
+
+        internal void Add(CollectionApplyResult<Trigger> result)
+            => Add(result.Inserts, result.Updates, result.Deletes, result.FailureList);
+
         internal void Add(ProjectCompareAndApplyResult result)
             => Add(result.Inserts, result.Updates, result.Deletes, result.FailureList);
 

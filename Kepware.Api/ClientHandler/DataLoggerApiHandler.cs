@@ -1,7 +1,9 @@
 using Kepware.Api.Model;
 using Kepware.Api.Model.Services;
 using Kepware.Api.Serializer;
+using Kepware.Api.Util;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 
@@ -584,6 +586,232 @@ namespace Kepware.Api.ClientHandler
                     return new KepServerJobPromise(endpoint, timeToLive, (ApiResponseCode)(int)response.StatusCode, jex.Message);
                 }
             }, cancellationToken);
+        }
+
+        #endregion
+
+        #region CompareAndApply
+
+        /// <summary>
+        /// Compares a source <see cref="DataLoggerContainer"/> against the current server state and applies
+        /// the minimum set of changes required to make the server match the source.
+        /// </summary>
+        /// <remarks>
+        /// Each log group is processed fully end-to-end before moving to the next, minimising the time
+        /// any individual group spends in a disabled state. Changes within each group are applied in
+        /// mandatory order:
+        /// <list type="number">
+        ///   <item><description>Log group properties (changed groups only)</description></item>
+        ///   <item><description>Log items (add / remove / update)</description></item>
+        ///   <item><description>Column mappings (update only — never created or deleted)</description></item>
+        ///   <item><description>Triggers (add / remove / update)</description></item>
+        /// </list>
+        /// When <paramref name="autoDisable"/> is <see langword="true"/>, any log group that is currently
+        /// enabled — whether its own properties changed or only its children changed — is disabled before
+        /// its changes begin and re-enabled after all four sub-steps complete.
+        /// </remarks>
+        /// <param name="source">The desired target state as a <see cref="DataLoggerContainer"/>.</param>
+        /// <param name="current">The current server state as a <see cref="DataLoggerContainer"/>.</param>
+        /// <param name="autoDisable">
+        /// When <see langword="true"/>, any enabled log group that has changes (group-level or child-level)
+        /// is temporarily disabled before changes begin and re-enabled afterward.
+        /// </param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>
+        /// A <see cref="ProjectCompareAndApplyResult"/> summarising the inserts, updates, deletes, and
+        /// any failures encountered during the apply pass.
+        /// </returns>
+        public async Task<ProjectCompareAndApplyResult> CompareAndApplyAsync(
+            DataLoggerContainer? source,
+            DataLoggerContainer? current,
+            bool autoDisable = false,
+            CancellationToken cancellationToken = default)
+        {
+            var result = new ProjectCompareAndApplyResult();
+
+            // Pure in-memory diff — no HTTP calls.
+            var groupDiff = EntityCompare.Compare<LogGroupCollection, LogGroup>(
+                source?.LogGroups, current?.LogGroups);
+
+            // Delete log groups that exist only in current (removed from source).
+            foreach (var bucket in groupDiff.ItemsOnlyInRight)
+            {
+                if (await m_kepwareApiClient.GenericConfig
+                        .DeleteItemAsync(bucket.Right!, cancellationToken: cancellationToken)
+                        .ConfigureAwait(false))
+                    result.AddDeleteSuccess();
+                else
+                    result.AddFailure(new ApplyFailure
+                    {
+                        Operation = ApplyOperation.Delete,
+                        AttemptedItem = bucket.Right!,
+                    });
+            }
+
+            // Insert log groups that exist only in source (new to current).
+            foreach (var bucket in groupDiff.ItemsOnlyInLeft)
+            {
+                if (await m_kepwareApiClient.GenericConfig
+                        .InsertItemAsync<LogGroupCollection, LogGroup>(bucket.Left!, cancellationToken: cancellationToken)
+                        .ConfigureAwait(false))
+                    result.AddInsertSuccess();
+                else
+                    result.AddFailure(new ApplyFailure
+                    {
+                        Operation = ApplyOperation.Insert,
+                        AttemptedItem = bucket.Left!,
+                    });
+            }
+
+            // Unchanged groups: children may still have changes; apply with optional auto-disable.
+            foreach (var bucket in groupDiff.UnchangedItems)
+            {
+                await ApplyGroupWithChildrenAsync(
+                    bucket.Left!, bucket.Right!, groupChanged: false, autoDisable, result, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
+            // Changed groups: update group properties + children; apply with optional auto-disable.
+            foreach (var bucket in groupDiff.ChangedItems)
+            {
+                await ApplyGroupWithChildrenAsync(
+                    bucket.Left!, bucket.Right!, groupChanged: true, autoDisable, result, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Processes a single log group end-to-end: optionally disables it, applies group property
+        /// changes (if any), applies all child collections in order, then re-enables it.
+        /// </summary>
+        /// <remarks>
+        /// For <paramref name="groupChanged"/> groups the group property update is folded into the same
+        /// PUT that acts as the disable when <paramref name="autoDisable"/> is <see langword="true"/>,
+        /// avoiding a redundant round-trip. For unchanged groups only children are applied.
+        /// </remarks>
+        private async Task ApplyGroupWithChildrenAsync(
+            LogGroup sourceGroup,
+            LogGroup currentGroup,
+            bool groupChanged,
+            bool autoDisable,
+            ProjectCompareAndApplyResult result,
+            CancellationToken cancellationToken)
+        {
+            bool wasEnabled = autoDisable && (currentGroup.Enabled == true);
+            bool? originalSourceEnabled = sourceGroup.Enabled;
+
+            try
+            {
+                if (groupChanged)
+                {
+                    // When auto-disabling: fold the disable into the group-property PUT by temporarily
+                    // marking Enabled=false on the source before sending the update.
+                    if (wasEnabled)
+                        sourceGroup.Enabled = false;
+
+                    if (await m_kepwareApiClient.GenericConfig
+                            .UpdateItemAsync(sourceGroup, oldItem: null, cancellationToken)
+                            .ConfigureAwait(false))
+                        result.AddUpdateSuccess();
+                    else
+                        result.AddFailure(new ApplyFailure
+                        {
+                            Operation = ApplyOperation.Update,
+                            AttemptedItem = sourceGroup,
+                        });
+                }
+                else if (wasEnabled)
+                {
+                    // Unchanged group but auto-disable requested: explicitly disable before children.
+                    sourceGroup.Enabled = false;
+                    await m_kepwareApiClient.GenericConfig
+                        .UpdateItemAsync(sourceGroup, oldItem: null, cancellationToken)
+                        .ConfigureAwait(false);
+                }
+
+                // Apply children in mandatory order: log items → column mappings → triggers.
+                await ApplyGroupChildrenAsync(sourceGroup, currentGroup, result, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            finally
+            {
+                // Re-enable only if the desired final state is enabled (originalSourceEnabled != false).
+                // If source explicitly wants the group disabled, skip the re-enable PUT.
+                if (wasEnabled && originalSourceEnabled != false)
+                {
+                    sourceGroup.Enabled = originalSourceEnabled;
+                    await m_kepwareApiClient.GenericConfig
+                        .UpdateItemAsync(sourceGroup, oldItem: null, cancellationToken)
+                        .ConfigureAwait(false);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Applies log items, column mappings, and triggers for a single log group pair in the
+        /// required order. The group's enabled/disabled state is assumed to already be correct.
+        /// </summary>
+        private async Task ApplyGroupChildrenAsync(
+            LogGroup sourceGroup,
+            LogGroup currentGroup,
+            ProjectCompareAndApplyResult result,
+            CancellationToken cancellationToken)
+        {
+            // Step 2: Log items.
+            var logItemCompare = await m_kepwareApiClient.GenericConfig
+                .CompareAndApplyDetailedAsync<LogItemCollection, LogItem>(
+                    sourceGroup.LogItems, currentGroup.LogItems, currentGroup, cancellationToken)
+                .ConfigureAwait(false);
+            result.Add(logItemCompare);
+
+            // Step 3: Column mappings.
+            // ColumnMappings are server-generated; re-fetch if log items were added or removed
+            // because the server regenerates the mapping set when the log item set changes.
+            ColumnMappingCollection? currentColumnMappings;
+            if (logItemCompare.Inserts > 0 || logItemCompare.Deletes > 0)
+            {
+                currentColumnMappings = await m_kepwareApiClient.GenericConfig
+                    .LoadCollectionAsync<ColumnMappingCollection, ColumnMapping>(
+                        currentGroup, cancellationToken: cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            else
+            {
+                currentColumnMappings = currentGroup.ColumnMappings;
+            }
+
+            if (sourceGroup.ColumnMappings != null && currentColumnMappings != null)
+            {
+                var currentByName = currentColumnMappings
+                    .ToDictionary(m => m.Name, StringComparer.OrdinalIgnoreCase);
+
+                foreach (var sourceMapping in sourceGroup.ColumnMappings)
+                {
+                    if (currentByName.TryGetValue(sourceMapping.Name, out var currentMapping)
+                        && sourceMapping.Hash != currentMapping.Hash)
+                    {
+                        if (await m_kepwareApiClient.GenericConfig
+                                .UpdateItemAsync(sourceMapping, currentMapping, cancellationToken)
+                                .ConfigureAwait(false))
+                            result.AddUpdateSuccess();
+                        else
+                            result.AddFailure(new ApplyFailure
+                            {
+                                Operation = ApplyOperation.Update,
+                                AttemptedItem = sourceMapping,
+                            });
+                    }
+                }
+            }
+
+            // Step 4: Triggers.
+            var triggerCompare = await m_kepwareApiClient.GenericConfig
+                .CompareAndApplyDetailedAsync<TriggerCollection, Trigger>(
+                    sourceGroup.Triggers, currentGroup.Triggers, currentGroup, cancellationToken)
+                .ConfigureAwait(false);
+            result.Add(triggerCompare);
         }
 
         #endregion
