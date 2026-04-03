@@ -1,3 +1,6 @@
+using YamlDotNet.Serialization;
+using System.Text.Json.Serialization;
+
 namespace Kepware.Api.Model
 {
     /// <summary>
@@ -14,5 +17,173 @@ namespace Kepware.Api.Model
         /// <summary>Initializes a new instance of the <see cref="ColumnMapping"/> class with the specified name.</summary>
         /// <param name="name">The name of the column mapping.</param>
         public ColumnMapping(string name) : base(name) { }
+
+        // ── Log Item reference ───────────────────────────────────────────────────
+
+        /// <summary>
+        /// Gets or sets the associated ServerItem name (wide table mode), or "__internal" (narrow table mode).
+        /// </summary>
+        [YamlIgnore, JsonIgnore]
+        public string? LogItemServerItemName
+        {
+            get => GetDynamicProperty<string>(Properties.DataLogger.ColumnMapping.LogItemId);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.LogItemId, value);
+        }
+
+        // ── Name column ──────────────────────────────────────────────────────────
+
+        /// <summary>Gets or sets the database field name for the name/string column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public string? FieldNameName
+        {
+            get => GetDynamicProperty<string>(Properties.DataLogger.ColumnMapping.FieldNameName);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.FieldNameName, value);
+        }
+
+        /// <summary>Gets or sets the SQL data type for the name/string column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public SqlDataType? SqlDataTypeName
+        {
+            get => (SqlDataType?)GetDynamicProperty<int>(Properties.DataLogger.ColumnMapping.SqlDataTypeName);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlDataTypeName, (int?)value);
+        }
+
+        /// <summary>Gets or sets the column length for the name/string column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public int? SqlLengthName
+        {
+            get => GetDynamicProperty<int>(Properties.DataLogger.ColumnMapping.SqlLengthName);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlLengthName, value);
+        }
+
+        // ── Numeric ID column ────────────────────────────────────────────────────
+
+        /// <summary>Gets or sets the database field name for the numeric ID column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public string? FieldNameNumeric
+        {
+            get => GetDynamicProperty<string>(Properties.DataLogger.ColumnMapping.FieldNameNumeric);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.FieldNameNumeric, value);
+        }
+
+        /// <summary>Gets or sets the SQL data type for the numeric ID column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public SqlDataType? SqlDataTypeNumeric
+        {
+            get => (SqlDataType?)GetDynamicProperty<int>(Properties.DataLogger.ColumnMapping.SqlDataTypeNumeric);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlDataTypeNumeric, (int?)value);
+        }
+
+        /// <summary>Gets or sets the column length for the numeric ID column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public int? SqlLengthNumeric
+        {
+            get => GetDynamicProperty<int>(Properties.DataLogger.ColumnMapping.SqlLengthNumeric);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlLengthNumeric, value);
+        }
+
+        // ── Quality column ───────────────────────────────────────────────────────
+
+        /// <summary>Gets or sets the database field name for the quality column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public string? FieldNameQuality
+        {
+            get => GetDynamicProperty<string>(Properties.DataLogger.ColumnMapping.FieldNameQuality);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.FieldNameQuality, value);
+        }
+
+        /// <summary>Gets or sets the SQL data type for the quality column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public SqlDataType? SqlDataTypeQuality
+        {
+            get => (SqlDataType?)GetDynamicProperty<int>(Properties.DataLogger.ColumnMapping.SqlDataTypeQuality);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlDataTypeQuality, (int?)value);
+        }
+
+        /// <summary>Gets or sets the column length for the quality column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public int? SqlLengthQuality
+        {
+            get => GetDynamicProperty<int>(Properties.DataLogger.ColumnMapping.SqlLengthQuality);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlLengthQuality, value);
+        }
+
+        // ── Timestamp column ─────────────────────────────────────────────────────
+
+        /// <summary>Gets or sets the database field name for the timestamp column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public string? FieldNameTimestamp
+        {
+            get => GetDynamicProperty<string>(Properties.DataLogger.ColumnMapping.FieldNameTimestamp);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.FieldNameTimestamp, value);
+        }
+
+        /// <summary>Gets or sets the SQL data type for the timestamp column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public SqlDataType? SqlDataTypeTimestamp
+        {
+            get => (SqlDataType?)GetDynamicProperty<int>(Properties.DataLogger.ColumnMapping.SqlDataTypeTimestamp);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlDataTypeTimestamp, (int?)value);
+        }
+
+        /// <summary>Gets or sets the column length for the timestamp column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public int? SqlLengthTimestamp
+        {
+            get => GetDynamicProperty<int>(Properties.DataLogger.ColumnMapping.SqlLengthTimestamp);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlLengthTimestamp, value);
+        }
+
+        // ── Value column ─────────────────────────────────────────────────────────
+
+        /// <summary>Gets or sets the database field name for the value column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public string? FieldNameValue
+        {
+            get => GetDynamicProperty<string>(Properties.DataLogger.ColumnMapping.FieldNameValue);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.FieldNameValue, value);
+        }
+
+        /// <summary>Gets or sets the SQL data type for the value column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public SqlDataType? SqlDataTypeValue
+        {
+            get => (SqlDataType?)GetDynamicProperty<int>(Properties.DataLogger.ColumnMapping.SqlDataTypeValue);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlDataTypeValue, (int?)value);
+        }
+
+        /// <summary>Gets or sets the column length for the value column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public int? SqlLengthValue
+        {
+            get => GetDynamicProperty<int>(Properties.DataLogger.ColumnMapping.SqlLengthValue);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlLengthValue, value);
+        }
+
+        // ── Batch ID column ──────────────────────────────────────────────────────
+
+        /// <summary>Gets or sets the database field name for the batch ID column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public string? FieldNameBatchId
+        {
+            get => GetDynamicProperty<string>(Properties.DataLogger.ColumnMapping.FieldNameBatchId);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.FieldNameBatchId, value);
+        }
+
+        /// <summary>Gets or sets the SQL data type for the batch ID column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public SqlDataType? SqlDataTypeBatchId
+        {
+            get => (SqlDataType?)GetDynamicProperty<int>(Properties.DataLogger.ColumnMapping.SqlDataTypeBatchId);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlDataTypeBatchId, (int?)value);
+        }
+
+        /// <summary>Gets or sets the column length for the batch ID column.</summary>
+        [YamlIgnore, JsonIgnore]
+        public int? SqlLengthBatchId
+        {
+            get => GetDynamicProperty<int>(Properties.DataLogger.ColumnMapping.SqlLengthBatchId);
+            set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlLengthBatchId, value);
+        }
     }
 }
