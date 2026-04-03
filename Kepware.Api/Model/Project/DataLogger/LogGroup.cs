@@ -11,16 +11,22 @@ namespace Kepware.Api.Model
     [Endpoint("/config/v1/project/_datalogger/log_groups/{name}")]
     public class LogGroup : NamedEntity
     {
-        /// <summary>Initializes a new instance of the <see cref="LogGroup"/> class.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LogGroup"/> class.
+        /// </summary>
         public LogGroup() { }
 
-        /// <summary>Initializes a new instance of the <see cref="LogGroup"/> class with the specified name.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LogGroup"/> class with the specified name.
+        /// </summary>
         /// <param name="name">The name of the log group.</param>
         public LogGroup(string name) : base(name) { }
 
         #region General — Configuration
 
-        /// <summary>Gets or sets whether the log group is enabled.</summary>
+        /// <summary>
+        /// Gets or sets whether the log group is enabled.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public bool? Enabled
         {
@@ -28,7 +34,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.LogGroup.Enabled, value);
         }
 
-        /// <summary>Gets or sets the update rate value (in the units of <see cref="UpdateRateUnits"/>).</summary>
+        /// <summary>
+        /// Gets or sets the update rate value (in the units of <see cref="UpdateRateUnits"/>).
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public int? UpdateRate
         {
@@ -36,7 +44,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.LogGroup.UpdateRate, value);
         }
 
-        /// <summary>Gets or sets the units for <see cref="UpdateRate"/> (0=ms, 1=s, 2=min, 3=hr, 4=days).</summary>
+        /// <summary>
+        /// Gets or sets the units for <see cref="UpdateRate"/> (0=ms, 1=s, 2=min, 3=hr, 4=days).
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public int? UpdateRateUnits
         {
@@ -44,7 +54,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.LogGroup.UpdateRateUnits, value);
         }
 
-        /// <summary>Gets or sets whether the numeric ID column maps to VARCHAR(64) instead of INTEGER.</summary>
+        /// <summary>
+        /// Gets or sets whether the numeric ID column maps to VARCHAR(64) instead of INTEGER.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public bool? MapNumericIdToVarchar
         {
@@ -52,7 +64,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.LogGroup.MapNumericIdToVarchar, value);
         }
 
-        /// <summary>Gets or sets whether local time is used for timestamps (false = UTC).</summary>
+        /// <summary>
+        /// Gets or sets whether local time is used for timestamps (false = UTC).
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public bool? UseLocalTimeForTimestamp
         {
@@ -64,7 +78,9 @@ namespace Kepware.Api.Model
 
         #region Advanced — Store and Forward
 
-        /// <summary>Gets or sets whether store-and-forward is enabled.</summary>
+        /// <summary>
+        /// Gets or sets whether store-and-forward is enabled.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public bool? StoreAndForwardEnabled
         {
@@ -72,7 +88,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.LogGroup.StoreAndForwardEnabled, value);
         }
 
-        /// <summary>Gets or sets the directory for the store-and-forward file.</summary>
+        /// <summary>
+        /// Gets or sets the directory for the store-and-forward file.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public string? StoreAndForwardStorageDirectory
         {
@@ -80,7 +98,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.LogGroup.StoreAndForwardStorageDirectory, value);
         }
 
-        /// <summary>Gets or sets the maximum store-and-forward file size in MB (1–2047).</summary>
+        /// <summary>
+        /// Gets or sets the maximum store-and-forward file size in MB (1–2047).
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public int? StoreAndForwardMaxStorageSizeMb
         {
@@ -92,7 +112,9 @@ namespace Kepware.Api.Model
 
         #region Advanced — Memory
 
-        /// <summary>Gets or sets the maximum number of records held in the row output buffer (1–99999).</summary>
+        /// <summary>
+        /// Gets or sets the maximum number of records held in the row output buffer (1–99999).
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public int? MaxRowBufferSize
         {
@@ -104,7 +126,9 @@ namespace Kepware.Api.Model
 
         #region General — Data Source
 
-        /// <summary>Gets or sets the Data Source Name (DSN) for the database connection.</summary>
+        /// <summary>
+        /// Gets or sets the Data Source Name (DSN) for the database connection.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public string? Dsn
         {
@@ -112,7 +136,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.LogGroup.Dsn, value);
         }
 
-        /// <summary>Gets or sets the username for the DSN connection.</summary>
+        /// <summary>
+        /// Gets or sets the username for the DSN connection.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public string? DsnUsername
         {
@@ -120,7 +146,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.LogGroup.DsnUsername, value);
         }
 
-        /// <summary>Gets or sets the password for the DSN connection.</summary>
+        /// <summary>
+        /// Gets or sets the password for the DSN connection.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public string? DsnPassword
         {
@@ -128,7 +156,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.LogGroup.DsnPassword, value);
         }
 
-        /// <summary>Gets or sets the login timeout in seconds (1–99999).</summary>
+        /// <summary>
+        /// Gets or sets the login timeout in seconds (1–99999).
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public int? DsnLoginTimeout
         {
@@ -136,7 +166,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.LogGroup.DsnLoginTimeout, value);
         }
 
-        /// <summary>Gets or sets the query timeout in seconds (1–99999).</summary>
+        /// <summary>
+        /// Gets or sets the query timeout in seconds (1–99999).
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public int? DsnQueryTimeout
         {
@@ -148,7 +180,9 @@ namespace Kepware.Api.Model
 
         #region General — Table
 
-        /// <summary>Gets or sets how data is logged (0=existing table, 1=new each start, 2=new once).</summary>
+        /// <summary>
+        /// Gets or sets how data is logged (0=existing table, 1=new each start, 2=new once).
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public int? TableSelection
         {
@@ -156,7 +190,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.LogGroup.TableSelection, value);
         }
 
-        /// <summary>Gets or sets the name of the database table to write to.</summary>
+        /// <summary>
+        /// Gets or sets the name of the database table to write to.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public string? TableName
         {
@@ -164,7 +200,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.LogGroup.TableName, value);
         }
 
-        /// <summary>Gets or sets the table format (0=Narrow, 1=Wide).</summary>
+        /// <summary>
+        /// Gets or sets the table format (0=Narrow, 1=Wide).
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public int? TableFormat
         {
@@ -176,7 +214,9 @@ namespace Kepware.Api.Model
 
         #region Advanced — Batch Identifier
 
-        /// <summary>Gets or sets the server item used as a batch identifier.</summary>
+        /// <summary>
+        /// Gets or sets the server item used as a batch identifier.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public string? BatchIdItem
         {
@@ -184,14 +224,18 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.LogGroup.BatchIdItem, value);
         }
 
-        /// <summary>Gets the data type of the batch ID item (read-only; set by the server).</summary>
+        /// <summary>
+        /// Gets the data type of the batch ID item (read-only; set by the server).
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public string? BatchIdItemType
         {
             get => GetDynamicProperty<string>(Properties.DataLogger.LogGroup.BatchIdItemType);
         }
 
-        /// <summary>Gets or sets the update rate for the batch ID item.</summary>
+        /// <summary>
+        /// Gets or sets the update rate for the batch ID item.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public int? BatchIdUpdateRate
         {
@@ -199,7 +243,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.LogGroup.BatchIdUpdateRate, value);
         }
 
-        /// <summary>Gets or sets the units for <see cref="BatchIdUpdateRate"/> (0=ms, 1=s, 2=min, 3=hr, 4=days).</summary>
+        /// <summary>
+        /// Gets or sets the units for <see cref="BatchIdUpdateRate"/> (0=ms, 1=s, 2=min, 3=hr, 4=days).
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public int? BatchIdUpdateRateUnits
         {
@@ -211,7 +257,9 @@ namespace Kepware.Api.Model
 
         #region Advanced — Regenerate Column Mapping Rules
 
-        /// <summary>Gets or sets whether column mappings reset automatically when the DSN changes.</summary>
+        /// <summary>
+        /// Gets or sets whether column mappings reset automatically when the DSN changes.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public bool? RegenerateOnDsnChange
         {
@@ -219,7 +267,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.LogGroup.RegenerateOnDsnChange, value);
         }
 
-        /// <summary>Gets or sets whether column mappings update automatically when the Batch ID changes.</summary>
+        /// <summary>
+        /// Gets or sets whether column mappings update automatically when the Batch ID changes.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public bool? RegenerateOnBatchIdChange
         {
@@ -227,7 +277,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.LogGroup.RegenerateOnBatchIdChange, value);
         }
 
-        /// <summary>Gets or sets whether column mappings update automatically when the table name changes.</summary>
+        /// <summary>
+        /// Gets or sets whether column mappings update automatically when the table name changes.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public bool? RegenerateOnTableNameChange
         {
@@ -235,7 +287,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.LogGroup.RegenerateOnTableNameChange, value);
         }
 
-        /// <summary>Gets or sets whether column mappings update automatically when the table selection changes.</summary>
+        /// <summary>
+        /// Gets or sets whether column mappings update automatically when the table selection changes.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public bool? RegenerateOnTableSelectionChange
         {
@@ -247,21 +301,27 @@ namespace Kepware.Api.Model
 
         #region Child Collections — REST API format
 
-        /// <summary>Gets or sets the log items in this group (populated via REST API endpoints).</summary>
+        /// <summary>
+        /// Gets or sets the log items in this group (populated via REST API endpoints).
+        /// </summary>
         [YamlIgnore]
         [JsonPropertyName("log_items")]
         [JsonPropertyOrder(100)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public LogItemCollection? LogItems { get; set; }
 
-        /// <summary>Gets or sets the column mappings in this group (populated via REST API endpoints).</summary>
+        /// <summary>
+        /// Gets or sets the column mappings in this group (populated via REST API endpoints).
+        /// </summary>
         [YamlIgnore]
         [JsonPropertyName("column_mappings")]
         [JsonPropertyOrder(101)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ColumnMappingCollection? ColumnMappings { get; set; }
 
-        /// <summary>Gets or sets the triggers in this group (populated via REST API endpoints).</summary>
+        /// <summary>
+        /// Gets or sets the triggers in this group (populated via REST API endpoints).
+        /// </summary>
         [YamlIgnore]
         [JsonPropertyName("triggers")]
         [JsonPropertyOrder(102)]

@@ -11,14 +11,18 @@ namespace Kepware.Api.Model
     [Endpoint("/config/v1/project/_datalogger/log_groups/{logGroupName}/column_mappings/{name}")]
     public class ColumnMapping : NamedEntity
     {
-        /// <summary>Initializes a new instance of the <see cref="ColumnMapping"/> class.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ColumnMapping"/> class.
+        /// </summary>
         public ColumnMapping() { }
 
-        /// <summary>Initializes a new instance of the <see cref="ColumnMapping"/> class with the specified name.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ColumnMapping"/> class with the specified name.
+        /// </summary>
         /// <param name="name">The name of the column mapping.</param>
         public ColumnMapping(string name) : base(name) { }
 
-        // ── Log Item reference ───────────────────────────────────────────────────
+        #region Log Item reference
 
         /// <summary>
         /// Gets or sets the associated ServerItem name (wide table mode), or "__internal" (narrow table mode).
@@ -30,9 +34,13 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.LogItemId, value);
         }
 
-        // ── Name column ──────────────────────────────────────────────────────────
+        #endregion
 
-        /// <summary>Gets or sets the database field name for the name/string column.</summary>
+        #region Name column
+
+        /// <summary>
+        /// Gets or sets the database field name for the name/string column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public string? FieldNameName
         {
@@ -40,7 +48,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.FieldNameName, value);
         }
 
-        /// <summary>Gets or sets the SQL data type for the name/string column.</summary>
+        /// <summary>
+        /// Gets or sets the SQL data type for the name/string column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public SqlDataType? SqlDataTypeName
         {
@@ -48,7 +58,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlDataTypeName, (int?)value);
         }
 
-        /// <summary>Gets or sets the column length for the name/string column.</summary>
+        /// <summary>
+        /// Gets or sets the column length for the name/string column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public int? SqlLengthName
         {
@@ -56,9 +68,13 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlLengthName, value);
         }
 
-        // ── Numeric ID column ────────────────────────────────────────────────────
+        #endregion
 
-        /// <summary>Gets or sets the database field name for the numeric ID column.</summary>
+        #region Numeric ID column
+
+        /// <summary>
+        /// Gets or sets the database field name for the numeric ID column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public string? FieldNameNumeric
         {
@@ -66,7 +82,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.FieldNameNumeric, value);
         }
 
-        /// <summary>Gets or sets the SQL data type for the numeric ID column.</summary>
+        /// <summary>
+        /// Gets or sets the SQL data type for the numeric ID column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public SqlDataType? SqlDataTypeNumeric
         {
@@ -74,7 +92,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlDataTypeNumeric, (int?)value);
         }
 
-        /// <summary>Gets or sets the column length for the numeric ID column.</summary>
+        /// <summary>
+        /// Gets or sets the column length for the numeric ID column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public int? SqlLengthNumeric
         {
@@ -82,9 +102,13 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlLengthNumeric, value);
         }
 
-        // ── Quality column ───────────────────────────────────────────────────────
+        #endregion
 
-        /// <summary>Gets or sets the database field name for the quality column.</summary>
+        #region Quality column
+
+        /// <summary>
+        /// Gets or sets the database field name for the quality column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public string? FieldNameQuality
         {
@@ -92,7 +116,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.FieldNameQuality, value);
         }
 
-        /// <summary>Gets or sets the SQL data type for the quality column.</summary>
+        /// <summary>
+        /// Gets or sets the SQL data type for the quality column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public SqlDataType? SqlDataTypeQuality
         {
@@ -100,7 +126,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlDataTypeQuality, (int?)value);
         }
 
-        /// <summary>Gets or sets the column length for the quality column.</summary>
+        /// <summary>
+        /// Gets or sets the column length for the quality column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public int? SqlLengthQuality
         {
@@ -108,9 +136,13 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlLengthQuality, value);
         }
 
-        // ── Timestamp column ─────────────────────────────────────────────────────
+        #endregion
 
-        /// <summary>Gets or sets the database field name for the timestamp column.</summary>
+        #region Timestamp column
+
+        /// <summary>
+        /// Gets or sets the database field name for the timestamp column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public string? FieldNameTimestamp
         {
@@ -118,7 +150,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.FieldNameTimestamp, value);
         }
 
-        /// <summary>Gets or sets the SQL data type for the timestamp column.</summary>
+        /// <summary>
+        /// Gets or sets the SQL data type for the timestamp column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public SqlDataType? SqlDataTypeTimestamp
         {
@@ -126,7 +160,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlDataTypeTimestamp, (int?)value);
         }
 
-        /// <summary>Gets or sets the column length for the timestamp column.</summary>
+        /// <summary>
+        /// Gets or sets the column length for the timestamp column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public int? SqlLengthTimestamp
         {
@@ -134,9 +170,13 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlLengthTimestamp, value);
         }
 
-        // ── Value column ─────────────────────────────────────────────────────────
+        #endregion
 
-        /// <summary>Gets or sets the database field name for the value column.</summary>
+        #region Value column
+
+        /// <summary>
+        /// Gets or sets the database field name for the value column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public string? FieldNameValue
         {
@@ -144,7 +184,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.FieldNameValue, value);
         }
 
-        /// <summary>Gets or sets the SQL data type for the value column.</summary>
+        /// <summary>
+        /// Gets or sets the SQL data type for the value column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public SqlDataType? SqlDataTypeValue
         {
@@ -152,7 +194,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlDataTypeValue, (int?)value);
         }
 
-        /// <summary>Gets or sets the column length for the value column.</summary>
+        /// <summary>
+        /// Gets or sets the column length for the value column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public int? SqlLengthValue
         {
@@ -160,9 +204,13 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlLengthValue, value);
         }
 
-        // ── Batch ID column ──────────────────────────────────────────────────────
+        #endregion
 
-        /// <summary>Gets or sets the database field name for the batch ID column.</summary>
+        #region Batch ID column
+
+        /// <summary>
+        /// Gets or sets the database field name for the batch ID column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public string? FieldNameBatchId
         {
@@ -170,7 +218,9 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.FieldNameBatchId, value);
         }
 
-        /// <summary>Gets or sets the SQL data type for the batch ID column.</summary>
+        /// <summary>
+        /// Gets or sets the SQL data type for the batch ID column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public SqlDataType? SqlDataTypeBatchId
         {
@@ -178,12 +228,16 @@ namespace Kepware.Api.Model
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlDataTypeBatchId, (int?)value);
         }
 
-        /// <summary>Gets or sets the column length for the batch ID column.</summary>
+        /// <summary>
+        /// Gets or sets the column length for the batch ID column.
+        /// </summary>
         [YamlIgnore, JsonIgnore]
         public int? SqlLengthBatchId
         {
             get => GetDynamicProperty<int>(Properties.DataLogger.ColumnMapping.SqlLengthBatchId);
             set => SetDynamicProperty(Properties.DataLogger.ColumnMapping.SqlLengthBatchId, value);
         }
+
+        #endregion
     }
 }
