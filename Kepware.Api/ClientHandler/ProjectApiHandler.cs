@@ -168,6 +168,9 @@ namespace Kepware.Api.ClientHandler
             // Compare and apply IoT Gateway agents and their IoT Items
             await CompareAndApplyIotGatewayDetailedAsync(sourceProject.IotGateway, projectFromApi.IotGateway, result, cancellationToken).ConfigureAwait(false);
 
+            // Compare and apply DataLogger log groups and their children
+            await CompareAndApplyDataLoggerDetailedAsync(sourceProject.DataLogger, projectFromApi.DataLogger, result, cancellationToken).ConfigureAwait(false);
+
             return result;
         }
         #endregion
@@ -452,6 +455,35 @@ namespace Kepware.Api.ClientHandler
                             item.Owner = agent;
                 }
             }
+
+            if (project.DataLogger?.LogGroups != null)
+            {
+                foreach (var group in project.DataLogger.LogGroups)
+                {
+                    // Flatten serialized-format group wrappers → direct collections
+                    if (group.LogItems == null && group.LogItemGroups != null)
+                        group.LogItems = group.LogItemGroups.FirstOrDefault()?.LogItems;
+
+                    if (group.ColumnMappings == null && group.ColumnMappingGroups != null)
+                        group.ColumnMappings = group.ColumnMappingGroups.FirstOrDefault()?.ColumnMappings;
+
+                    if (group.Triggers == null && group.TriggerGroups != null)
+                        group.Triggers = group.TriggerGroups.FirstOrDefault()?.Triggers;
+
+                    // Set Owner for children
+                    if (group.LogItems != null)
+                        foreach (var item in group.LogItems)
+                            item.Owner = group;
+
+                    if (group.ColumnMappings != null)
+                        foreach (var mapping in group.ColumnMappings)
+                            mapping.Owner = group;
+
+                    if (group.Triggers != null)
+                        foreach (var trigger in group.Triggers)
+                            trigger.Owner = group;
+                }
+            }
         }
 
         private async Task<Project> LoadProjectOptimizedRecurisveAsync(Project project, int tagLimit, CancellationToken cancellationToken = default)
@@ -558,6 +590,9 @@ namespace Kepware.Api.ClientHandler
             // Load IoT Gateway agents and their IoT Items
             await LoadIotGatewayRecursiveAsync(project, cancellationToken).ConfigureAwait(false);
 
+            // Load DataLogger log groups and their children
+            await LoadDataLoggerRecursiveAsync(project, cancellationToken).ConfigureAwait(false);
+
             return project;
         }
 
@@ -610,6 +645,9 @@ namespace Kepware.Api.ClientHandler
             // Load IoT Gateway agents and their IoT Items
             await LoadIotGatewayRecursiveAsync(project, cancellationToken).ConfigureAwait(false);
 
+            // Load DataLogger log groups and their children
+            await LoadDataLoggerRecursiveAsync(project, cancellationToken).ConfigureAwait(false);
+
             return project;
         }
 
@@ -657,6 +695,37 @@ namespace Kepware.Api.ClientHandler
                 await Task.WhenAll(agentTasks).ConfigureAwait(false);
             }
         }
+        private async Task LoadDataLoggerRecursiveAsync(Project project, CancellationToken cancellationToken)
+        {
+            LogGroupCollection? logGroups;
+            try
+            {
+                logGroups = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<LogGroupCollection, LogGroup>(cancellationToken: cancellationToken).ConfigureAwait(false);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // DataLogger plug-in may not be installed on the server
+                m_logger.LogDebug(ex, "DataLogger plug-in not available, skipping DataLogger loading");
+                return;
+            }
+
+            if (logGroups != null && logGroups.Count > 0)
+            {
+                project.DataLogger = new DataLoggerContainer { LogGroups = logGroups };
+
+                var tasks = new List<Task>();
+                foreach (var group in logGroups)
+                {
+                    tasks.Add(Task.Run(async () =>
+                    {
+                        group.LogItems = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<LogItemCollection, LogItem>(group, cancellationToken: cancellationToken).ConfigureAwait(false);
+                        group.ColumnMappings = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<ColumnMappingCollection, ColumnMapping>(group, cancellationToken: cancellationToken).ConfigureAwait(false);
+                        group.Triggers = await m_kepwareApiClient.GenericConfig.LoadCollectionAsync<TriggerCollection, Trigger>(group, cancellationToken: cancellationToken).ConfigureAwait(false);
+                    }));
+                }
+                await Task.WhenAll(tasks).ConfigureAwait(false);
+            }
+        }
         #endregion
 
         #region recursive methods
@@ -700,6 +769,14 @@ namespace Kepware.Api.ClientHandler
                     agent.Left!.IotItems, agent.Right!.IotItems, agent.Right, cancellationToken).ConfigureAwait(false);
                 result.Add(itemCompare);
             }
+        }
+
+        private async Task CompareAndApplyDataLoggerDetailedAsync(
+            DataLoggerContainer? source, DataLoggerContainer? current,
+            ProjectCompareAndApplyResult result, CancellationToken cancellationToken)
+        {
+            var dataLoggerResult = await DataLogger.CompareAndApplyAsync(source, current, autoDisable: false, cancellationToken).ConfigureAwait(false);
+            result.Add(dataLoggerResult);
         }
 
         private static void SetOwnerRecursive(IEnumerable<DeviceTagGroup> tagGroups, NamedEntity owner)
