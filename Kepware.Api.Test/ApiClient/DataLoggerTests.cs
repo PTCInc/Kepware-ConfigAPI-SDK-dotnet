@@ -2,6 +2,7 @@ using Kepware.Api.ClientHandler;
 using Kepware.Api.Model;
 using Kepware.Api.Model.Services;
 using Kepware.Api.Test.Util;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Contrib.HttpClient;
 using Moq.Protected;
@@ -203,6 +204,24 @@ public class DataLoggerTests : TestApiClientBase
     }
 
     [Fact]
+    public async Task GetLogGroups_ShouldLoadCollection()
+    {
+        // Arrange
+        var groupsJson = $$"""[ { "common.ALLTYPES_NAME": "{{TEST_GROUP_NAME}}" } ]""";
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, LogGroupsEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK, groupsJson, "application/json");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.GetLogGroupsAsync();
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Count.ShouldBe(1);
+        result[0].Name.ShouldBe(TEST_GROUP_NAME);
+    }
+
+    [Fact]
     public async Task DeleteLogGroup_ByName_ShouldDeleteFromCorrectEndpoint()
     {
         // Arrange
@@ -339,6 +358,57 @@ public class DataLoggerTests : TestApiClientBase
 
         // Act
         var result = await _kepwareApiClient.Project.DataLogger.DeleteLogItemAsync(item, parent);
+
+        // Assert
+        result.ShouldBeTrue();
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Delete, LogItemEndpoint, Times.Once());
+    }
+
+    [Fact]
+    public async Task GetLogItem_WhenExists_ShouldReturnLogItem()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        var itemJson = $$"""{ "common.ALLTYPES_NAME": "{{TEST_ITEM_NAME}}" }""";
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, LogItemEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK, itemJson, "application/json");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.GetLogItemAsync(TEST_ITEM_NAME, parent);
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Name.ShouldBe(TEST_ITEM_NAME);
+    }
+
+    [Fact]
+    public async Task GetLogItem_WhenNotFound_ShouldReturnNull()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, LogItemEndpoint)
+            .ReturnsResponse(HttpStatusCode.NotFound, "Not Found");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.GetLogItemAsync(TEST_ITEM_NAME, parent);
+
+        // Assert
+        result.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task DeleteLogItem_ByName_ShouldDeleteFromCorrectEndpoint()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Delete, LogItemEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK);
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.DeleteLogItemAsync(TEST_ITEM_NAME, parent);
 
         // Assert
         result.ShouldBeTrue();
@@ -638,6 +708,40 @@ public class DataLoggerTests : TestApiClientBase
         // Assert
         result.ShouldBeTrue();
         _httpMessageHandlerMock.VerifyRequest(HttpMethod.Delete, TriggerEndpoint, Times.Once());
+    }
+
+    [Fact]
+    public async Task GetTrigger_WhenExists_ShouldReturnTrigger()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        var triggerJson = $$"""{ "common.ALLTYPES_NAME": "{{TEST_TRIGGER_NAME}}" }""";
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TriggerEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK, triggerJson, "application/json");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.GetTriggerAsync(TEST_TRIGGER_NAME, parent);
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Name.ShouldBe(TEST_TRIGGER_NAME);
+    }
+
+    [Fact]
+    public async Task GetTrigger_WhenNotFound_ShouldReturnNull()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TriggerEndpoint)
+            .ReturnsResponse(HttpStatusCode.NotFound, "Not Found");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.GetTriggerAsync(TEST_TRIGGER_NAME, parent);
+
+        // Assert
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -949,6 +1053,319 @@ public class DataLoggerTests : TestApiClientBase
         completionResult.IsSuccess.ShouldBeFalse();
         completionResult.ResponseCode.ShouldBe(ApiResponseCode.ServiceUnavailable);
         completionResult.Message.ShouldBe(jobStatusFailed.Message);
+    }
+
+    #endregion
+
+    #region Argument Validation Tests
+
+    [Fact]
+    public async Task GetLogGroupAsync_WithEmptyName_ShouldThrowArgumentException()
+    {
+        await Should.ThrowAsync<ArgumentException>(
+            () => _kepwareApiClient.Project.DataLogger.GetLogGroupAsync(""));
+    }
+
+    [Fact]
+    public async Task CreateLogGroupAsync_WithEmptyName_ShouldThrowArgumentException()
+    {
+        await Should.ThrowAsync<ArgumentException>(
+            () => _kepwareApiClient.Project.DataLogger.CreateLogGroupAsync(""));
+    }
+
+    [Fact]
+    public async Task UpdateLogGroupAsync_WithNullEntity_ShouldThrowArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _kepwareApiClient.Project.DataLogger.UpdateLogGroupAsync((LogGroup)null!));
+    }
+
+    [Fact]
+    public async Task DeleteLogGroupAsync_WithNullEntity_ShouldThrowArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _kepwareApiClient.Project.DataLogger.DeleteLogGroupAsync((LogGroup)null!));
+    }
+
+    [Fact]
+    public async Task GetLogItemAsync_WithEmptyName_ShouldThrowArgumentException()
+    {
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        await Should.ThrowAsync<ArgumentException>(
+            () => _kepwareApiClient.Project.DataLogger.GetLogItemAsync("", parent));
+    }
+
+    [Fact]
+    public async Task GetLogItemAsync_WithNullParent_ShouldThrowArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _kepwareApiClient.Project.DataLogger.GetLogItemAsync(TEST_ITEM_NAME, null!));
+    }
+
+    [Fact]
+    public async Task CreateLogItemAsync_WithEmptyName_ShouldThrowArgumentException()
+    {
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        await Should.ThrowAsync<ArgumentException>(
+            () => _kepwareApiClient.Project.DataLogger.CreateLogItemAsync("", parent));
+    }
+
+    [Fact]
+    public async Task CreateLogItemAsync_WithNullParent_ShouldThrowArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _kepwareApiClient.Project.DataLogger.CreateLogItemAsync(TEST_ITEM_NAME, null!));
+    }
+
+    [Fact]
+    public async Task DeleteLogItemAsync_WithNullEntity_ShouldThrowArgumentNullException()
+    {
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _kepwareApiClient.Project.DataLogger.DeleteLogItemAsync((LogItem)null!, parent));
+    }
+
+    [Fact]
+    public async Task GetColumnMappingAsync_WithEmptyName_ShouldThrowArgumentException()
+    {
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        await Should.ThrowAsync<ArgumentException>(
+            () => _kepwareApiClient.Project.DataLogger.GetColumnMappingAsync("", parent));
+    }
+
+    [Fact]
+    public async Task UpdateColumnMappingAsync_WithNullEntity_ShouldThrowArgumentNullException()
+    {
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _kepwareApiClient.Project.DataLogger.UpdateColumnMappingAsync((ColumnMapping)null!, parent));
+    }
+
+    [Fact]
+    public async Task GetTriggerAsync_WithEmptyName_ShouldThrowArgumentException()
+    {
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        await Should.ThrowAsync<ArgumentException>(
+            () => _kepwareApiClient.Project.DataLogger.GetTriggerAsync("", parent));
+    }
+
+    [Fact]
+    public async Task CreateTriggerAsync_WithEmptyName_ShouldThrowArgumentException()
+    {
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        await Should.ThrowAsync<ArgumentException>(
+            () => _kepwareApiClient.Project.DataLogger.CreateTriggerAsync("", parent));
+    }
+
+    [Fact]
+    public async Task DeleteTriggerAsync_WithNullEntity_ShouldThrowArgumentNullException()
+    {
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _kepwareApiClient.Project.DataLogger.DeleteTriggerAsync((Trigger)null!, parent));
+    }
+
+    [Fact]
+    public async Task GetOrCreateLogGroup_WhenCreateFails_ShouldThrowInvalidOperationException()
+    {
+        // Arrange — GET returns 404, POST returns 500
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, LogGroupEndpoint)
+            .ReturnsResponse(HttpStatusCode.NotFound, "Not Found");
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Post, LogGroupsEndpoint)
+            .ReturnsResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
+
+        // Act & Assert
+        await Should.ThrowAsync<InvalidOperationException>(
+            () => _kepwareApiClient.Project.DataLogger.GetOrCreateLogGroupAsync(TEST_GROUP_NAME));
+    }
+
+    [Fact]
+    public async Task GetOrCreateLogItem_WhenCreateFails_ShouldThrowInvalidOperationException()
+    {
+        // Arrange — GET returns 404, POST returns 500
+        var parent = new LogGroup(TEST_GROUP_NAME);
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, LogItemEndpoint)
+            .ReturnsResponse(HttpStatusCode.NotFound, "Not Found");
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Post, LogItemsEndpoint)
+            .ReturnsResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
+
+        // Act & Assert
+        await Should.ThrowAsync<InvalidOperationException>(
+            () => _kepwareApiClient.Project.DataLogger.GetOrCreateLogItemAsync(TEST_ITEM_NAME, parent));
+    }
+
+    [Fact]
+    public async Task GetOrCreateTrigger_WhenCreateFails_ShouldThrowInvalidOperationException()
+    {
+        // Arrange — GET returns 404, POST returns 500
+        var parent = new LogGroup(TEST_GROUP_NAME);
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TriggerEndpoint)
+            .ReturnsResponse(HttpStatusCode.NotFound, "Not Found");
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Post, TriggersEndpoint)
+            .ReturnsResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
+
+        // Act & Assert
+        await Should.ThrowAsync<InvalidOperationException>(
+            () => _kepwareApiClient.Project.DataLogger.GetOrCreateTriggerAsync(TEST_TRIGGER_NAME, parent));
+    }
+
+    #endregion
+
+    #region Error Handling Tests
+
+    [Fact]
+    public async Task CreateLogGroup_WithHttpError_ShouldReturnNull()
+    {
+        // Arrange
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Post, LogGroupsEndpoint)
+            .ReturnsResponse(HttpStatusCode.BadRequest, "Bad Request");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.CreateLogGroupAsync(TEST_GROUP_NAME);
+
+        // Assert
+        result.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task CreateLogGroup_WithHttpError_ShouldLogError()
+    {
+        // Arrange
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Post, LogGroupsEndpoint)
+            .ReturnsResponse(HttpStatusCode.BadRequest, "Bad Request");
+
+        // Act
+        await _kepwareApiClient.Project.DataLogger.CreateLogGroupAsync(TEST_GROUP_NAME);
+
+        // Assert
+        _loggerMockGeneric.Verify(
+            logger => logger.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteLogGroup_WithHttpError_ShouldReturnFalse()
+    {
+        // Arrange
+        var group = new LogGroup(TEST_GROUP_NAME);
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Delete, LogGroupEndpoint)
+            .ReturnsResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.DeleteLogGroupAsync(group);
+
+        // Assert
+        result.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task DeleteLogGroup_WithConnectionError_ShouldReturnFalse()
+    {
+        // Arrange
+        var group = new LogGroup(TEST_GROUP_NAME);
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Delete, LogGroupEndpoint)
+            .Throws(new HttpRequestException("Connection refused"));
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.DeleteLogGroupAsync(group);
+
+        // Assert
+        result.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task CreateLogItem_WithHttpError_ShouldReturnNull()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Post, LogItemsEndpoint)
+            .ReturnsResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.CreateLogItemAsync(TEST_ITEM_NAME, parent);
+
+        // Assert
+        result.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task DeleteLogItem_WithConnectionError_ShouldReturnFalse()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        var item = new LogItem(TEST_ITEM_NAME) { Owner = parent };
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Delete, LogItemEndpoint)
+            .Throws(new HttpRequestException("Connection refused"));
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.DeleteLogItemAsync(item, parent);
+
+        // Assert
+        result.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task CreateTrigger_WithHttpError_ShouldReturnNull()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Post, TriggersEndpoint)
+            .ReturnsResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.CreateTriggerAsync(TEST_TRIGGER_NAME, parent);
+
+        // Assert
+        result.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task DeleteTrigger_WithHttpError_ShouldReturnFalse()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        var trigger = new Trigger(TEST_TRIGGER_NAME) { Owner = parent };
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Delete, TriggerEndpoint)
+            .ReturnsResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.DeleteTriggerAsync(trigger, parent);
+
+        // Assert
+        result.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task DeleteTrigger_WithConnectionError_ShouldReturnFalse()
+    {
+        // Arrange
+        var parent = new LogGroup(TEST_GROUP_NAME);
+        var trigger = new Trigger(TEST_TRIGGER_NAME) { Owner = parent };
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Delete, TriggerEndpoint)
+            .Throws(new HttpRequestException("Connection refused"));
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.DeleteTriggerAsync(trigger, parent);
+
+        // Assert
+        result.ShouldBeFalse();
     }
 
     #endregion

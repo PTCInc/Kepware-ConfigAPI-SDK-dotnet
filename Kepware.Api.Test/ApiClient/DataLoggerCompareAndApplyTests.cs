@@ -445,4 +445,116 @@ public class DataLoggerCompareAndApplyTests : TestApiClientBase
 
         result.Updates.ShouldBe(1); // one log item updated
     }
+
+    [Fact]
+    public async Task CompareAndApply_RemovedLogItem_ShouldDeleteFromCorrectEndpoint()
+    {
+        // Arrange — source group has 0 log items; current has 1
+        var sourceGroup = CreateGroup(TEST_GROUP_NAME, enabled: true);
+        sourceGroup.LogItems = new LogItemCollection();
+
+        var currentGroup = CreateGroup(TEST_GROUP_NAME, enabled: true);
+        var curItem = new LogItem("Item1") { Owner = currentGroup };
+        currentGroup.LogItems = new LogItemCollection { curItem };
+
+        var source  = ContainerWith(sourceGroup);
+        var current = ContainerWith(currentGroup);
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Delete, $"{LogItemsEndpoint}/Item1")
+            .ReturnsResponse(HttpStatusCode.OK);
+
+        // After log item delete, column mappings are re-fetched
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, ColumnMappingsEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK, "[]", "application/json");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.CompareAndApplyAsync(source, current);
+
+        // Assert
+        result.Deletes.ShouldBe(1);
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Delete, $"{LogItemsEndpoint}/Item1", Times.Once());
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Get, ColumnMappingsEndpoint, Times.Once());
+    }
+
+    [Fact]
+    public async Task CompareAndApply_AfterLogItemDeletes_ShouldRefetchColumnMappingsAndApplyChanges()
+    {
+        // Arrange — deleting a log item causes the server to regenerate column mappings;
+        // the handler must re-fetch and then apply updates to the new mappings
+        var sourceGroup = CreateGroup(TEST_GROUP_NAME, enabled: true);
+        sourceGroup.LogItems = new LogItemCollection(); // no items → item will be deleted
+        var srcCm = new ColumnMapping("CM_Remaining") { Owner = sourceGroup };
+        srcCm.SetDynamicProperty("datalogger.COLUMN_DESCRIPTION", "updated");
+        sourceGroup.ColumnMappings = new ColumnMappingCollection { srcCm };
+
+        var currentGroup = CreateGroup(TEST_GROUP_NAME, enabled: true);
+        var curItem = new LogItem("Item1") { Owner = currentGroup };
+        currentGroup.LogItems = new LogItemCollection { curItem };
+        var curCm = new ColumnMapping("CM_Remaining") { Owner = currentGroup };
+        curCm.SetDynamicProperty("datalogger.COLUMN_DESCRIPTION", "old");
+        currentGroup.ColumnMappings = new ColumnMappingCollection { curCm };
+
+        var source  = ContainerWith(sourceGroup);
+        var current = ContainerWith(currentGroup);
+
+        // Mock DELETE for the removed log item
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Delete, $"{LogItemsEndpoint}/Item1")
+            .ReturnsResponse(HttpStatusCode.OK);
+
+        // Mock GET for column mapping re-fetch (server regenerated mappings after delete)
+        var refetchedCmJson = """[{ "common.ALLTYPES_NAME": "CM_Remaining", "datalogger.COLUMN_DESCRIPTION": "old" }]""";
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, ColumnMappingsEndpoint)
+            .ReturnsResponse(HttpStatusCode.OK, refetchedCmJson, "application/json");
+
+        // Mock GET+PUT for the column mapping update
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, $"{ColumnMappingsEndpoint}/CM_Remaining")
+            .ReturnsResponse(HttpStatusCode.OK, """{ "common.ALLTYPES_NAME": "CM_Remaining" }""", "application/json");
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Put, $"{ColumnMappingsEndpoint}/CM_Remaining")
+            .ReturnsResponse(HttpStatusCode.OK);
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.CompareAndApplyAsync(source, current);
+
+        // Assert — re-fetch happened and the column mapping was updated
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Get, ColumnMappingsEndpoint, Times.Once());
+        _httpMessageHandlerMock.VerifyRequest(HttpMethod.Put, $"{ColumnMappingsEndpoint}/CM_Remaining", Times.Once());
+        result.Deletes.ShouldBeGreaterThanOrEqualTo(1);
+        result.Updates.ShouldBeGreaterThanOrEqualTo(1);
+    }
+
+    [Fact]
+    public async Task CompareAndApply_WhenInsertFails_ShouldIncrementFailureCount()
+    {
+        // Arrange — source has a new group; POST returns 500
+        var source  = ContainerWith(CreateGroup(TEST_GROUP_NAME));
+        var current = new DataLoggerContainer { LogGroups = new LogGroupCollection() };
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Post, LogGroupsEndpoint)
+            .ReturnsResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.CompareAndApplyAsync(source, current);
+
+        // Assert
+        result.Inserts.ShouldBe(0);
+        result.Failures.ShouldBeGreaterThanOrEqualTo(1);
+    }
+
+    [Fact]
+    public async Task CompareAndApply_WhenDeleteFails_ShouldIncrementFailureCount()
+    {
+        // Arrange — current has a group not in source; DELETE returns 500
+        var source  = new DataLoggerContainer { LogGroups = new LogGroupCollection() };
+        var current = ContainerWith(CreateGroup(TEST_GROUP_NAME));
+
+        _httpMessageHandlerMock.SetupRequest(HttpMethod.Delete, LogGroupEndpoint)
+            .ReturnsResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
+
+        // Act
+        var result = await _kepwareApiClient.Project.DataLogger.CompareAndApplyAsync(source, current);
+
+        // Assert
+        result.Deletes.ShouldBe(0);
+        result.Failures.ShouldBeGreaterThanOrEqualTo(1);
+    }
 }
