@@ -13,6 +13,14 @@ namespace Kepware.Api.Serializer
     [YamlSerializable(typeof(Device))]
     [YamlSerializable(typeof(DeviceTagGroup))]
     [YamlSerializable(typeof(DefaultEntity))]
+    [YamlSerializable(typeof(LogGroup))]
+    [YamlSerializable(typeof(LogItem))]
+    [YamlSerializable(typeof(ColumnMapping))]
+    [YamlSerializable(typeof(Trigger))]
+    [YamlSerializable(typeof(LogItemGroup))]
+    [YamlSerializable(typeof(ColumnMappingGroup))]
+    [YamlSerializable(typeof(TriggerGroup))]
+    [YamlSerializable(typeof(DataLoggerContainer))]
     public partial class KepYamlContext : StaticContext
     {
 
