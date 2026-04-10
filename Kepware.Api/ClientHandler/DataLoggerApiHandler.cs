@@ -127,10 +127,14 @@ namespace Kepware.Api.ClientHandler
         /// </param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A boolean indicating whether the update was successful.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the group is null.</exception>
         public Task<bool> UpdateLogGroupAsync(LogGroup group, bool autoDisable = false, CancellationToken cancellationToken = default)
-            => WithAutoDisableAsync(group, autoDisable,
+        {
+            ArgumentNullException.ThrowIfNull(group);
+            return WithAutoDisableAsync(group, autoDisable,
                 () => m_kepwareApiClient.GenericConfig.UpdateItemAsync(group, oldItem: null, cancellationToken),
                 cancellationToken);
+        }
 
         /// <summary>
         /// Deletes the specified log group.
@@ -536,7 +540,10 @@ namespace Kepware.Api.ClientHandler
         /// <returns>A <see cref="KepServerJobPromise"/> representing the async server job.</returns>
         /// <exception cref="ArgumentNullException">Thrown when the group is null.</exception>
         public Task<KepServerJobPromise> ResetColumnMappingAsync(LogGroup group, bool autoDisable = false, CancellationToken cancellationToken = default)
-            => ResetColumnMappingAsync(group, TimeSpan.FromSeconds(30), autoDisable, cancellationToken);
+        {
+            ArgumentNullException.ThrowIfNull(group);
+            return ResetColumnMappingAsync(group, TimeSpan.FromSeconds(30), autoDisable, cancellationToken);
+        }
 
         /// <summary>
         /// Initiates the ResetColumnMapping service for the specified log group.
