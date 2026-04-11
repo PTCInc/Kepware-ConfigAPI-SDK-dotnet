@@ -118,6 +118,32 @@ namespace Kepware.Api.Test.Sync
         }
 
         [Fact]
+        public async Task CompareAndApply_ProjectHashMismatchWithoutProjectPropertyDiff_ShouldReportNoChanges()
+        {
+            ConfigureConnectedClient();
+
+            var sourceProject = CreateProjectPropertiesOnly("Desired description");
+            _ = sourceProject.Hash;
+            sourceProject.Channels = [CreateTestChannel("Channel_Main", "Simulator")];
+
+            var targetProject = await sourceProject.CloneAsync();
+            AssignOwners(targetProject);
+
+            var targetProjectJson = JsonSerializer.Serialize(targetProject, KepJsonContext.Default.Project);
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Get, TEST_ENDPOINT + "/config/v1/project")
+                .ReturnsResponse(HttpStatusCode.OK, targetProjectJson, "application/json");
+            _httpMessageHandlerMock.SetupRequest(HttpMethod.Put, TEST_ENDPOINT + "/config/v1/project")
+                .ReturnsResponse(HttpStatusCode.OK);
+
+            var result = await _kepwareApiClient.Project.CompareAndApplyDetailedAsync(sourceProject, targetProject);
+
+            result.Updates.ShouldBe(0);
+            result.Inserts.ShouldBe(0);
+            result.Deletes.ShouldBe(0);
+            result.Failures.ShouldBe(0);
+        }
+
+        [Fact]
         public async Task SyncService_DiskToPrimaryFollowedByPrimarySync_ShouldNotLoopWhenNoEffectiveChangesRemain()
         {
             ConfigureConnectedClient();
