@@ -122,9 +122,10 @@ namespace Kepware.Api.Test.Sync
         {
             ConfigureConnectedClient();
 
-            var sourceProject = CreateProjectPropertiesOnly("Desired description");
+            var sourceProject = CreateProjectPropertiesOnly(string.Empty);
+            sourceProject.Description = "Transient description";
             _ = sourceProject.Hash;
-            sourceProject.Channels = [CreateTestChannel("Channel_Main", "Simulator")];
+            sourceProject.Description = string.Empty;
 
             var targetProject = await sourceProject.CloneAsync();
             AssignOwners(targetProject);

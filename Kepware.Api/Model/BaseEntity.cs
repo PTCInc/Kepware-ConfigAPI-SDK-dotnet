@@ -44,6 +44,10 @@ namespace Kepware.Api.Model
     public abstract class BaseEntity : IEquatable<BaseEntity>
     {
         private bool _dynamicPropertiesNormalized = false;
+        private ulong? _hash;
+        private long? _projectId;
+        private string? _description = string.Empty;
+        private Dictionary<string, JsonElement> _dynamicProperties = [];
 
         /// <summary>
         /// Flag indicating if the entity includes nested dynamic properties that require normalization.
@@ -59,7 +63,7 @@ namespace Kepware.Api.Model
         /// </summary>
         [JsonIgnore]
         [YamlIgnore]
-        public ulong Hash => CalculateHash();
+        public ulong Hash => _hash ??= CalculateHash();
 
         /// <summary>
         /// The project ID the entity belongs to.
@@ -67,14 +71,36 @@ namespace Kepware.Api.Model
         [JsonPropertyName(Properties.ProjectId)]
         [YamlIgnore]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public long? ProjectId { get; set; } = null;
+        public long? ProjectId
+        {
+            get => _projectId;
+            set
+            {
+                if (_projectId != value)
+                {
+                    _projectId = value;
+                    InvalidateHash();
+                }
+            }
+        }
 
         /// <summary>
         /// The description of the entity.
         /// </summary>
         [JsonPropertyName(Properties.Description)]
         [YamlMember(Alias = Properties.Description)]
-        public string? Description { get; set; } = string.Empty;
+        public string? Description
+        {
+            get => _description;
+            set
+            {
+                if (_description != value)
+                {
+                    _description = value;
+                    InvalidateHash();
+                }
+            }
+        }
 
         /// <summary>
         /// The type name of the entity.
@@ -87,7 +113,16 @@ namespace Kepware.Api.Model
         /// Dynamic properties associated with the entity.
         /// </summary>
         [JsonExtensionData]
-        public Dictionary<string, JsonElement> DynamicProperties { get; set; } = new();
+        public Dictionary<string, JsonElement> DynamicProperties
+        {
+            get => _dynamicProperties;
+            set
+            {
+                _dynamicProperties = value ?? [];
+                _dynamicPropertiesNormalized = false;
+                InvalidateHash();
+            }
+        }
 
         /// <summary>
         /// Compares the current entity with another for equality.
@@ -160,15 +195,22 @@ namespace Kepware.Api.Model
                 if (DynamicProperties.ContainsKey(key))
                 {
                     DynamicProperties.Remove(key);
+                    InvalidateHash();
                 }
             }
             else
             {
                 DynamicProperties[key] = value is JsonElement jsonElement ? jsonElement : KepJsonContext.WrapInJsonElement(value);
+                InvalidateHash();
             }
             
             return this;
         }
+
+        /// <summary>
+        /// Invalidates the cached hash value.
+        /// </summary>
+        protected void InvalidateHash() => _hash = null;
 
         /// <summary>
         /// Attempts to retrieve a dynamic property by key.
@@ -197,6 +239,8 @@ namespace Kepware.Api.Model
         /// <returns>The calculated hash.</returns>
         protected internal virtual ulong CalculateHash()
         {
+            if (IncludesNestedDynamicProperties) EnsureDynamicPropertiesNormalized();
+
             return CustomHashGenerator.ComputeHash(
                     KepJsonContext.Unwrap(DynamicProperties.Except(Properties.NonSerialized.AsHashSet, Properties.NonUpdatable.AsHashSet, ConditionalNonSerialized()))
                         .Concat(
@@ -219,6 +263,7 @@ namespace Kepware.Api.Model
             NormalizeNestedProperties();
 
             _dynamicPropertiesNormalized = true;
+            InvalidateHash();
         }
 
         /// <summary>
@@ -290,6 +335,9 @@ namespace Kepware.Api.Model
 
         public virtual Dictionary<string, JsonElement> GetUpdateDiff(DefaultEntity other)
         {
+            if (IncludesNestedDynamicProperties) EnsureDynamicPropertiesNormalized();
+            if (other.IncludesNestedDynamicProperties) other.EnsureDynamicPropertiesNormalized();
+
             var diff = new Dictionary<string, JsonElement>();
 
             if (Description != other.Description)
@@ -329,12 +377,25 @@ namespace Kepware.Api.Model
     [DebuggerDisplay("{TypeName} - {Name} - {Description}")]
     public class NamedEntity : DefaultEntity, IHaveName
     {
+        private string _name = string.Empty;
+
         /// <summary>
         /// The name of the entity.
         /// </summary>
         [JsonPropertyName(Properties.Name)]
         [YamlIgnore]
-        public string Name { get; set; } = string.Empty;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (_name != value)
+                {
+                    _name = value;
+                    InvalidateHash();
+                }
+            }
+        }
 
         public NamedEntity()
         {
@@ -398,7 +459,13 @@ namespace Kepware.Api.Model
         /// <summary>
         /// Removes the unique ID from the entity.
         /// </summary>
-        public void RemoveUniqueId() => DynamicProperties.Remove(UniqueIdKey);
+        public void RemoveUniqueId()
+        {
+            if (DynamicProperties.Remove(UniqueIdKey))
+            {
+                InvalidateHash();
+            }
+        }
 
         protected NamedUidEntity()
         {
