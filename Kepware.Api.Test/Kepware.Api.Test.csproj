@@ -29,6 +29,11 @@
     <ProjectReference Include="..\Kepware.Api\Kepware.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.3" />
+    <ProjectReference Include="..\KepwareSync.Service\Kepware.SyncService.csproj" />
+  </ItemGroup>
+
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>

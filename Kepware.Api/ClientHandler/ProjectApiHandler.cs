@@ -109,8 +109,9 @@ namespace Kepware.Api.ClientHandler
         public async Task<ProjectCompareAndApplyResult> CompareAndApplyDetailedAsync(Project sourceProject, Project projectFromApi, CancellationToken cancellationToken = default)
         {
             var result = new ProjectCompareAndApplyResult();
+            var projectPropertyDiff = sourceProject.GetUpdateDiff(projectFromApi);
 
-            if (sourceProject.Hash != projectFromApi.Hash)
+            if (projectPropertyDiff.Count > 0)
             {
                 m_logger.LogInformation("Project properties has changed. Updating project properties...");
                 var projectPropertyFailure = await SetProjectPropertiesDetailedAsync(sourceProject, cancellationToken: cancellationToken).ConfigureAwait(false);

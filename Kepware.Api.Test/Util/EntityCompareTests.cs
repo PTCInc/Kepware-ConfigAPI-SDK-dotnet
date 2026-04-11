@@ -98,6 +98,23 @@ namespace Kepware.Api.Test.Util
             Assert.Equal(EntityCompare.CompareResult.Changed, result);
         }
 
+        [Fact]
+        public void Compare_ShouldReturnChanged_WhenEntityWasMutatedAfterHashWasRead()
+        {
+            // Arrange
+            var sourceEntity = new NamedEntity { Name = "Entity", Description = "Initial" };
+            _ = sourceEntity.Hash;
+            sourceEntity.Description = "Updated";
+
+            var targetEntity = new NamedEntity { Name = "Entity", Description = "Initial" };
+
+            // Act
+            var result = EntityCompare.Compare<NamedEntity>(sourceEntity, targetEntity);
+
+            // Assert
+            Assert.Equal(EntityCompare.CompareResult.Changed, result);
+        }
+
         #endregion
 
         #region Compare - Sammlungen
