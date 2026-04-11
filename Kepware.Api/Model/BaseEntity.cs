@@ -44,7 +44,6 @@ namespace Kepware.Api.Model
     public abstract class BaseEntity : IEquatable<BaseEntity>
     {
         private bool _dynamicPropertiesNormalized = false;
-        private ulong? _hash;
 
         /// <summary>
         /// Flag indicating if the entity includes nested dynamic properties that require normalization.
@@ -60,7 +59,7 @@ namespace Kepware.Api.Model
         /// </summary>
         [JsonIgnore]
         [YamlIgnore]
-        public ulong Hash => _hash ??= CalculateHash();
+        public ulong Hash => CalculateHash();
 
         /// <summary>
         /// The project ID the entity belongs to.
@@ -161,13 +160,11 @@ namespace Kepware.Api.Model
                 if (DynamicProperties.ContainsKey(key))
                 {
                     DynamicProperties.Remove(key);
-                    _hash = null;
                 }
             }
             else
             {
                 DynamicProperties[key] = value is JsonElement jsonElement ? jsonElement : KepJsonContext.WrapInJsonElement(value);
-                _hash = null;
             }
             
             return this;
