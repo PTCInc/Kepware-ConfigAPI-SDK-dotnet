@@ -291,20 +291,35 @@ namespace Kepware.Api.TestIntg.ApiClient
 
         }
 
-        // protected async Task<IotItem> AddTestIotItem(string name = "IotItemTest", Dictionary<string, JsonElement>? properties = null)
-        // {
-        //     var item = new IotItem(name);
-        //     if (properties != null)
-        //     {
-        //         foreach (var kvp in properties)
-        //         {
-        //             item.DynamicProperties[kvp.Key] = kvp.Value;
-        //         }
-        //     }
-        //     await _kepwareApiClient.GenericConfig.InsertItemAsync<IotItem>(item, cancellationToken: CancellationToken.None);
-        //     return await _kepwareApiClient.GenericConfig.LoadEntityAsync<IotItem>(item.Name, cancellationToken: CancellationToken.None) ?? throw new Exception($"Failed to create IoT Item '{name}'.");
-        // }
+        #region DataLogger Helpers
 
+        protected async Task<LogGroup> AddTestLogGroup(string name = "TestLogGroup", Dictionary<string, JsonElement>? properties = null)
+        {
+            var group = new LogGroup(name);
+            if (properties != null)
+            {
+                foreach (var kvp in properties)
+                {
+                    group.DynamicProperties[kvp.Key] = kvp.Value;
+                }
+            }
+            await _kepwareApiClient.GenericConfig.InsertItemAsync<LogGroupCollection, LogGroup>(group, cancellationToken: CancellationToken.None);
+            return await _kepwareApiClient.GenericConfig.LoadEntityAsync<LogGroup>(group.Name, cancellationToken: CancellationToken.None) ?? throw new Exception($"Failed to create Log Group '{name}'.");
+        }
+
+        protected async Task DeleteAllLogGroupsAsync()
+        {
+            var logGroups = await _kepwareApiClient.GenericConfig.LoadCollectionAsync<LogGroupCollection, LogGroup>();
+            if (logGroups != null)
+            {
+                foreach (var group in logGroups)
+                {
+                    await _kepwareApiClient.Project.DataLogger.DeleteLogGroupAsync(group.Name);
+                }
+            }
+        }
+
+        #endregion
 
 
     }
