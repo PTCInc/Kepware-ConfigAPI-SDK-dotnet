@@ -636,4 +636,225 @@ public class DataLoggerIntegrationTests : TestIntgApiClientBase
     }
 
     #endregion
+
+    #region Project Load Tests
+
+    [SkippableFact]
+    public async Task LoadProject_Full_ShouldMapDataLoggerIntoProjectStructure()
+    {
+        Skip.If(!HasDataLoggerPlugIn(), "Requires DataLogger plug-in");
+
+        try
+        {
+            // ── Arrange — create channels, devices, and tags (mirroring ProjectLoadTests) ──
+            var channel = await AddTestChannel();
+            var device = await AddTestDevice(channel);
+            var tags = await AddSimulatorTestTags(device);
+            var tagGroup = await AddTestTagGroup(device);
+            var tagGroup2 = await AddTestTagGroup(tagGroup, "TagGroup2");
+
+            var channel2 = await AddTestChannel("Channel2");
+            var device2 = await AddTestDevice(channel2);
+            var tags2 = await AddSimulatorTestTags(device2);
+            var tagGroup_2 = await AddTestTagGroup(device2);
+            var tagGroup2_2 = await AddTestTagGroup(tagGroup_2, "TagGroup2");
+
+            // Create a log group per channel with log items pointing to the channel's tags
+            var logGroup1 = await AddTestLogGroup("LogGroup_TestChannel");
+            foreach (var tag in tags)
+            {
+                var item = new LogItem($"LogItem_{tag.Name}") { ServerItem = $"{channel.Name}.{device.Name}.{tag.Name}" };
+                var props = item.DynamicProperties.ToDictionary(kvp => kvp.Key, kvp => (object)kvp.Value);
+                await _kepwareApiClient.Project.DataLogger.CreateLogItemAsync($"LogItem_{tag.Name}", logGroup1, properties: props);
+            }
+
+            var logGroup2 = await AddTestLogGroup("LogGroup_Channel2");
+            foreach (var tag in tags2)
+            {
+                var item = new LogItem($"LogItem_{tag.Name}") { ServerItem = $"{channel2.Name}.{device2.Name}.{tag.Name}" };
+                var props = item.DynamicProperties.ToDictionary(kvp => kvp.Key, kvp => (object)kvp.Value);
+                await _kepwareApiClient.Project.DataLogger.CreateLogItemAsync($"LogItem_{tag.Name}", logGroup2, properties: props);
+            }
+
+            // ── Act — load full project ────────────────────────────────────────────
+            var project = await _kepwareApiClient.Project.LoadProjectAsync(blnLoadFullProject: true);
+
+            // ── Assert — channels, devices, tags loaded correctly ───────────────────
+            project.ShouldNotBeNull();
+            project.Channels.ShouldNotBeNull();
+            project.Channels.ShouldContain(c => c.Name == channel.Name);
+            project.Channels.ShouldContain(c => c.Name == channel2.Name);
+
+            var foundChannel = project.Channels.Find(c => c.Name == channel.Name);
+            foundChannel.ShouldNotBeNull();
+            foundChannel.Devices.ShouldNotBeNull();
+            foundChannel.Devices.ShouldContain(d => d.Name == device.Name);
+
+            var foundDevice = foundChannel.Devices.Find(d => d.Name == device.Name);
+            foundDevice.ShouldNotBeNull();
+            foundDevice.Tags.ShouldNotBeNull();
+            foundDevice.Tags.Count.ShouldBe(tags.Count);
+            foundDevice.TagGroups.ShouldNotBeNull();
+            foundDevice.TagGroups.ShouldContain(tg => tg.Name == tagGroup.Name);
+
+            var foundTagGroup = foundDevice.TagGroups.Find(tg => tg.Name == tagGroup.Name);
+            foundTagGroup.ShouldNotBeNull();
+            foundTagGroup.TagGroups.ShouldNotBeNull();
+            foundTagGroup.TagGroups.ShouldContain(tg => tg.Name == tagGroup2.Name);
+
+            // ── Assert — DataLogger container loaded correctly ──────────────────────
+            project.DataLogger.ShouldNotBeNull("DataLogger container should be populated in loaded project");
+            project.DataLogger.LogGroups.ShouldNotBeNull();
+            project.DataLogger.LogGroups.Count.ShouldBe(2);
+
+            // Validate LogGroup_TestChannel
+            var foundLogGroup1 = project.DataLogger.LogGroups.FirstOrDefault(g => g.Name == "LogGroup_TestChannel");
+            foundLogGroup1.ShouldNotBeNull("LogGroup_TestChannel should exist in loaded project");
+            foundLogGroup1.LogItems.ShouldNotBeNull();
+            foundLogGroup1.LogItems.Count.ShouldBe(tags.Count,
+                $"LogGroup_TestChannel should have {tags.Count} log items (one per tag)");
+            foreach (var tag in tags)
+            {
+                foundLogGroup1.LogItems.ShouldContain(i => i.Name == $"LogItem_{tag.Name}",
+                    $"Log item for tag '{tag.Name}' should exist");
+            }
+            foundLogGroup1.ColumnMappings.ShouldNotBeNull();
+            foundLogGroup1.ColumnMappings.Count.ShouldBeGreaterThanOrEqualTo(1,
+                "Column mappings should be auto-generated for log items");
+            foundLogGroup1.Triggers.ShouldNotBeNull();
+
+            // Validate LogGroup_Channel2
+            var foundLogGroup2 = project.DataLogger.LogGroups.FirstOrDefault(g => g.Name == "LogGroup_Channel2");
+            foundLogGroup2.ShouldNotBeNull("LogGroup_Channel2 should exist in loaded project");
+            foundLogGroup2.LogItems.ShouldNotBeNull();
+            foundLogGroup2.LogItems.Count.ShouldBe(tags2.Count,
+                $"LogGroup_Channel2 should have {tags2.Count} log items (one per tag)");
+            foreach (var tag in tags2)
+            {
+                foundLogGroup2.LogItems.ShouldContain(i => i.Name == $"LogItem_{tag.Name}",
+                    $"Log item for tag '{tag.Name}' should exist");
+            }
+            foundLogGroup2.ColumnMappings.ShouldNotBeNull();
+            foundLogGroup2.ColumnMappings.Count.ShouldBeGreaterThanOrEqualTo(1);
+            foundLogGroup2.Triggers.ShouldNotBeNull();
+        }
+        finally
+        {
+            await DeleteAllLogGroupsAsync();
+            await DeleteAllChannelsAsync();
+        }
+    }
+
+    [SkippableFact]
+    public async Task LoadProject_Full_OptimizedRecursion_ShouldMapDataLoggerIntoProjectStructure()
+    {
+        Skip.If(!HasDataLoggerPlugIn(), "Requires DataLogger plug-in");
+
+        try
+        {
+            // ── Arrange — create channels, devices, and tags (mirroring optimized recursion test) ──
+            var channel = await AddTestChannel();
+            var device = await AddTestDevice(channel);
+            var tags = await AddSimulatorTestTags(device, count: 200);
+            var tagGroup = await AddTestTagGroup(device);
+            var tagGroup2 = await AddTestTagGroup(tagGroup, "TagGroup2");
+            var tagsTagGroup2 = await AddSimulatorTestTags(tagGroup2, count: 10);
+
+            var channel2 = await AddTestChannel("Channel2");
+            var device2 = await AddTestDevice(channel2);
+            var tags2 = await AddSimulatorTestTags(device2);
+            var tagGroup_2 = await AddTestTagGroup(device2);
+            var tagGroup2_2 = await AddTestTagGroup(tagGroup_2, "TagGroup2");
+
+            // Create a log group per channel with log items pointing to a subset of the channel's tags
+            var logGroup1 = await AddTestLogGroup("LogGroup_TestChannel");
+            var logGroup1Items = tags.Take(5).ToList(); // use first 5 tags to keep setup fast
+            foreach (var tag in logGroup1Items)
+            {
+                var item = new LogItem($"LogItem_{tag.Name}") { ServerItem = $"{channel.Name}.{device.Name}.{tag.Name}" };
+                var props = item.DynamicProperties.ToDictionary(kvp => kvp.Key, kvp => (object)kvp.Value);
+                await _kepwareApiClient.Project.DataLogger.CreateLogItemAsync($"LogItem_{tag.Name}", logGroup1, properties: props);
+            }
+
+            var logGroup2 = await AddTestLogGroup("LogGroup_Channel2");
+            foreach (var tag in tags2)
+            {
+                var item = new LogItem($"LogItem_{tag.Name}") { ServerItem = $"{channel2.Name}.{device2.Name}.{tag.Name}" };
+                var props = item.DynamicProperties.ToDictionary(kvp => kvp.Key, kvp => (object)kvp.Value);
+                await _kepwareApiClient.Project.DataLogger.CreateLogItemAsync($"LogItem_{tag.Name}", logGroup2, properties: props);
+            }
+
+            // ── Act — load full project with projectLoadTagLimit=100 to force optimized recursive logic ──
+            var project = await _kepwareApiClient.Project.LoadProjectAsync(blnLoadFullProject: true, projectLoadTagLimit: 100);
+
+            // ── Assert — channels, devices, tags loaded correctly ───────────────────
+            project.ShouldNotBeNull();
+            project.Channels.ShouldNotBeNull();
+            project.Channels.ShouldContain(c => c.Name == channel.Name);
+
+            var foundChannel = project.Channels.Find(c => c.Name == channel.Name);
+            foundChannel.ShouldNotBeNull();
+            foundChannel.Devices.ShouldNotBeNull();
+
+            var foundDevice = foundChannel.Devices.Find(d => d.Name == device.Name);
+            foundDevice.ShouldNotBeNull();
+            foundDevice.Tags.ShouldNotBeNull();
+            foundDevice.Tags.Count.ShouldBe(tags.Count);
+            foundDevice.TagGroups.ShouldNotBeNull();
+            foundDevice.TagGroups.ShouldContain(tg => tg.Name == tagGroup.Name);
+
+            var foundTagGroup = foundDevice.TagGroups.Find(tg => tg.Name == tagGroup.Name);
+            foundTagGroup.ShouldNotBeNull();
+            foundTagGroup.TagGroups.ShouldNotBeNull();
+            foundTagGroup.TagGroups.ShouldContain(tg => tg.Name == tagGroup2.Name);
+
+            var foundTagGroup2 = foundTagGroup.TagGroups.Find(tg => tg.Name == tagGroup2.Name);
+            foundTagGroup2.ShouldNotBeNull();
+            foundTagGroup2.Tags.ShouldNotBeNull();
+            foundTagGroup2.Tags.Count.ShouldBe(tagsTagGroup2.Count);
+
+            // ── Assert — DataLogger container loaded correctly under optimized path ──
+            project.DataLogger.ShouldNotBeNull("DataLogger container should be populated under optimized recursive load");
+            project.DataLogger.LogGroups.ShouldNotBeNull();
+            project.DataLogger.LogGroups.Count.ShouldBe(2);
+
+            // Validate LogGroup_TestChannel
+            var foundLogGroup1 = project.DataLogger.LogGroups.FirstOrDefault(g => g.Name == "LogGroup_TestChannel");
+            foundLogGroup1.ShouldNotBeNull("LogGroup_TestChannel should exist in loaded project");
+            foundLogGroup1.LogItems.ShouldNotBeNull();
+            foundLogGroup1.LogItems.Count.ShouldBe(logGroup1Items.Count,
+                $"LogGroup_TestChannel should have {logGroup1Items.Count} log items");
+            foreach (var tag in logGroup1Items)
+            {
+                foundLogGroup1.LogItems.ShouldContain(i => i.Name == $"LogItem_{tag.Name}",
+                    $"Log item for tag '{tag.Name}' should exist");
+            }
+            foundLogGroup1.ColumnMappings.ShouldNotBeNull();
+            foundLogGroup1.ColumnMappings.Count.ShouldBeGreaterThanOrEqualTo(1,
+                "Column mappings should be auto-generated for log items");
+            foundLogGroup1.Triggers.ShouldNotBeNull();
+
+            // Validate LogGroup_Channel2
+            var foundLogGroup2 = project.DataLogger.LogGroups.FirstOrDefault(g => g.Name == "LogGroup_Channel2");
+            foundLogGroup2.ShouldNotBeNull("LogGroup_Channel2 should exist in loaded project");
+            foundLogGroup2.LogItems.ShouldNotBeNull();
+            foundLogGroup2.LogItems.Count.ShouldBe(tags2.Count,
+                $"LogGroup_Channel2 should have {tags2.Count} log items");
+            foreach (var tag in tags2)
+            {
+                foundLogGroup2.LogItems.ShouldContain(i => i.Name == $"LogItem_{tag.Name}",
+                    $"Log item for tag '{tag.Name}' should exist");
+            }
+            foundLogGroup2.ColumnMappings.ShouldNotBeNull();
+            foundLogGroup2.ColumnMappings.Count.ShouldBeGreaterThanOrEqualTo(1);
+            foundLogGroup2.Triggers.ShouldNotBeNull();
+        }
+        finally
+        {
+            await DeleteAllLogGroupsAsync();
+            await DeleteAllChannelsAsync();
+        }
+    }
+
+    #endregion
 }
